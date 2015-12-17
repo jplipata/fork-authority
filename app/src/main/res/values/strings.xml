@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Get Device Location and Query Yelp</string>
+    <string name="action_settings">Settings</string>
+    <string name="no_location_detected">onConnected() No Location Detected</string>
+    <string name="latitude_label">Latitude:</string>
+    <string name="longitude_label">Longitude:</string>
+</resources>
