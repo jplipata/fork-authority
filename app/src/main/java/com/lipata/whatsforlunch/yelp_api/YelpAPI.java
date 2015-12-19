@@ -1,9 +1,10 @@
-package com.lipata.testlocationdatafromdevice;
+package com.lipata.whatsforlunch.yelp_api;
 
 
 import android.util.Log;
 
 import com.beust.jcommander.Parameter;
+import com.lipata.whatsforlunch.ApiKeys;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

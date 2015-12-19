@@ -1,4 +1,4 @@
-package com.lipata.testlocationdatafromdevice;
+package com.lipata.whatsforlunch.yelp_api;
 
 import org.scribe.builder.api.DefaultApi10a;
 import org.scribe.model.Token;

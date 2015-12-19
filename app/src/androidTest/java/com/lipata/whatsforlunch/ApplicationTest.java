@@ -1,4 +1,4 @@
-package com.lipata.testlocationdatafromdevice;
+package com.lipata.whatsforlunch;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

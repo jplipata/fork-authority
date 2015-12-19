@@ -1,4 +1,4 @@
-package com.lipata.testlocationdatafromdevice;
+package com.lipata.whatsforlunch;
 
 import android.location.Location;
 import android.os.AsyncTask;
@@ -17,8 +17,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
-import com.lipata.testlocationdatafromdevice.data.yelp.Business;
-import com.lipata.testlocationdatafromdevice.data.yelp.YelpResponse;
+import com.lipata.whatsforlunch.yelp_apiresponsepojo.Business;
+import com.lipata.whatsforlunch.yelp_apiresponsepojo.YelpResponse;
+import com.lipata.whatsforlunch.yelp_api.YelpAPI;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity
     final String SEARCH_TERM = "restaurants";
     static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -155,18 +156,18 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onPostExecute(String yelpResponse) {
-            super.onPostExecute(yelpResponse);
-            Log.d(LOG_TAG, yelpResponse);
-            mTextView_Other.setText(yelpResponse);
-            parseYelpResponse(yelpResponse);
+        protected void onPostExecute(String yelpResponse_Json) {
+            super.onPostExecute(yelpResponse_Json);
+            Log.d(LOG_TAG, yelpResponse_Json);
+            mTextView_Other.setText(yelpResponse_Json);
+            parseYelpResponse(yelpResponse_Json);
         }
     }
 
-    void parseYelpResponse(String yelpResponse){
+    void parseYelpResponse(String yelpResponse_Json){
         Log.d(LOG_TAG, "parseYelpResponse()");
         Gson gson = new Gson();
-        YelpResponse yelpResponsePojo = gson.fromJson(yelpResponse, YelpResponse.class);
+        YelpResponse yelpResponsePojo = gson.fromJson(yelpResponse_Json, YelpResponse.class);
         List<Business> businesses = yelpResponsePojo.getBusinesses();
         Business business = businesses.get(0);
         mTextView_Other.setText(business.getName() + "\nPhone: " + business.getPhone() + "\nWebsite: " + business.getUrl());
