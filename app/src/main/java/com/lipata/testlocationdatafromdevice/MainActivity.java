@@ -16,6 +16,11 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.gson.Gson;
+import com.lipata.testlocationdatafromdevice.data.yelp.Business;
+import com.lipata.testlocationdatafromdevice.data.yelp.YelpResponse;
+
+import java.util.List;
 
 /**
  *  Quick and dirty test project that gets device location and other related data.  This data can
@@ -35,10 +40,10 @@ public class MainActivity extends AppCompatActivity
     protected String mLatitudeLabel;
     protected String mLongitudeLabel;
 
-    protected TextView mLatitudeTextView;
-    protected TextView mLongitudeTextView;
-    protected TextView mAccuracyTextView;
-    protected TextView mOtherLocationData;
+    protected TextView mTextView_Latitude;
+    protected TextView mTextView_Longitude;
+    protected TextView mTextView_Accuracy;
+    protected TextView mTextView_Other;
 
     static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -50,10 +55,10 @@ public class MainActivity extends AppCompatActivity
 
         mLatitudeLabel = getResources().getString(R.string.latitude_label);
         mLongitudeLabel = getResources().getString(R.string.longitude_label);
-        mLatitudeTextView = (TextView) findViewById((R.id.latitude_text));
-        mLongitudeTextView = (TextView) findViewById((R.id.longitude_text));
-        mAccuracyTextView = (TextView) findViewById(R.id.accuracy_text);
-        mOtherLocationData = (TextView) findViewById((R.id.otherlocationdata_text));
+        mTextView_Latitude = (TextView) findViewById((R.id.latitude_text));
+        mTextView_Longitude = (TextView) findViewById((R.id.longitude_text));
+        mTextView_Accuracy = (TextView) findViewById(R.id.accuracy_text);
+        mTextView_Other = (TextView) findViewById((R.id.otherlocationdata_text));
 
         buildGoogleApiClient();
 
@@ -126,9 +131,9 @@ public class MainActivity extends AppCompatActivity
             double longitude = mLastLocation.getLongitude();
             float accuracy = mLastLocation.getAccuracy();
             Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
-            mLatitudeTextView.setText(Double.toString(latitude));
-            mLongitudeTextView.setText(Double.toString(longitude));
-            mAccuracyTextView.setText(Float.toString(accuracy) + " meters");
+            mTextView_Latitude.setText(Double.toString(latitude));
+            mTextView_Longitude.setText(Double.toString(longitude));
+            mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
             Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
         } else {
             Log.d(LOG_TAG, "No Location Detected");
@@ -157,10 +162,19 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(String yelpResponse) {
             super.onPostExecute(yelpResponse);
             Log.d(LOG_TAG, yelpResponse);
-            mOtherLocationData.setText(yelpResponse);
+            mTextView_Other.setText(yelpResponse);
+            parseYelpResponse(yelpResponse);
         }
     }
 
+    void parseYelpResponse(String yelpResponse){
+        Log.d(LOG_TAG, "parseYelpResponse()");
+        Gson gson = new Gson();
+        YelpResponse yelpResponsePojo = gson.fromJson(yelpResponse, YelpResponse.class);
+        List<Business> businesses = yelpResponsePojo.getBusinesses();
+        Business business = businesses.get(0);
+        mTextView_Other.setText(business.getName() + "\nPhone: " + business.getPhone() + "\n" + business.getUrl());
+    }
 
     // MainActivity template menu override methods
     @Override
