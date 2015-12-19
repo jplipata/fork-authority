@@ -23,38 +23,34 @@ import com.lipata.testlocationdatafromdevice.data.yelp.YelpResponse;
 import java.util.List;
 
 /**
- *  Quick and dirty test project that gets device location and other related data.  This data can
- *  be used to feed remote APIs, etc that provide data based on a user's location
+ *  Quick and dirty test project that gets device location, queries the Yelp API, and uses
+ *  GSON to parse and display the response.
  */
 
 public class MainActivity extends AppCompatActivity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+    // Location vars
     GoogleApiClient mGoogleApiClient;
-    final String SEARCH_TERM = "restaurants";
-
-    /**
-     * Represents a geographical location.
-     */
     protected Location mLastLocation;
-    protected String mLatitudeLabel;
-    protected String mLongitudeLabel;
 
+    // Views
     protected TextView mTextView_Latitude;
     protected TextView mTextView_Longitude;
     protected TextView mTextView_Accuracy;
     protected TextView mTextView_Other;
 
+    // Constants
+    final String SEARCH_TERM = "restaurants";
     static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mLatitudeLabel = getResources().getString(R.string.latitude_label);
-        mLongitudeLabel = getResources().getString(R.string.longitude_label);
         mTextView_Latitude = (TextView) findViewById((R.id.latitude_text));
         mTextView_Longitude = (TextView) findViewById((R.id.longitude_text));
         mTextView_Accuracy = (TextView) findViewById(R.id.accuracy_text);
@@ -173,7 +169,7 @@ public class MainActivity extends AppCompatActivity
         YelpResponse yelpResponsePojo = gson.fromJson(yelpResponse, YelpResponse.class);
         List<Business> businesses = yelpResponsePojo.getBusinesses();
         Business business = businesses.get(0);
-        mTextView_Other.setText(business.getName() + "\nPhone: " + business.getPhone() + "\n" + business.getUrl());
+        mTextView_Other.setText(business.getName() + "\nPhone: " + business.getPhone() + "\nWebsite: " + business.getUrl());
     }
 
     // MainActivity template menu override methods

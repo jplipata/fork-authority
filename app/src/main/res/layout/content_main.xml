@@ -17,7 +17,7 @@
         android:id="@+id/textview_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Location Data Available From Your Device\n" />
+        android:text="Your Location\n" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -70,7 +70,7 @@
         android:paddingTop="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Yelp Response:"/>
+        android:text="Where To Eat\n"/>
     <TextView
         android:id="@+id/otherlocationdata_text"
         android:layout_width="wrap_content"
