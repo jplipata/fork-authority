@@ -15,11 +15,15 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
+import com.lipata.whatsforlunch.yelp_api.YelpAPI;
 import com.lipata.whatsforlunch.yelp_apiresponsepojo.Business;
 import com.lipata.whatsforlunch.yelp_apiresponsepojo.YelpResponse;
-import com.lipata.whatsforlunch.yelp_api.YelpAPI;
 
 import java.util.List;
 
@@ -29,11 +33,13 @@ import java.util.List;
  */
 
 public class MainActivity extends AppCompatActivity
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 
     // Location vars
     GoogleApiClient mGoogleApiClient;
     protected Location mLastLocation;
+    private LocationRequest mLocationRequest;
+
 
     // Views
     protected TextView mTextView_Latitude;
@@ -59,16 +65,19 @@ public class MainActivity extends AppCompatActivity
 
         buildGoogleApiClient();
 
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Getting latest location data...", Toast.LENGTH_SHORT).show();
-                updateLocationData();
-                if (mLastLocation != null) {
-                    String ll = mLastLocation.getLatitude()+","+mLastLocation.getLongitude()+","+mLastLocation.getAccuracy();
-                    Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + SEARCH_TERM);
-                    new YelpAsyncTask(ll, SEARCH_TERM).execute();                }
+
+                // Button don't do jack
+
             }
         });
     }
@@ -80,9 +89,21 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
-        mGoogleApiClient.disconnect();
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+
     }
 
     /**
@@ -102,6 +123,13 @@ public class MainActivity extends AppCompatActivity
     public void onConnected(Bundle connectionHint) {
         Log.d(LOG_TAG, "onConnected()");
         updateLocationData();
+
+        if (mLastLocation == null) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        } else {
+            String ll = mLastLocation.getLatitude()+","+mLastLocation.getLongitude()+","+mLastLocation.getAccuracy();
+            Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + SEARCH_TERM);
+            new YelpAsyncTask(ll, SEARCH_TERM).execute();                }
     }
 
     @Override
@@ -122,20 +150,33 @@ public class MainActivity extends AppCompatActivity
     // Once connection with Google Play Services has been established, call this method to get location data
     private void updateLocationData(){
         Log.d(LOG_TAG, "updateLocationData()...");
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null) {
-            double latitude = mLastLocation.getLatitude();
-            double longitude = mLastLocation.getLongitude();
-            float accuracy = mLastLocation.getAccuracy();
-            Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
-            mTextView_Latitude.setText(Double.toString(latitude));
-            mTextView_Longitude.setText(Double.toString(longitude));
-            mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
-            Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
+        if (mGoogleApiClient.hasConnectedApi(LocationServices.API)) {
+
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            if (mLastLocation != null) {
+
+                // I'm breaking a rule here.  Need to split data from UI update.
+                double latitude = mLastLocation.getLatitude();
+                double longitude = mLastLocation.getLongitude();
+                float accuracy = mLastLocation.getAccuracy();
+                Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
+                mTextView_Latitude.setText(Double.toString(latitude));
+                mTextView_Longitude.setText(Double.toString(longitude));
+                mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
+                Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
+            } else {
+                Log.d(LOG_TAG, "No Location Detected");
+                Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
+            }
         } else {
-            Log.d(LOG_TAG, "No Location Detected");
-            Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
+            Log.d(LOG_TAG, "Location Services API not available");
         }
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        updateLocationData();
     }
 
     // Yelp stuff

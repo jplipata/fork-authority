@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">What\'s For Lunch?</string>
     <string name="action_settings">Settings</string>
-    <string name="no_location_detected">onConnected() No Location Detected</string>
+    <string name="no_location_detected">No Location Detected</string>
     <string name="latitude_label">Latitude:</string>
     <string name="longitude_label">Longitude:</string>
 </resources>
