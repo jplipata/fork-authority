@@ -1,5 +1,5 @@
 
-package com.lipata.whatsforlunch.yelp_apiresponsepojo;
+package com.lipata.whatsforlunch.data.yelppojo;
 
 import javax.annotation.Generated;
 

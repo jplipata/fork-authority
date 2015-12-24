@@ -1,4 +1,4 @@
-package com.lipata.whatsforlunch.yelp_api;
+package com.lipata.whatsforlunch.api.yelp;
 
 import org.scribe.builder.api.DefaultApi10a;
 import org.scribe.model.Token;

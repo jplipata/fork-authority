@@ -21,9 +21,9 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
-import com.lipata.whatsforlunch.yelp_api.YelpAPI;
-import com.lipata.whatsforlunch.yelp_apiresponsepojo.Business;
-import com.lipata.whatsforlunch.yelp_apiresponsepojo.YelpResponse;
+import com.lipata.whatsforlunch.api.yelp.YelpAPI;
+import com.lipata.whatsforlunch.data.yelppojo.Business;
+import com.lipata.whatsforlunch.data.yelppojo.YelpResponse;
 
 import java.util.List;
 
@@ -35,22 +35,20 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 
-    // Location vars
-    GoogleApiClient mGoogleApiClient;
+    // Constants
+    final String SEARCH_TERM = "restaurants";
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+
+    // Location stuff
+    protected GoogleApiClient mGoogleApiClient;
     protected Location mLastLocation;
     private LocationRequest mLocationRequest;
-
 
     // Views
     protected TextView mTextView_Latitude;
     protected TextView mTextView_Longitude;
     protected TextView mTextView_Accuracy;
     protected TextView mTextView_Other;
-
-    // Constants
-    final String SEARCH_TERM = "restaurants";
-    static final String LOG_TAG = MainActivity.class.getSimpleName();
-
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,52 +63,18 @@ public class MainActivity extends AppCompatActivity
 
         buildGoogleApiClient();
 
-        mLocationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
-                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
-
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                // Button don't do jack
+                // FAB don't do jack at the moment
 
             }
         });
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mGoogleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-            mGoogleApiClient.disconnect();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
-
-    }
-
-    /**
-     * Builds a GoogleApiClient. Uses the addApi() method to request the LocationServices API.
-     */
     protected synchronized void buildGoogleApiClient() {
-        Log.d(LOG_TAG, "buildGoogleApiClient()");
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -118,20 +82,89 @@ public class MainActivity extends AppCompatActivity
                 .build();
     }
 
-    // Override methods for Google Play Services
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(LOG_TAG, "onStart()");
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(LOG_TAG, "onPause");
+        if (mGoogleApiClient.isConnected()) {
+            stopLocationUpdates();
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    // Is this redundant? I'm already doing this in onPause().  However the API doc says to always
+    // call disconnect() in onStop()
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(LOG_TAG, "onStop()");
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        Log.d(LOG_TAG, "Location Updates Stopped");
+    }
+
+    // Callback method for Google Play Services
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.d(LOG_TAG, "onConnected()");
+
         updateLocationData();
 
+        // If getLastLocation() returned null, start a Location Request to get device location
+        // Otherwise, query yelp with location arguments
         if (mLastLocation == null) {
+
+            Log.d(LOG_TAG, "Creating LocationRequest...");
+            mLocationRequest = LocationRequest.create()
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                    .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                    .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
         } else {
             String ll = mLastLocation.getLatitude()+","+mLastLocation.getLongitude()+","+mLastLocation.getAccuracy();
             Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + SEARCH_TERM);
             new YelpAsyncTask(ll, SEARCH_TERM).execute();                }
     }
 
+    private void updateLocationData(){
+        Log.d(LOG_TAG, "updateLocationData()...");
+
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        if (mLastLocation != null) {
+            double latitude = mLastLocation.getLatitude();
+            double longitude = mLastLocation.getLongitude();
+            float accuracy = mLastLocation.getAccuracy();
+            Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
+            updateUI(latitude, longitude, accuracy);
+            stopLocationUpdates();
+        } else {
+            Log.d(LOG_TAG, "mLastLocation = null");
+        }
+    }
+
+    private void updateUI(double latitude, double longitude, float accuracy){
+        mTextView_Latitude.setText(Double.toString(latitude));
+        mTextView_Longitude.setText(Double.toString(longitude));
+        mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
+        Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
+    }
+
+    // Override method for Google Play Services
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
@@ -139,6 +172,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(LOG_TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
     }
 
+    // Override method for Google Play Services
     @Override
     public void onConnectionSuspended(int cause) {
         // The connection to Google Play services was lost for some reason. We call connect() to
@@ -147,35 +181,10 @@ public class MainActivity extends AppCompatActivity
         mGoogleApiClient.connect();
     }
 
-    // Once connection with Google Play Services has been established, call this method to get location data
-    private void updateLocationData(){
-        Log.d(LOG_TAG, "updateLocationData()...");
-        if (mGoogleApiClient.hasConnectedApi(LocationServices.API)) {
-
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            if (mLastLocation != null) {
-
-                // I'm breaking a rule here.  Need to split data from UI update.
-                double latitude = mLastLocation.getLatitude();
-                double longitude = mLastLocation.getLongitude();
-                float accuracy = mLastLocation.getAccuracy();
-                Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
-                mTextView_Latitude.setText(Double.toString(latitude));
-                mTextView_Longitude.setText(Double.toString(longitude));
-                mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
-                Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
-            } else {
-                Log.d(LOG_TAG, "No Location Detected");
-                Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
-            }
-        } else {
-            Log.d(LOG_TAG, "Location Services API not available");
-        }
-
-    }
-
+    // Callback method for LocationRequest
     @Override
     public void onLocationChanged(Location location) {
+        Log.d(LOG_TAG, "Location Changed");
         updateLocationData();
     }
 
