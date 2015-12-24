@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity
         if (mLastLocation == null) {
 
             Log.d(LOG_TAG, "Creating LocationRequest...");
+            Toast.makeText(this, "Getting location...", Toast.LENGTH_SHORT).show();
             mLocationRequest = LocationRequest.create()
                     .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                     .setInterval(10 * 1000)        // 10 seconds, in milliseconds
@@ -169,7 +170,20 @@ public class MainActivity extends AppCompatActivity
     public void onConnectionFailed(ConnectionResult result) {
         // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
         // onConnectionFailed.
-        Log.i(LOG_TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
+
+        int errorCode = result.getErrorCode();
+
+        Log.i(LOG_TAG, "Connection failed: ConnectionResult.getErrorCode() = " + errorCode);
+
+        switch (errorCode){
+            case 2:
+                Toast.makeText(MainActivity.this,
+                        "ERROR: The installed version of Google Play services is out of date.",
+                        Toast.LENGTH_LONG).show();
+                break;
+
+        }
+
     }
 
     // Override method for Google Play Services
