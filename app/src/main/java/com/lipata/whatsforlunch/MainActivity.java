@@ -3,6 +3,7 @@ package com.lipata.whatsforlunch;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -36,13 +37,16 @@ public class MainActivity extends AppCompatActivity
         implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 
     // Constants
-    final String SEARCH_TERM = "restaurants";
+    static final String SEARCH_TERM = "restaurants";
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    static final double LOCATION_LIFESPAN = 10000; // "Age" of location data in milliseconds before it becomes "stale"
+    static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
 
     // Location stuff
     protected GoogleApiClient mGoogleApiClient;
     protected Location mLastLocation;
     private LocationRequest mLocationRequest;
+    long mLocationUpdateTimestamp; // in milliseconds
 
     // Views
     protected TextView mTextView_Latitude;
@@ -61,32 +65,30 @@ public class MainActivity extends AppCompatActivity
         mTextView_Accuracy = (TextView) findViewById(R.id.accuracy_text);
         mTextView_Other = (TextView) findViewById((R.id.otherlocationdata_text));
 
+        if (savedInstanceState!=null){
+            mLocationUpdateTimestamp = savedInstanceState.getLong(LOCATION_UPDATE_TIMESTAMP_KEY);
+        }
+
         buildGoogleApiClient();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                // FAB don't do jack at the moment
-
+                Log.d(LOG_TAG, "isLocationStale() " + isLocationStale()); // testing
             }
         });
     }
 
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-
+    // Activity lifecycle
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(LOG_TAG, "onStart()");
-        mGoogleApiClient.connect();
+        boolean isLocationStale = isLocationStale();
+        Log.d(LOG_TAG, "onStart()... isLocationStale() = " + isLocationStale);
+        if(isLocationStale) {
+            mGoogleApiClient.connect(); // Calling this at onStart() as per Google API documentation
+        }
     }
 
     @Override
@@ -110,10 +112,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        Log.d(LOG_TAG, "Location Updates Stopped");
-    }
 
     // Callback method for Google Play Services
     @Override
@@ -123,49 +121,26 @@ public class MainActivity extends AppCompatActivity
         updateLocationData();
 
         // If getLastLocation() returned null, start a Location Request to get device location
-        // Otherwise, query yelp with location arguments
+        // Otherwise, query yelp with existing location arguments
         if (mLastLocation == null) {
-
             Log.d(LOG_TAG, "Creating LocationRequest...");
             Toast.makeText(this, "Getting location...", Toast.LENGTH_SHORT).show();
+
             mLocationRequest = LocationRequest.create()
-                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                    .setInterval(10 * 1000)        // 10 seconds, in milliseconds
-                    .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                        .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                        .setFastestInterval(1 * 1000); // 1 second, in milliseconds
 
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
         } else {
-            String ll = mLastLocation.getLatitude()+","+mLastLocation.getLongitude()+","+mLastLocation.getAccuracy();
+            String ll = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude() + "," + mLastLocation.getAccuracy();
             Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + SEARCH_TERM);
-            new YelpAsyncTask(ll, SEARCH_TERM).execute();                }
-    }
-
-    private void updateLocationData(){
-        Log.d(LOG_TAG, "updateLocationData()...");
-
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
-        if (mLastLocation != null) {
-            double latitude = mLastLocation.getLatitude();
-            double longitude = mLastLocation.getLongitude();
-            float accuracy = mLastLocation.getAccuracy();
-            Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
-            updateUI(latitude, longitude, accuracy);
-            stopLocationUpdates();
-        } else {
-            Log.d(LOG_TAG, "mLastLocation = null");
+            new YelpAsyncTask(ll, SEARCH_TERM).execute();
         }
     }
 
-    private void updateUI(double latitude, double longitude, float accuracy){
-        mTextView_Latitude.setText(Double.toString(latitude));
-        mTextView_Longitude.setText(Double.toString(longitude));
-        mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
-        Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
-    }
-
-    // Override method for Google Play Services
+    // Callback method for Google Play Services
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
@@ -186,7 +161,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    // Override method for Google Play Services
+    // Callback method for Google Play Services
     @Override
     public void onConnectionSuspended(int cause) {
         // The connection to Google Play services was lost for some reason. We call connect() to
@@ -228,6 +203,57 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // Helper methods
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    private boolean isLocationStale(){
+        long currentTime = SystemClock.elapsedRealtime();
+        Log.d(LOG_TAG, "currentTime = " + currentTime);
+        Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
+
+        if ((currentTime - mLocationUpdateTimestamp) > LOCATION_LIFESPAN){
+            return true;
+        } else {
+            return false;}
+    }
+
+    private void updateLocationData(){
+        Log.d(LOG_TAG, "updateLocationData()...");
+
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        mLocationUpdateTimestamp = SystemClock.elapsedRealtime();
+        Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
+
+        if (mLastLocation != null) {
+            double latitude = mLastLocation.getLatitude();
+            double longitude = mLastLocation.getLongitude();
+            float accuracy = mLastLocation.getAccuracy();
+            Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
+            updateLocationViews(latitude, longitude, accuracy);
+            stopLocationUpdates();
+        } else {
+            Log.d(LOG_TAG, "mLastLocation = null");
+        }
+    }
+
+    private void updateLocationViews(double latitude, double longitude, float accuracy){
+        mTextView_Latitude.setText(Double.toString(latitude));
+        mTextView_Longitude.setText(Double.toString(longitude));
+        mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
+        Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
+    }
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        Log.d(LOG_TAG, "Location Updates Stopped");
+    }
+
     void parseYelpResponse(String yelpResponse_Json){
         Log.d(LOG_TAG, "parseYelpResponse()");
         Gson gson = new Gson();
@@ -236,6 +262,7 @@ public class MainActivity extends AppCompatActivity
         Business business = businesses.get(0);
         mTextView_Other.setText(business.getName() + "\nPhone: " + business.getPhone() + "\nWebsite: " + business.getUrl());
     }
+
 
     // MainActivity template menu override methods
     @Override
@@ -260,5 +287,12 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    // Retain Activity state
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, mLocationUpdateTimestamp);
+        super.onSaveInstanceState(savedInstanceState);
+
+    }
 
 }

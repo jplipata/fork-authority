@@ -32,6 +32,7 @@
             android:id="@+id/latitude_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:freezesText="true"
             android:text="No data available" />
     </LinearLayout>
     <LinearLayout
@@ -47,6 +48,7 @@
             android:id="@+id/longitude_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:freezesText="true"
             android:text="No data available" />
     </LinearLayout>
     <LinearLayout
@@ -62,6 +64,7 @@
             android:id="@+id/accuracy_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:freezesText="true"
             android:text="No data available" />
     </LinearLayout>
 
@@ -75,5 +78,6 @@
         android:id="@+id/otherlocationdata_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:freezesText="true"
         android:autoLink="web"/>
 </LinearLayout>
