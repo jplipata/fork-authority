@@ -75,8 +75,6 @@ public class MainActivity extends AppCompatActivity
         mSuggestionListLayoutManager = new LinearLayoutManager(this);
         mRecyclerView_suggestionList.setLayoutManager(mSuggestionListLayoutManager);
 
-       // mTextView_Other = (TextView) findViewById((R.id.otherlocationdata_text));
-
         if (savedInstanceState!=null){
             mLocationUpdateTimestamp = savedInstanceState.getLong(LOCATION_UPDATE_TIMESTAMP_KEY);
         }
@@ -190,6 +188,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     // Yelp stuff
+    // TODO: Replace this with Retrofit
     private class YelpAsyncTask extends AsyncTask<String, Void, String> {
 
         YelpAPI yelpApi = new YelpAPI(ApiKeys.CONSUMER_KEY, ApiKeys.CONSUMER_SECRET, ApiKeys.TOKEN, ApiKeys.TOKEN_SECRET);
@@ -299,6 +298,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     // Retain Activity state
+    // TODO: Retain recyclerview state
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState){
         savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, mLocationUpdateTimestamp);
