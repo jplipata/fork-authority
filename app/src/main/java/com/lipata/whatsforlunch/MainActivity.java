@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity
         Gson gson = new Gson();
         YelpResponse yelpResponsePojo = gson.fromJson(yelpResponse_Json, YelpResponse.class);
         List<Business> businesses = yelpResponsePojo.getBusinesses();
-        mSuggestionListAdapter = new SuggestionListAdapter(businesses);
+        mSuggestionListAdapter = new SuggestionListAdapter(businesses, this);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
     }
 

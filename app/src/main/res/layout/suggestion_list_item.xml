@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-
-        <android.support.v7.widget.CardView
-            xmlns:card_view="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/card_view"
-            android:layout_gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:elevation="8dp">
+<android.support.v7.widget.CardView
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_view"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -18,25 +13,38 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/business_name"
-                    android:text="Business Name"/>
-
+                    android:text="Business Name" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="rating"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/stars_small_4_half"
+                    android:id="@+id/business_rating"/>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/business_phone"
-                    android:text="Phone Number"/>
+                    android:id="@+id/business_address"
+                    android:text="Address"/>
 
-                <TextView
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Website"
-                    android:id="@+id/business_url" />
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Phone: "/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/business_phone"
+                        android:text="Phone Number"/>
+                </LinearLayout>
+
             </LinearLayout>
 
-
         </android.support.v7.widget.CardView>
-
-</LinearLayout>

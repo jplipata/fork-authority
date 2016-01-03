@@ -1,12 +1,15 @@
 package com.lipata.whatsforlunch;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lipata.whatsforlunch.data.yelppojo.Business;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -15,26 +18,29 @@ import java.util.List;
  */
 public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAdapter.ViewHolder> {
 
-    private List<Business> businessList;
+    static public String LOG_TAG = SuggestionListAdapter.class.getSimpleName();
+    private List<Business> mBusinessList;
+    private Context mContext;
 
-    public SuggestionListAdapter(List<Business> businessList){
-        this.businessList = businessList;
+    public SuggestionListAdapter(List<Business> businessList, Context context){
+        this.mBusinessList = businessList;
+        this.mContext = context;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
         public TextView mTextView_BusinessName;
         public TextView mTextView_BusinessPhone;
-        public TextView mTextView_BusinessUrl;
+        public TextView mTextView_BusinessAddress;
+        public ImageView mImageView_BusinessRatingUrl;
 
         public ViewHolder(View v) {
             super(v);
             mTextView_BusinessName = (TextView) v.findViewById(R.id.business_name);
             mTextView_BusinessPhone = (TextView) v.findViewById(R.id.business_phone);
-            mTextView_BusinessUrl = (TextView) v.findViewById(R.id.business_url);
+            mTextView_BusinessAddress = (TextView) v.findViewById(R.id.business_address);
+            mImageView_BusinessRatingUrl = (ImageView) v.findViewById(R.id.business_rating);
         }
     }
-
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -45,15 +51,18 @@ public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAd
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Business business = businessList.get(position);
-        holder.mTextView_BusinessName.setText(business.getName());
-        holder.mTextView_BusinessPhone.setText(business.getPhone());
-        holder.mTextView_BusinessUrl.setText(business.getUrl());
-    }
+        Business business = mBusinessList.get(position);
 
+        holder.mTextView_BusinessName.setText(position + 1 + ". " + business.getName());
+        Picasso.with(mContext)
+                .load(business.getRatingImgUrlLarge())
+                .into(holder.mImageView_BusinessRatingUrl);
+        holder.mTextView_BusinessPhone.setText(business.getDisplayPhone());
+        holder.mTextView_BusinessAddress.setText(business.getLocation().getFormattedDisplayAddress());
+    }
 
     @Override
     public int getItemCount() {
-        return businessList.size();
+        return mBusinessList.size();
     }
 }

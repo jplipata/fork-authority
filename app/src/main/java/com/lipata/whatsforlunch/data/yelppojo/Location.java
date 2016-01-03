@@ -1,15 +1,21 @@
 
 package com.lipata.whatsforlunch.data.yelppojo;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
 public class Location {
 
     private String city;
+
+    @SerializedName("display_address")
     private List<String> displayAddress = new ArrayList<String>();
+
     private double geoAccuracy;
     private List<String> neighborhoods = new ArrayList<String>();
     private String postalCode;
@@ -43,6 +49,16 @@ public class Location {
      */
     public List<String> getDisplayAddress() {
         return displayAddress;
+    }
+
+    public String getFormattedDisplayAddress(){
+        String formattedDisplayAddress = "";
+
+        formattedDisplayAddress += displayAddress.get(0);
+        formattedDisplayAddress += ", ";
+        formattedDisplayAddress += displayAddress.get(2);
+
+        return formattedDisplayAddress;
     }
 
     /**

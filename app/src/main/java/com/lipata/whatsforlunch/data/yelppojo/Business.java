@@ -1,8 +1,11 @@
 
 package com.lipata.whatsforlunch.data.yelppojo;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
@@ -21,14 +24,23 @@ public class Business {
     private int menuDateUpdated;
     private String phone;
     private String snippetText;
+
+    @SerializedName("image_url")
     private String imageUrl;
+
     private Location location;
+
+    @SerializedName("display_phone")
     private String displayPhone;
+
+    @SerializedName("rating_img_url_large")
     private String ratingImgUrlLarge;
+
     private String menuProvider;
     private String id;
     private boolean isClosed;
     private double distance;
+
 
     /**
      * 
