@@ -74,10 +74,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Where To Eat\n"/>
-    <TextView
-        android:id="@+id/otherlocationdata_text"
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:freezesText="true"
-        android:autoLink="web"/>
+        android:scrollbars="vertical"
+        android:id="@+id/suggestion_list"/>
+
 </LinearLayout>

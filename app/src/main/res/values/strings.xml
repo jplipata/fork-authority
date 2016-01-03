@@ -4,6 +4,4 @@
     <string name="no_location_detected">No Location Detected</string>
     <string name="latitude_label">Latitude:</string>
     <string name="longitude_label">Longitude:</string>
-    <string name="mLocationUpdateTimestamp">mLocationUpdateTimestamp</string>
-
 </resources>

@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -52,7 +54,10 @@ public class MainActivity extends AppCompatActivity
     protected TextView mTextView_Latitude;
     protected TextView mTextView_Longitude;
     protected TextView mTextView_Accuracy;
-    protected TextView mTextView_Other;
+    //protected TextView mTextView_Other;
+    protected RecyclerView mRecyclerView_suggestionList;
+    private RecyclerView.LayoutManager mSuggestionListLayoutManager;
+    private RecyclerView.Adapter mSuggestionListAdapter;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +68,14 @@ public class MainActivity extends AppCompatActivity
         mTextView_Latitude = (TextView) findViewById((R.id.latitude_text));
         mTextView_Longitude = (TextView) findViewById((R.id.longitude_text));
         mTextView_Accuracy = (TextView) findViewById(R.id.accuracy_text);
-        mTextView_Other = (TextView) findViewById((R.id.otherlocationdata_text));
+
+        // RecyclerView
+        mRecyclerView_suggestionList = (RecyclerView) findViewById(R.id.suggestion_list);
+        mRecyclerView_suggestionList.setHasFixedSize(true);
+        mSuggestionListLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView_suggestionList.setLayoutManager(mSuggestionListLayoutManager);
+
+       // mTextView_Other = (TextView) findViewById((R.id.otherlocationdata_text));
 
         if (savedInstanceState!=null){
             mLocationUpdateTimestamp = savedInstanceState.getLong(LOCATION_UPDATE_TIMESTAMP_KEY);
@@ -198,7 +210,6 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(String yelpResponse_Json) {
             super.onPostExecute(yelpResponse_Json);
             Log.d(LOG_TAG, yelpResponse_Json);
-            mTextView_Other.setText(yelpResponse_Json);
             parseYelpResponse(yelpResponse_Json);
         }
     }
@@ -259,8 +270,8 @@ public class MainActivity extends AppCompatActivity
         Gson gson = new Gson();
         YelpResponse yelpResponsePojo = gson.fromJson(yelpResponse_Json, YelpResponse.class);
         List<Business> businesses = yelpResponsePojo.getBusinesses();
-        Business business = businesses.get(0);
-        mTextView_Other.setText(business.getName() + "\nPhone: " + business.getPhone() + "\nWebsite: " + business.getUrl());
+        mSuggestionListAdapter = new SuggestionListAdapter(businesses);
+        mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
     }
 
 
