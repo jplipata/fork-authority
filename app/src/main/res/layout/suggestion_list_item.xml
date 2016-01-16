@@ -22,7 +22,6 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="rating"
                     android:layout_gravity="center_vertical"
-                    android:src="@drawable/stars_small_4_half"
                     android:id="@+id/business_rating"/>
                 <TextView
                     android:layout_width="match_parent"
