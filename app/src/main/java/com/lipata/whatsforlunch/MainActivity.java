@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(LOG_TAG, "isLocationStale() " + isLocationStale()); // testing
+                requestLocationData();
             }
         });
     }
@@ -145,33 +145,42 @@ public class MainActivity extends AppCompatActivity
         // If getLastLocation() returned null, start a Location Request to get device location
         // Otherwise, query yelp with existing location arguments
         if (mLastLocation == null) {
-            Log.d(LOG_TAG, "Creating LocationRequest...");
-            Toast.makeText(this, "Getting location...", Toast.LENGTH_SHORT).show();
-
-            mLocationRequest = LocationRequest.create()
-                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                        .setInterval(10 * 1000)        // 10 seconds, in milliseconds
-                        .setFastestInterval(1 * 1000); // 1 second, in milliseconds
-
-            // Check for Location permission
-            boolean isPermissionMissing = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED;
-            Log.d(LOG_TAG, "isPermissionMissing = " + isPermissionMissing);
-
-            if(isPermissionMissing) {
-                // If permission is missing, we need to ask for it.  See onRequestPermissionResult() callback
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID);
-            } else {
-
-                // Else, permission has already been granted.  Proceed with requestLocationUpdates...
-                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-            }
+            requestLocationData();
         } else {
             String ll = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude() + "," + mLastLocation.getAccuracy();
             Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + SEARCH_TERM);
             new YelpAsyncTask(ll, SEARCH_TERM).execute();
+        }
+    }
+
+    void requestLocationData(){
+
+        Log.d(LOG_TAG, "Creating LocationRequest...");
+        Toast.makeText(this, "Getting location...", Toast.LENGTH_SHORT).show();
+
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+
+        // Check for Location permission
+        boolean isPermissionMissing = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED;
+        Log.d(LOG_TAG, "isPermissionMissing = " + isPermissionMissing);
+
+        if(isPermissionMissing) {
+            // If permission is missing, we need to ask for it.  See onRequestPermissionResult() callback
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID);
+        } else {
+
+            // Else, permission has already been granted.  Proceed with requestLocationUpdates...
+            if(mGoogleApiClient.isConnected()) {
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            } else {
+                mGoogleApiClient.connect();
+            }
         }
     }
 
