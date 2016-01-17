@@ -1,10 +1,16 @@
 package com.lipata.whatsforlunch;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,18 +37,19 @@ import com.lipata.whatsforlunch.data.yelppojo.YelpResponse;
 import java.util.List;
 
 /**
- *  Quick and dirty test project that gets device location, queries the Yelp API, and uses
- *  GSON to parse and display the response.
+ *  This Android app gets device location, queries the Yelp API for restaurant recommendations,
+ *  and uses GSON to parse and display the response.
  */
 
 public class MainActivity extends AppCompatActivity
         implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 
     // Constants
-    static final String SEARCH_TERM = "restaurants";
+    static final String SEARCH_TERM = "restaurants"; // This should not be user-definable at this time
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     static final double LOCATION_LIFESPAN = 10000; // "Age" of location data in milliseconds before it becomes "stale"
     static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
+    static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
     // Location stuff
     protected GoogleApiClient mGoogleApiClient;
@@ -51,10 +58,10 @@ public class MainActivity extends AppCompatActivity
     long mLocationUpdateTimestamp; // in milliseconds
 
     // Views
+    protected CoordinatorLayout mCoordinatorLayout;
     protected TextView mTextView_Latitude;
     protected TextView mTextView_Longitude;
     protected TextView mTextView_Accuracy;
-    //protected TextView mTextView_Other;
     protected RecyclerView mRecyclerView_suggestionList;
     private RecyclerView.LayoutManager mSuggestionListLayoutManager;
     private RecyclerView.Adapter mSuggestionListAdapter;
@@ -65,6 +72,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
         mTextView_Latitude = (TextView) findViewById((R.id.latitude_text));
         mTextView_Longitude = (TextView) findViewById((R.id.longitude_text));
         mTextView_Accuracy = (TextView) findViewById(R.id.accuracy_text);
@@ -79,7 +87,11 @@ public class MainActivity extends AppCompatActivity
             mLocationUpdateTimestamp = savedInstanceState.getLong(LOCATION_UPDATE_TIMESTAMP_KEY);
         }
 
-        buildGoogleApiClient();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -90,7 +102,6 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    // Activity lifecycle
     @Override
     protected void onStart() {
         super.onStart();
@@ -105,23 +116,24 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         Log.d(LOG_TAG, "onPause");
-        if (mGoogleApiClient.isConnected()) {
-            stopLocationUpdates();
-            mGoogleApiClient.disconnect();
-        }
+//        if (mGoogleApiClient.isConnected()) {
+//            stopLocationUpdates();
+//            mGoogleApiClient.disconnect();
+//        }
+
     }
 
-    // Is this redundant? I'm already doing this in onPause().  However the API doc says to always
-    // call disconnect() in onStop()
+    // Is stopping location updates and disconnecting redundant? I'm already doing this in onPause().  However the API doc says to always
+    // call disconnect() in onStop().  UPDATE -- I've decided to only stopLocationUpdates() and disconnect at onStop()
     @Override
     protected void onStop() {
         super.onStop();
         Log.d(LOG_TAG, "onStop()");
         if (mGoogleApiClient.isConnected()) {
+            stopLocationUpdates();
             mGoogleApiClient.disconnect();
         }
     }
-
 
     // Callback method for Google Play Services
     @Override
@@ -141,12 +153,48 @@ public class MainActivity extends AppCompatActivity
                         .setInterval(10 * 1000)        // 10 seconds, in milliseconds
                         .setFastestInterval(1 * 1000); // 1 second, in milliseconds
 
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            // Check for Location permission
+            boolean isPermissionMissing = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED;
+            Log.d(LOG_TAG, "isPermissionMissing = " + isPermissionMissing);
 
+            if(isPermissionMissing) {
+                // If permission is missing, we need to ask for it.  See onRequestPermissionResult() callback
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID);
+            } else {
+
+                // Else, permission has already been granted.  Proceed with requestLocationUpdates...
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            }
         } else {
             String ll = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude() + "," + mLastLocation.getAccuracy();
             Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + SEARCH_TERM);
             new YelpAsyncTask(ll, SEARCH_TERM).execute();
+        }
+    }
+
+    // Callback for Marshmallow requestPermissions() response
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    if(mGoogleApiClient.isConnected()) {
+                        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+                    } else {
+                        mGoogleApiClient.connect();
+                    }
+
+                } else {
+                    Snackbar.make(mCoordinatorLayout, "Location Permission Required", Snackbar.LENGTH_LONG);                }
+                return;
+            }
         }
     }
 
@@ -214,14 +262,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     // Helper methods
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-
     private boolean isLocationStale(){
         long currentTime = SystemClock.elapsedRealtime();
         Log.d(LOG_TAG, "currentTime = " + currentTime);
@@ -272,7 +312,6 @@ public class MainActivity extends AppCompatActivity
         mSuggestionListAdapter = new SuggestionListAdapter(businesses, this);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
     }
-
 
     // MainActivity template menu override methods
     @Override
