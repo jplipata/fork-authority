@@ -34,6 +34,8 @@ public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAd
         public TextView mTextView_BusinessCategories;
         public TextView mTextView_BusinessAddress;
         public ImageView mImageView_BusinessRatingUrl;
+        public TextView mTextView_BusinessReviewCount;
+
 
         public ViewHolder(View v) {
             super(v);
@@ -42,6 +44,8 @@ public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAd
             mTextView_BusinessCategories = (TextView) v.findViewById(R.id.business_categories);
             mTextView_BusinessAddress = (TextView) v.findViewById(R.id.business_address);
             mImageView_BusinessRatingUrl = (ImageView) v.findViewById(R.id.business_rating);
+            mTextView_BusinessReviewCount = (TextView) v.findViewById(R.id.business_review_count);
+
         }
     }
 
@@ -54,15 +58,26 @@ public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAd
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+
+        // Get business at `position` index. This object's fields will be used to populate UI views
         Business business = mBusinessList.get(position);
 
+        // Business image
         Picasso.with(mContext)
                 .load(business.getImageUrl()).fit()
                 .into(holder.mImageView_BusinessImage);
+
+        // Business name
         holder.mTextView_BusinessName.setText(position + 1 + ". " + business.getName());
+
+        // Business rating image
         Picasso.with(mContext)
                 .load(business.getRatingImgUrlLarge()).resize(440,60).centerInside()
                 .into(holder.mImageView_BusinessRatingUrl);
+
+        // Business review count
+        holder.mTextView_BusinessReviewCount.setText(business.getReviewCount() + " Reviews");
+
         //List<T> categoryList = business.getCategories();
 
         //holder.mTextView_BusinessCategories.setText(formattedCategories);

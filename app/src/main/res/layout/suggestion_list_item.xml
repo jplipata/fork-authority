@@ -31,11 +31,24 @@
                     android:textSize="16sp"
                     android:text="Business Name"
                     android:textStyle="bold" />
-                <ImageView
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="rating"
-                    android:id="@+id/business_rating"/>
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="rating"
+                        android:id="@+id/business_rating"/>
+                    <TextView
+                        android:paddingLeft="16dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/business_review_count"
+                        android:text="x Reviews"/>
+                </LinearLayout>
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

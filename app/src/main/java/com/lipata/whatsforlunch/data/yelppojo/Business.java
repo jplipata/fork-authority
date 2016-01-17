@@ -15,7 +15,10 @@ public class Business {
     private double rating;
     private String mobileUrl;
     private String ratingImgUrl;
+
+    @SerializedName("review_count")
     private int reviewCount;
+
     private String name;
     private String snippetImageUrl;
     private String ratingImgUrlSmall;
