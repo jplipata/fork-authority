@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -78,9 +79,18 @@ public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAd
         // Business review count
         holder.mTextView_BusinessReviewCount.setText(business.getReviewCount() + " Reviews");
 
-        //List<T> categoryList = business.getCategories();
+        StringBuilder stringBuilder = new StringBuilder();
+        List<List<String>> categoryList = business.getCategories();
+        for(int i=0; i<categoryList.size(); i++){
+            String category = categoryList.get(i).get(0);
+            stringBuilder.append(category);
+            if(i<(categoryList.size()-1)){
+                stringBuilder.append(", ");
+            }
+        }
+        String formattedCategories = stringBuilder.toString();
 
-        //holder.mTextView_BusinessCategories.setText(formattedCategories);
+        holder.mTextView_BusinessCategories.setText(formattedCategories);
 
         holder.mTextView_BusinessAddress.setText(business.getLocation().getFormattedDisplayAddress());
     }

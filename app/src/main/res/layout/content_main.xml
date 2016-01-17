@@ -68,7 +68,6 @@
             android:freezesText="true"
             android:text="No data" />
 
-
     </LinearLayout>
 
     <TextView

@@ -56,7 +56,7 @@ public class Location {
 
         formattedDisplayAddress += displayAddress.get(0);
         formattedDisplayAddress += ", ";
-        formattedDisplayAddress += displayAddress.get(2);
+        formattedDisplayAddress += displayAddress.get(1);
 
         return formattedDisplayAddress;
     }
