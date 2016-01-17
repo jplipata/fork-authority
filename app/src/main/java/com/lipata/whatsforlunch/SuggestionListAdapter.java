@@ -72,7 +72,7 @@ public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAd
 
         // Business rating image
         Picasso.with(mContext)
-                .load(business.getRatingImgUrlLarge()).resize(440,60).centerInside()
+                .load(business.getRatingImgUrlLarge()).fit()
                 .into(holder.mImageView_BusinessRatingUrl);
 
         // Business review count

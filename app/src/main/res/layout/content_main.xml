@@ -16,19 +16,19 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:text="LATITUDE"
             android:layout_weight="1"/>
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="LONGITUDE"
             android:textAlignment="center"
             android:layout_weight="1"/>
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:layout_weight="1"
@@ -43,7 +43,7 @@
 
         <TextView
             android:id="@+id/latitude_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:layout_weight="1"
@@ -52,7 +52,7 @@
 
         <TextView
             android:id="@+id/longitude_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:layout_weight="1"
@@ -61,7 +61,7 @@
 
         <TextView
             android:id="@+id/accuracy_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:layout_weight="1"
