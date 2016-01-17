@@ -29,14 +29,14 @@ public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAd
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView mTextView_BusinessName;
-        public TextView mTextView_BusinessPhone;
+        public TextView mTextView_BusinessCategories;
         public TextView mTextView_BusinessAddress;
         public ImageView mImageView_BusinessRatingUrl;
 
         public ViewHolder(View v) {
             super(v);
             mTextView_BusinessName = (TextView) v.findViewById(R.id.business_name);
-            mTextView_BusinessPhone = (TextView) v.findViewById(R.id.business_phone);
+            mTextView_BusinessCategories = (TextView) v.findViewById(R.id.business_categories);
             mTextView_BusinessAddress = (TextView) v.findViewById(R.id.business_address);
             mImageView_BusinessRatingUrl = (ImageView) v.findViewById(R.id.business_rating);
         }
@@ -55,9 +55,11 @@ public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAd
 
         holder.mTextView_BusinessName.setText(position + 1 + ". " + business.getName());
         Picasso.with(mContext)
-                .load(business.getRatingImgUrlLarge())
+                .load(business.getRatingImgUrlLarge()).resize(440,60).centerInside()
                 .into(holder.mImageView_BusinessRatingUrl);
-        holder.mTextView_BusinessPhone.setText(business.getDisplayPhone());
+        List<T> categoryList = business.getCategories();
+        
+        holder.mTextView_BusinessCategories.setText(formattedCategories);
         holder.mTextView_BusinessAddress.setText(business.getLocation().getFormattedDisplayAddress());
     }
 
