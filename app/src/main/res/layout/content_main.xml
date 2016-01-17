@@ -78,6 +78,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
+        android:background="@color/material_gray_100"
         android:id="@+id/suggestion_list"/>
 
 </LinearLayout>

@@ -28,6 +28,8 @@ public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAd
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+
+        public ImageView mImageView_BusinessImage;
         public TextView mTextView_BusinessName;
         public TextView mTextView_BusinessCategories;
         public TextView mTextView_BusinessAddress;
@@ -35,6 +37,7 @@ public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAd
 
         public ViewHolder(View v) {
             super(v);
+            mImageView_BusinessImage = (ImageView) v.findViewById(R.id.business_image);
             mTextView_BusinessName = (TextView) v.findViewById(R.id.business_name);
             mTextView_BusinessCategories = (TextView) v.findViewById(R.id.business_categories);
             mTextView_BusinessAddress = (TextView) v.findViewById(R.id.business_address);
@@ -53,13 +56,17 @@ public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAd
     public void onBindViewHolder(ViewHolder holder, int position) {
         Business business = mBusinessList.get(position);
 
+        Picasso.with(mContext)
+                .load(business.getImageUrl()).fit()
+                .into(holder.mImageView_BusinessImage);
         holder.mTextView_BusinessName.setText(position + 1 + ". " + business.getName());
         Picasso.with(mContext)
                 .load(business.getRatingImgUrlLarge()).resize(440,60).centerInside()
                 .into(holder.mImageView_BusinessRatingUrl);
-        List<T> categoryList = business.getCategories();
-        
-        holder.mTextView_BusinessCategories.setText(formattedCategories);
+        //List<T> categoryList = business.getCategories();
+
+        //holder.mTextView_BusinessCategories.setText(formattedCategories);
+
         holder.mTextView_BusinessAddress.setText(business.getLocation().getFormattedDisplayAddress());
     }
 

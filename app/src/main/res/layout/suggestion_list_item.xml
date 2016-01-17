@@ -5,7 +5,19 @@
     android:id="@+id/card_view"
     android:layout_gravity="center"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingBottom="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:paddingRight="8dp"
+            android:id="@+id/business_image"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -16,8 +28,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/business_name"
-                    style="@style/TextAppearance.AppCompat.Body2"
-                    android:text="Business Name" />
+                    android:textSize="16sp"
+                    android:text="Business Name"
+                    android:textStyle="bold" />
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -41,12 +54,10 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/button_gotoyelp"
-
-                        />
+                        android:id="@+id/button_gotoyelp" />
 
                 </LinearLayout>
 
             </LinearLayout>
-
+    </LinearLayout>
         </android.support.v7.widget.CardView>
