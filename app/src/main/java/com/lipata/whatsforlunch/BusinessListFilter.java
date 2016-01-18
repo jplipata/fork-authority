@@ -16,7 +16,7 @@ public class BusinessListFilter {
         this.mBusinessList_Source = businessList_Source;
     }
 
-    List<Business> getFilteredList(){
+    List<Business> filter(){
         // Iterate through list, adjust order according to user preferences
         mBusinessList_Filtered.addAll(mBusinessList_Source);
         for(int i=0; i<mBusinessList_Source.size(); i++){

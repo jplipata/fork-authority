@@ -79,7 +79,7 @@ public class YelpAPI {
     request.addQuerystringParameter("term", term);
       Log.d("YelpAPI", "Location = " +location);
     request.addQuerystringParameter("ll", location); //latitude,longitude
-    request.addQuerystringParameter("limit", String.valueOf(SEARCH_LIMIT));
+    //request.addQuerystringParameter("limit", String.valueOf(SEARCH_LIMIT));
     return sendRequestAndGetResponse(request);
   }
 

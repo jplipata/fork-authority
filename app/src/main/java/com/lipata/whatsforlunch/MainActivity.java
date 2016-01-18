@@ -185,20 +185,29 @@ public class MainActivity extends AppCompatActivity
     public void onConnectionFailed(ConnectionResult result) {
         // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
         // onConnectionFailed.
+        // https://developers.google.com/android/reference/com/google/android/gms/common/ConnectionResult
 
         int errorCode = result.getErrorCode();
 
-        Log.i(LOG_TAG, "Connection failed: ConnectionResult.getErrorCode() = " + errorCode);
+        Log.i(LOG_TAG, "GoogleApiClient Connection failed: ConnectionResult.getErrorCode() = " + errorCode);
 
         switch (errorCode){
-            case 2:
-                Toast.makeText(MainActivity.this,
-                        "ERROR: The installed version of Google Play services is out of date.",
-                        Toast.LENGTH_LONG).show();
+            case 1:
+                Snackbar.make(mCoordinatorLayout,
+                        "ERROR: Google Play services is missing on this device",
+                        Snackbar.LENGTH_INDEFINITE).show();
                 break;
-
+            case 2:
+                Snackbar.make(mCoordinatorLayout,
+                        "ERROR: The installed version of Google Play services is out of date.",
+                        Snackbar.LENGTH_INDEFINITE).show();
+                break;
+            default:
+                Snackbar.make(mCoordinatorLayout,
+                        "ERROR: Google API Client, error code: " + errorCode,
+                        Snackbar.LENGTH_INDEFINITE).show();
+                break;
         }
-
     }
 
     // Callback method for Google Play Services
@@ -325,7 +334,7 @@ public class MainActivity extends AppCompatActivity
 
         // Need to manipulate `businesses` to apply customization
         BusinessListFilter businessListFilter = new BusinessListFilter(businesses);
-        List<Business> filteredBusinesses = businessListFilter.getFilteredList();
+        List<Business> filteredBusinesses = businessListFilter.filter();
 
         mSuggestionListAdapter = new SuggestionListAdapter(filteredBusinesses, this);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
