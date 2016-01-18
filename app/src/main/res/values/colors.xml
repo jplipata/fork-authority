@@ -4,5 +4,8 @@
     <color name="colorPrimaryDark">#bd1304</color>
     <color name="colorAccent">#ce1505</color>
     <color name="material_gray_100">#F5F5F5</color>
+    <color name="material_text_gray">#757575</color>
+
+
 
 </resources>

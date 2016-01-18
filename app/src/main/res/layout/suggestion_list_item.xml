@@ -6,11 +6,14 @@
     android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="8dp">
+    android:layout_margin="2dp"
+    card_view:cardUseCompatPadding="true">
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/cardview_layout_LR_padding"
+    android:paddingRight="@dimen/cardview_layout_LR_padding">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -69,11 +72,54 @@
 
             </LinearLayout>
     </LinearLayout>
-    <Button
+
+    <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="8dp">
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:id="@+id/button_justatehere"
-        android:text="J U S T   A T E   H E R E "/>
+        android:id="@+id/button_like"
+        android:foreground="?android:attr/selectableItemBackground"
+        style="?android:attr/borderlessButtonStyle"
+        android:text="LIKE"
+        android:background="@color/cardview_light_background"
+        android:textSize="@dimen/cardview_buttons"
+        android:textColor="@color/material_text_gray"
+        android:drawableTop="@drawable/ic_thumb_up_black_24px"/>
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_toosoon"
+        android:foreground="?android:attr/selectableItemBackground"
+        style="?android:attr/borderlessButtonStyle"
+        android:text="TOO SOON"
+        android:background="@color/cardview_light_background"
+        android:textSize="@dimen/cardview_buttons"
+        android:textColor="@color/material_text_gray"
+        android:drawableTop="@drawable/ic_schedule_black_24px"/>
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_dontlike"
+        android:foreground="?android:attr/selectableItemBackground"
+        style="?android:attr/borderlessButtonStyle"
+        android:text="DON'T LIKE"
+        android:background="@color/cardview_light_background"
+        android:textSize="@dimen/cardview_buttons"
+        android:textColor="@color/material_text_gray"
+        android:drawableTop="@drawable/ic_thumb_down_black_24px"/>
+
+    </LinearLayout>
 <!--
     <LinearLayout
         android:layout_width="match_parent"
