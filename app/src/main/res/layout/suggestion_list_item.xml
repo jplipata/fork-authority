@@ -89,9 +89,9 @@
         style="?android:attr/borderlessButtonStyle"
         android:text="LIKE"
         android:background="@color/cardview_light_background"
-        android:textSize="@dimen/cardview_buttons"
+        android:textSize="@dimen/cardview_buttons_text"
         android:textColor="@color/material_text_gray"
-        android:drawableTop="@drawable/ic_thumb_up_black_24px"/>
+        android:drawableTop="@drawable/thumb_up_outline"/>
 
     <Button
         android:layout_width="0dp"
@@ -100,9 +100,9 @@
         android:id="@+id/button_toosoon"
         android:foreground="?android:attr/selectableItemBackground"
         style="?android:attr/borderlessButtonStyle"
-        android:text="TOO SOON"
+        android:text="JUST ATE HERE"
         android:background="@color/cardview_light_background"
-        android:textSize="@dimen/cardview_buttons"
+        android:textSize="@dimen/cardview_buttons_text"
         android:textColor="@color/material_text_gray"
         android:drawableTop="@drawable/ic_schedule_black_24px"/>
 
@@ -115,9 +115,9 @@
         style="?android:attr/borderlessButtonStyle"
         android:text="DON'T LIKE"
         android:background="@color/cardview_light_background"
-        android:textSize="@dimen/cardview_buttons"
+        android:textSize="@dimen/cardview_buttons_text"
         android:textColor="@color/material_text_gray"
-        android:drawableTop="@drawable/ic_thumb_down_black_24px"/>
+        android:drawableTop="@drawable/thumb_down_outline"/>
 
     </LinearLayout>
 

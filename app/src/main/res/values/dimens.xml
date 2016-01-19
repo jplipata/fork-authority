@@ -6,5 +6,5 @@
 
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="cardview_layout_LR_padding">4dp</dimen>
-    <dimen name="cardview_buttons">11sp</dimen>
+    <dimen name="cardview_buttons_text">10sp</dimen>
 </resources>

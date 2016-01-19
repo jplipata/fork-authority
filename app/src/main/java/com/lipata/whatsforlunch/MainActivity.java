@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity
 
         // If getLastLocation() returned null, start a Location Request to get device location
         // Else, query yelp with existing location arguments
-        if (mLastLocation == null) {
+        if (mLastLocation == null || isLocationStale()) {
             requestLocationData();
         } else {
             String ll = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude() + "," + mLastLocation.getAccuracy();
@@ -332,7 +332,7 @@ public class MainActivity extends AppCompatActivity
         YelpResponse yelpResponsePojo = gson.fromJson(yelpResponse_Json, YelpResponse.class);
         List<Business> businesses = yelpResponsePojo.getBusinesses();
 
-        // Need to manipulate `businesses` to apply customization
+        // Manipulate `businesses` to apply customization
         BusinessListFilter businessListFilter = new BusinessListFilter(businesses);
         List<Business> filteredBusinesses = businessListFilter.filter();
 
