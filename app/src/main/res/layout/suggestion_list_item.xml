@@ -120,7 +120,21 @@
         android:drawableTop="@drawable/ic_thumb_down_black_24px"/>
 
     </LinearLayout>
-<!--
+
+    <!-- 1/18/16 We could provide a summary of net likes to the user.
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/net_likes"
+            android:layout_gravity="center"
+            android:paddingTop="4dp"
+            android:textStyle="italic"
+            android:text="+2 likes"/>
+
+            -->
+
+    <!-- 1/17/16 Possible action buttons.  Open in Yelp. Reserve. Eat24. Map. Call.
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

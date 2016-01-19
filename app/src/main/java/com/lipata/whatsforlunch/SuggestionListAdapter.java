@@ -129,7 +129,6 @@ public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAd
             }
         });
 
-
     }
 
     @Override
