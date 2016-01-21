@@ -107,7 +107,12 @@
             />
         </LinearLayout>
     </FrameLayout>
-    <android.support.v7.widget.RecyclerView
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/activity_horizontal_margin_thin"
@@ -115,5 +120,6 @@
         android:scrollbars="vertical"
         android:background="@color/material_gray_100"
         android:id="@+id/suggestion_list"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>
