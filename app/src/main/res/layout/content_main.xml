@@ -71,14 +71,42 @@
     </LinearLayout>
 
     <TextView
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="1dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/material_gray_100"
         android:gravity="center_horizontal"
         style="@style/TextAppearance.AppCompat.Medium"
         android:text="F O O D   O P T I O N S"/>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@color/material_gray_100"
+        android:paddingBottom="1dp">
+
+        <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/material_gray_100"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="powered by"
+            android:textSize="11sp"
+            android:textStyle="italic"
+            android:layout_gravity="center_vertical"/>
+        <ImageView
+            android:src="@drawable/yelp_logo_xsmall_2"
+            android:layout_gravity="center_vertical"
+            android:layout_width="40dp"
+            android:layout_height="20dp"
+            />
+        </LinearLayout>
+    </FrameLayout>
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
