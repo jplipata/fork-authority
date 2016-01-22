@@ -3,11 +3,9 @@ package com.lipata.whatsforlunch;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -19,7 +17,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +28,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
-import com.lipata.whatsforlunch.api.yelp.YelpAPI;
+import com.lipata.whatsforlunch.api.yelp.AsyncYelpCall;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 import com.lipata.whatsforlunch.data.yelppojo.YelpResponse;
 
@@ -93,7 +90,7 @@ public class MainActivity extends AppCompatActivity
             public void onRefresh() {
                 Log.d(LOG_TAG, "Pulldown refresh.  onRefresh()");
                 if(isLocationStale()) {
-                    requestLocationData();
+                    executeSequence();
                 } else {
                     Toast.makeText(MainActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
                 }
@@ -149,9 +146,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.d(LOG_TAG, "onConnected()");
+        executeSequence();
+    }
 
+    void executeSequence(){
         getLocation();
-
         // If getLastLocation() returned null, start a Location Request to get device location
         // Else, query yelp with existing location arguments
         if (mLastLocation == null || isLocationStale()) {
@@ -159,7 +158,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             String ll = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude() + "," + mLastLocation.getAccuracy();
             Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + SEARCH_TERM);
-            new YelpAsyncTask(ll, SEARCH_TERM).execute();
+            new AsyncYelpCall(ll, SEARCH_TERM, this).execute();
         }
     }
 
@@ -230,32 +229,6 @@ public class MainActivity extends AppCompatActivity
     public void onLocationChanged(Location location) {
         Log.d(LOG_TAG, "Location Changed");
         getLocation();
-    }
-
-    // Yelp stuff
-    // TODO: Replace this with Retrofit
-    private class YelpAsyncTask extends AsyncTask<String, Void, String> {
-
-        YelpAPI yelpApi = new YelpAPI(ApiKeys.CONSUMER_KEY, ApiKeys.CONSUMER_SECRET, ApiKeys.TOKEN, ApiKeys.TOKEN_SECRET);
-        String userLocation;
-        String userSearch;
-
-        public YelpAsyncTask(String userLocation, String userSearch) {
-            this.userLocation = userLocation;
-            this.userSearch = userSearch;
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            return yelpApi.searchForBusinessesByLocation(userSearch, userLocation);
-        }
-
-        @Override
-        protected void onPostExecute(String yelpResponse_Json) {
-            super.onPostExecute(yelpResponse_Json);
-            Log.d(LOG_TAG, yelpResponse_Json);
-            parseYelpResponse(yelpResponse_Json);
-        }
     }
 
     // Helper methods
@@ -332,7 +305,8 @@ public class MainActivity extends AppCompatActivity
         Log.d(LOG_TAG, "Location Updates Stopped");
     }
 
-    void parseYelpResponse(String yelpResponse_Json){
+    // I made this `public` in order for it to be called from api.yelp.AsyncYelpCall.class  Is there a better way?
+    public void parseYelpResponse(String yelpResponse_Json){
         Log.d(LOG_TAG, "parseYelpResponse()");
         Gson gson = new Gson();
         YelpResponse yelpResponsePojo = gson.fromJson(yelpResponse_Json, YelpResponse.class);
