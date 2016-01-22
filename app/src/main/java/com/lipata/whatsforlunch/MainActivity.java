@@ -316,7 +316,7 @@ public class MainActivity extends AppCompatActivity
         BusinessListFilter businessListFilter = new BusinessListFilter(businesses);
         List<Business> filteredBusinesses = businessListFilter.filter();
 
-        mSuggestionListAdapter = new SuggestionListAdapter(filteredBusinesses, this, mCoordinatorLayout);
+        mSuggestionListAdapter = new BusinessListAdapter(filteredBusinesses, this, mCoordinatorLayout);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
     }
 

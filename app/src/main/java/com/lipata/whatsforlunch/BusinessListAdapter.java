@@ -19,14 +19,14 @@ import java.util.List;
 /**
  * Created by jlipata on 1/1/16.
  */
-public class SuggestionListAdapter extends RecyclerView.Adapter<SuggestionListAdapter.ViewHolder> {
+public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapter.ViewHolder> {
 
-    static public String LOG_TAG = SuggestionListAdapter.class.getSimpleName();
+    static public String LOG_TAG = BusinessListAdapter.class.getSimpleName();
     private List<Business> mBusinessList;
     private Context mContext;
     private CoordinatorLayout mCoordinatorLayout;
 
-    public SuggestionListAdapter(List<Business> businessList, Context context, CoordinatorLayout coordinatorLayout){
+    public BusinessListAdapter(List<Business> businessList, Context context, CoordinatorLayout coordinatorLayout){
         this.mBusinessList = businessList;
         this.mContext = context;
         this.mCoordinatorLayout = coordinatorLayout;

@@ -8,19 +8,21 @@ import com.lipata.whatsforlunch.MainActivity;
 
 /**
  * Created by jlipatap on 1/21/16.
+ * TODO Replace this AsyncTask with Retrofit
  */
+
 public class AsyncYelpCall extends AsyncTask<String, Void, String> {
 
     private static final String LOG_TAG = AsyncYelpCall.class.getSimpleName();
     YelpAPI yelpApi = new YelpAPI(ApiKeys.CONSUMER_KEY, ApiKeys.CONSUMER_SECRET, ApiKeys.TOKEN, ApiKeys.TOKEN_SECRET);
     String userLocation;
     String userSearch;
-    MainActivity mMainAcitivity;
+    MainActivity mMainActivity;
 
     public AsyncYelpCall(String userLocation, String userSearch, MainActivity mainActivity) {
         this.userLocation = userLocation;
         this.userSearch = userSearch;
-        this.mMainAcitivity = mainActivity;
+        this.mMainActivity = mainActivity;
     }
 
     @Override
@@ -32,6 +34,6 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String yelpResponse_Json) {
         super.onPostExecute(yelpResponse_Json);
         Log.d(LOG_TAG, yelpResponse_Json);
-        mMainAcitivity.parseYelpResponse(yelpResponse_Json);
+        mMainActivity.parseYelpResponse(yelpResponse_Json);
     }
 }
