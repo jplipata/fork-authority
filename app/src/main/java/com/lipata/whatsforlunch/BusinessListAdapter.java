@@ -128,6 +128,12 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                 */
 
                 mUserRecordList.updateTooSoon(business, System.currentTimeMillis());
+                mUserRecordList.commit();
+
+                // This doesn't need to happen here
+//                BusinessListFilter businessListFilter = new BusinessListFilter(mBusinessList, mContext);
+//                businessListFilter.filter();
+
 
                 Snackbar.make(mCoordinatorLayout,
                         "Noted. You just ate at " + business.getName() + ". I won't suggest this again for a couple days.",

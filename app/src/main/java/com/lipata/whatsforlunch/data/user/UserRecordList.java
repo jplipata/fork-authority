@@ -1,7 +1,11 @@
 package com.lipata.whatsforlunch.data.user;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.lipata.whatsforlunch.R;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 
 import java.util.ArrayList;
@@ -12,7 +16,13 @@ import java.util.List;
  */
 public class UserRecordList {
     private static String LOG_TAG = UserRecordList.class.getSimpleName();
-    List<BusinessItemRecord> mList = new ArrayList<BusinessItemRecord>();
+    List<BusinessItemRecord> mList;
+    Context mContext;
+
+    public UserRecordList(Context context) {
+        mList = new ArrayList<BusinessItemRecord>();
+        this.mContext=context;
+    }
 
     public void addRecord(BusinessItemRecord businessItemRecord){
         mList.add(businessItemRecord);
@@ -61,5 +71,26 @@ public class UserRecordList {
             }
         }
         return result;
+    }
+
+    public void commit(){
+        // Convert UserRecordList to JSON
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(mList);
+
+        // Check
+        Log.d(LOG_TAG, jsonString);
+
+        // Store data
+        Log.d(LOG_TAG, "Writing to SharedPreferences...");
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(mContext.getString(R.string.SharedPrefsFile),
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(mContext.getString(R.string.UserRecordList), jsonString);
+        editor.commit();
+
+        // Check
+        String check = sharedPreferences.getString(mContext.getString(R.string.UserRecordList), null);
+        Log.d(LOG_TAG, "Checking SharedPrefs... "+check);
     }
 }

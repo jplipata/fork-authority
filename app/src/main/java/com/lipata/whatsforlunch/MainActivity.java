@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         // todo: Check for existing UserRecordList.  If exists, load.  Else, create new.
-        mUserRecordList = new UserRecordList();
+        mUserRecordList = new UserRecordList(this);
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
         mTextView_Latitude = (TextView) findViewById((R.id.latitude_text));
@@ -310,6 +310,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     // Public methods
+
     // I made this `public` in order for it to be called from api.yelp.AsyncYelpCall.class  Is there a better way?
     public void parseYelpResponse(String yelpResponse_Json){
         Log.d(LOG_TAG, "parseYelpResponse()");
@@ -318,7 +319,7 @@ public class MainActivity extends AppCompatActivity
         List<Business> businesses = yelpResponsePojo.getBusinesses();
 
         // Manipulate `businesses` to apply customization
-        BusinessListFilter businessListFilter = new BusinessListFilter(businesses);
+        BusinessListFilter businessListFilter = new BusinessListFilter(businesses, this);
         List<Business> filteredBusinesses = businessListFilter.filter();
 
         mSuggestionListAdapter = new BusinessListAdapter(filteredBusinesses, this, mCoordinatorLayout, mUserRecordList);
