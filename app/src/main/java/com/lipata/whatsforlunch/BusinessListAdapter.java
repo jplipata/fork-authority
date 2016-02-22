@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.lipata.whatsforlunch.data.user.UserRecordList;
+import com.lipata.whatsforlunch.data.user.UserRecords;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 import com.squareup.picasso.Picasso;
 
@@ -27,13 +27,13 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     private List<Business> mBusinessList;
     private Context mContext;
     private CoordinatorLayout mCoordinatorLayout;
-    UserRecordList mUserRecordList;
+    UserRecords mUserRecords;
 
-    public BusinessListAdapter(List<Business> businessList, Context context, CoordinatorLayout coordinatorLayout, UserRecordList userRecordList){
+    public BusinessListAdapter(List<Business> businessList, Context context, CoordinatorLayout coordinatorLayout, UserRecords userRecords){
         this.mBusinessList = businessList;
         this.mContext = context;
         this.mCoordinatorLayout = coordinatorLayout;
-        this.mUserRecordList = userRecordList;
+        this.mUserRecords = userRecords;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -121,19 +121,12 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 Log.d(LOG_TAG, "Too Soon Clicked");
 
-                /*  Test code to move the item in RecyclerView
-                *   int numberOfItems = getItemCount();
-                *   Log.d(LOG_TAG, "Too Soon Clicked: numberOfItems = "+numberOfItems+" position = "+position);
-                *   notifyItemMoved(position, numberOfItems-1);
-                */
+                mUserRecords.updateTooSoon(business, System.currentTimeMillis());
+                mUserRecords.commit();
+                
+                //notifyItemMoved(position, (position+BusinessListFilter.TOOSOON_PENALTY));
 
-                mUserRecordList.updateTooSoon(business, System.currentTimeMillis());
-                mUserRecordList.commit();
-
-                // This doesn't need to happen here
-//                BusinessListFilter businessListFilter = new BusinessListFilter(mBusinessList, mContext);
-//                businessListFilter.filter();
-
+                // Need to update UI
 
                 Snackbar.make(mCoordinatorLayout,
                         "Noted. You just ate at " + business.getName() + ". I won't suggest this again for a couple days.",

@@ -29,7 +29,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.lipata.whatsforlunch.api.yelp.AsyncYelpCall;
-import com.lipata.whatsforlunch.data.user.UserRecordList;
+import com.lipata.whatsforlunch.data.user.UserRecords;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 import com.lipata.whatsforlunch.data.yelppojo.YelpResponse;
 
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView.Adapter mSuggestionListAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    UserRecordList mUserRecordList;
+    UserRecords mUserRecords;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,8 +74,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // todo: Check for existing UserRecordList.  If exists, load.  Else, create new.
-        mUserRecordList = new UserRecordList(this);
+        mUserRecords = new UserRecords(this);
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
         mTextView_Latitude = (TextView) findViewById((R.id.latitude_text));
@@ -319,10 +318,10 @@ public class MainActivity extends AppCompatActivity
         List<Business> businesses = yelpResponsePojo.getBusinesses();
 
         // Manipulate `businesses` to apply customization
-        BusinessListFilter businessListFilter = new BusinessListFilter(businesses, this);
+        BusinessListFilter businessListFilter = new BusinessListFilter(businesses, this, mUserRecords);
         List<Business> filteredBusinesses = businessListFilter.filter();
 
-        mSuggestionListAdapter = new BusinessListAdapter(filteredBusinesses, this, mCoordinatorLayout, mUserRecordList);
+        mSuggestionListAdapter = new BusinessListAdapter(filteredBusinesses, this, mCoordinatorLayout, mUserRecords);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
     }
 

@@ -5,23 +5,44 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.lipata.whatsforlunch.R;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by jlipata on 2/22/16.
  */
-public class UserRecordList {
-    private static String LOG_TAG = UserRecordList.class.getSimpleName();
+public class UserRecords {
+    private static String LOG_TAG = UserRecords.class.getSimpleName();
     List<BusinessItemRecord> mList;
     Context mContext;
 
-    public UserRecordList(Context context) {
-        mList = new ArrayList<BusinessItemRecord>();
+    public UserRecords(Context context) {
         this.mContext=context;
+
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(mContext.getString(R.string.SharedPrefsFile),
+                Context.MODE_PRIVATE);
+
+        // If there's an existing list of records, load it
+        if (sharedPreferences.contains(mContext.getString(R.string.UserRecordList))){
+            Gson gson = new Gson();
+            Type collectionType = new TypeToken<ArrayList<BusinessItemRecord>>(){}.getType();
+            ArrayList<BusinessItemRecord> userRecordList = gson.fromJson(sharedPreferences
+                    .getString(mContext.getString(R.string.UserRecordList), null), collectionType );
+            mList=userRecordList;
+        }
+        // If there's no existing UserRecords
+        else {
+            mList = new ArrayList<BusinessItemRecord>();
+        }
+    }
+
+    public List<BusinessItemRecord> getList(){
+        return mList;
     }
 
     public void addRecord(BusinessItemRecord businessItemRecord){
@@ -74,7 +95,7 @@ public class UserRecordList {
     }
 
     public void commit(){
-        // Convert UserRecordList to JSON
+        // Convert UserRecords to JSON
         Gson gson = new Gson();
         String jsonString = gson.toJson(mList);
 
