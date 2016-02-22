@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.lipata.whatsforlunch.data.user.UserRecordList;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 import com.squareup.picasso.Picasso;
 
@@ -25,11 +27,13 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     private List<Business> mBusinessList;
     private Context mContext;
     private CoordinatorLayout mCoordinatorLayout;
+    UserRecordList mUserRecordList;
 
-    public BusinessListAdapter(List<Business> businessList, Context context, CoordinatorLayout coordinatorLayout){
+    public BusinessListAdapter(List<Business> businessList, Context context, CoordinatorLayout coordinatorLayout, UserRecordList userRecordList){
         this.mBusinessList = businessList;
         this.mContext = context;
         this.mCoordinatorLayout = coordinatorLayout;
+        this.mUserRecordList = userRecordList;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -66,7 +70,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
 
         // Get business at `position` index. This object's fields will be used to populate UI views
         final Business business = mBusinessList.get(position);
@@ -114,6 +118,17 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         holder.mButton_TooSoon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Log.d(LOG_TAG, "Too Soon Clicked");
+
+                /*  Test code to move the item in RecyclerView
+                *   int numberOfItems = getItemCount();
+                *   Log.d(LOG_TAG, "Too Soon Clicked: numberOfItems = "+numberOfItems+" position = "+position);
+                *   notifyItemMoved(position, numberOfItems-1);
+                */
+
+                mUserRecordList.updateTooSoon(business, System.currentTimeMillis());
+
                 Snackbar.make(mCoordinatorLayout,
                         "Noted. You just ate at " + business.getName() + ". I won't suggest this again for a couple days.",
                         Snackbar.LENGTH_LONG).show();

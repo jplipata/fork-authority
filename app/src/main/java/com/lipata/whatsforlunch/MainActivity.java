@@ -29,6 +29,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.lipata.whatsforlunch.api.yelp.AsyncYelpCall;
+import com.lipata.whatsforlunch.data.user.UserRecordList;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 import com.lipata.whatsforlunch.data.yelppojo.YelpResponse;
 
@@ -65,12 +66,16 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView.Adapter mSuggestionListAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
+    UserRecordList mUserRecordList;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // todo: Check for existing UserRecordList.  If exists, load.  Else, create new.
+        mUserRecordList = new UserRecordList();
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
         mTextView_Latitude = (TextView) findViewById((R.id.latitude_text));
@@ -169,8 +174,7 @@ public class MainActivity extends AppCompatActivity
 
     // Callback for Marshmallow requestPermissions() response
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID: {
                 // If request is cancelled, the result arrays are empty.
@@ -305,6 +309,7 @@ public class MainActivity extends AppCompatActivity
         Log.d(LOG_TAG, "Location Updates Stopped");
     }
 
+    // Public methods
     // I made this `public` in order for it to be called from api.yelp.AsyncYelpCall.class  Is there a better way?
     public void parseYelpResponse(String yelpResponse_Json){
         Log.d(LOG_TAG, "parseYelpResponse()");
@@ -316,9 +321,11 @@ public class MainActivity extends AppCompatActivity
         BusinessListFilter businessListFilter = new BusinessListFilter(businesses);
         List<Business> filteredBusinesses = businessListFilter.filter();
 
-        mSuggestionListAdapter = new BusinessListAdapter(filteredBusinesses, this, mCoordinatorLayout);
+        mSuggestionListAdapter = new BusinessListAdapter(filteredBusinesses, this, mCoordinatorLayout, mUserRecordList);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
     }
+
+
 
     // MainActivity template menu override methods
     @Override
