@@ -50,8 +50,8 @@ public class UserRecords {
         Log.d(LOG_TAG, "BusinessItemRecord added");
     }
 
-    public void updateTooSoon(Business business, long time){
-        Log.d(LOG_TAG, "updateTooSoon()");
+    public void updateTooSoonClickDate(Business business, long time){
+        Log.d(LOG_TAG, "updateTooSoonClickDate()");
 
         // Check for item
         int itemIndex = getItemIndex(business.getId());

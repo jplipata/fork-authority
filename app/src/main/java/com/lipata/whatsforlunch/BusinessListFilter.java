@@ -31,6 +31,7 @@ public class BusinessListFilter {
         this.mContext = context;
     }
 
+    // Returns a filtered list
     List<Business> filter(){
         // Get user data
         List<BusinessItemRecord> userRecordList = mUserRecords.getList();
@@ -47,20 +48,34 @@ public class BusinessListFilter {
                 if(businessItemRecord.getId().equals(businessId)){
                     long tooSoonClickDate = businessItemRecord.getTooSoonClickDate();
                     int rating = businessItemRecord.getRating();
-                    Log.d(LOG_TAG, "Match found. Id = "+businessId+" tooSoonClickDate = "+tooSoonClickDate+" rating = "+rating);
+                    Log.d(LOG_TAG, "Match found. Id = " + businessId + " tooSoonClickDate = " + tooSoonClickDate + " rating = " + rating);
 
                     // On match found, do:
 
+
                     // Handle the "Too Soon" case:
+
+                        // Crude implementation of 'just ate here' visual representation
+    //                    String name = business.getName();
+    //                    name = name + " - Just ate here";
+    //                    business.setName(name);
+
 
                         // Calculate difference between current time and tooSoonClickDate
                         long tooSoonDelta = System.currentTimeMillis()-tooSoonClickDate;
-                        long tooSoonDeltaInDays = tooSoonDelta / 1000 / 60 / 60 / 24;
-                        Log.d(LOG_TAG, "tooSoonDeltaInDays = "+tooSoonDeltaInDays);
+
+                        // If you need to see how many days...
+//                        long tooSoonDeltaInDays = tooSoonDelta / 1000 / 60 / 60 / 24;
+//                        Log.d(LOG_TAG, "tooSoonDeltaInDays = "+tooSoonDeltaInDays);
 
                         if (tooSoonDelta < TOOSOON_THRESHOLD){
 
                             // Move item down the list
+                            //
+                            // This exact code appears in BusinessListAdapter.  I would like to
+                            // break it out into a function, but I'm not sure where to put it
+                            // (where's best in terms of access, constants, etc)
+                            //
                             if(i+TOOSOON_PENALTY > mBusinessList_Filtered.size()){ // Check for IndexOutOfBounds
                                 mBusinessList_Filtered.add(business);
                                 Log.d(LOG_TAG, "Added "+businessId+" to end of ArrayList");
@@ -75,7 +90,7 @@ public class BusinessListFilter {
 
                         }
 
-                    // Handle `rating`.  If rating is high, move item up.  If rating is low, move item down.
+                    // Handle `rating` case.  If rating is high, move item up.  If rating is low, move item down.
 
 
                     break;  // Once you've found the match, there's no need to keep going. Exit the `for` loop

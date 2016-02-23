@@ -16,6 +16,7 @@ import com.lipata.whatsforlunch.data.user.UserRecords;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 import com.squareup.picasso.Picasso;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -121,16 +122,47 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 Log.d(LOG_TAG, "Too Soon Clicked");
 
-                mUserRecords.updateTooSoon(business, System.currentTimeMillis());
+                // Get current date/time
+                long systemTime_ms = System.currentTimeMillis();
+
+                // Test
+//                Calendar calendar = Calendar.getInstance();
+//                calendar.setTimeInMillis(systemTime_ms);
+//                int month = calendar.get(Calendar.MONTH);
+//                int day = calendar.get(Calendar.DATE);
+//                int year = calendar.get(Calendar.YEAR);
+
+                // Update user records
+                mUserRecords.updateTooSoonClickDate(business, systemTime_ms);
                 mUserRecords.commit();
-                
-                //notifyItemMoved(position, (position+BusinessListFilter.TOOSOON_PENALTY));
 
-                // Need to update UI
+                // Update current list
 
+                // Move item down the list
+                //
+                // This exact code appears in BusinessListFilter.  I would like to
+                // break it out into a function, but I'm not sure where to put it
+                // (where's best in terms of access, constants, etc)
+                //
+                if(position + BusinessListFilter.TOOSOON_PENALTY > mBusinessList.size()){ // Check for IndexOutOfBounds
+                    mBusinessList.add(business);
+                    Log.d(LOG_TAG, "Added "+business.getName()+" to end of ArrayList");
+                } else {
+                    int offset = position + BusinessListFilter.TOOSOON_PENALTY;
+                    mBusinessList.add(offset, business);
+                    Log.d(LOG_TAG, "Added " + business.getName() + " to index " + offset);
+                }
+
+                mBusinessList.set(position, null);
+                mBusinessList.removeAll(Collections.singleton(null));
+
+                // Notify user
                 Snackbar.make(mCoordinatorLayout,
                         "Noted. You just ate at " + business.getName() + ". I won't suggest this again for a couple days.",
                         Snackbar.LENGTH_LONG).show();
+
+                // Update Suggestion List
+                notifyDataSetChanged();
             }
         });
 
