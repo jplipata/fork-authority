@@ -3,6 +3,7 @@ package com.lipata.whatsforlunch;
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import com.lipata.whatsforlunch.data.user.UserRecords;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 import com.squareup.picasso.Picasso;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,24 +41,28 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        public CardView mCardView_CardView;
         public ImageView mImageView_BusinessImage;
         public TextView mTextView_BusinessName;
         public TextView mTextView_BusinessCategories;
         public TextView mTextView_BusinessAddress;
         public ImageView mImageView_BusinessRatingUrl;
         public TextView mTextView_BusinessReviewCount;
+        public TextView mTextView_JustAteHereDate;
         public Button mButton_TooSoon;
         public Button mButton_Like;
         public Button mButton_DontLike;
 
         public ViewHolder(View v) {
             super(v);
+            mCardView_CardView = (CardView) v.findViewById(R.id.card_view);
             mImageView_BusinessImage = (ImageView) v.findViewById(R.id.business_image);
             mTextView_BusinessName = (TextView) v.findViewById(R.id.business_name);
             mTextView_BusinessCategories = (TextView) v.findViewById(R.id.business_categories);
             mTextView_BusinessAddress = (TextView) v.findViewById(R.id.business_address);
             mImageView_BusinessRatingUrl = (ImageView) v.findViewById(R.id.business_rating);
             mTextView_BusinessReviewCount = (TextView) v.findViewById(R.id.business_review_count);
+            mTextView_JustAteHereDate = (TextView) v.findViewById(R.id.business_justateheredate);
             mButton_TooSoon = (Button) v.findViewById(R.id.button_toosoon);
             mButton_Like = (Button) v.findViewById(R.id.button_like);
             mButton_DontLike = (Button) v.findViewById(R.id.button_dontlike);
@@ -71,7 +77,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         // Get business at `position` index. This object's fields will be used to populate UI views
         final Business business = mBusinessList.get(position);
@@ -106,6 +112,19 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         holder.mTextView_BusinessCategories.setText(formattedCategories);
 
         holder.mTextView_BusinessAddress.setText(business.getLocation().getFormattedDisplayAddress());
+
+        long tooSoonClickDate = business.getTooSoonClickDate();
+        if(tooSoonClickDate!=0) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(business.getTooSoonClickDate());
+            int month = calendar.get(Calendar.MONTH)+1;
+            int day = calendar.get(Calendar.DATE);
+            int year = calendar.get(Calendar.YEAR);
+            holder.mTextView_JustAteHereDate.setText("Just ate here on "+month+"/"+day+"/"+year);
+            holder.mCardView_CardView.invalidate();
+        } else {
+            holder.mTextView_JustAteHereDate.setVisibility(View.GONE);
+        }
 
         holder.mButton_Like.setOnClickListener(new View.OnClickListener() {
             @Override

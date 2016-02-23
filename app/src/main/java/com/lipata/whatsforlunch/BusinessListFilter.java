@@ -55,10 +55,16 @@ public class BusinessListFilter {
 
                     // Handle the "Too Soon" case:
 
-                        // Crude implementation of 'just ate here' visual representation
+                        // Update the `business` data to include tooSoonClickDate;
+                        business.setTooSoonClickDate(tooSoonClickDate);
+
+                        //
+                        // Crude implementation
+                        //
     //                    String name = business.getName();
     //                    name = name + " - Just ate here";
     //                    business.setName(name);
+
 
 
                         // Calculate difference between current time and tooSoonClickDate

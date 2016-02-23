@@ -44,6 +44,17 @@ public class Business {
     private boolean isClosed;
     private double distance;
 
+    // My data
+    long tooSoonClickDate;
+
+
+    public long getTooSoonClickDate() {
+        return tooSoonClickDate;
+    }
+
+    public void setTooSoonClickDate(long tooSoonClickDate) {
+        this.tooSoonClickDate = tooSoonClickDate;
+    }
 
     /**
      * 
