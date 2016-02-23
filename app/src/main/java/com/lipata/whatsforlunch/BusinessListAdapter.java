@@ -162,7 +162,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 // Notify user
                 Snackbar.make(mCoordinatorLayout,
-                        "Noted. You just ate at " + business.getName() + ". I won't suggest this again for a couple days.",
+                        "Noted. You just ate at " + business.getName() + ". I have moved this to the bottom of the list.",
                         Snackbar.LENGTH_LONG).show();
 
                 // Update Suggestion List View

@@ -86,15 +86,7 @@ public class BusinessListFilter {
 
     // This returns a list with null values, nulls still need to be removed after new list is returned
     List<Business> moveItemTooSoon (List<Business> businessList, int itemPosition, Business business){
-
-        if(itemPosition + BusinessListFilter.TOOSOON_PENALTY > businessList.size()){ // Check for IndexOutOfBounds
-            businessList.add(business);
-            Log.d(LOG_TAG, "Added "+business.getName()+" to end of ArrayList");
-        } else {
-            int offset = itemPosition + BusinessListFilter.TOOSOON_PENALTY;
-            businessList.add(offset, business);
-            Log.d(LOG_TAG, "Added " + business.getName() + " to index " + offset);
-        }
+        businessList.add(business);
         businessList.set(itemPosition, null);
         return businessList;
     }
