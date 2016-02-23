@@ -31,12 +31,15 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     private Context mContext;
     private CoordinatorLayout mCoordinatorLayout;
     UserRecords mUserRecords;
+    BusinessListFilter mBusinessListFilter;
 
-    public BusinessListAdapter(List<Business> businessList, Context context, CoordinatorLayout coordinatorLayout, UserRecords userRecords){
+    public BusinessListAdapter(List<Business> businessList, Context context, CoordinatorLayout coordinatorLayout,
+                               UserRecords userRecords, BusinessListFilter businessListFilter){
         this.mBusinessList = businessList;
         this.mContext = context;
         this.mCoordinatorLayout = coordinatorLayout;
         this.mUserRecords = userRecords;
+        this.mBusinessListFilter = businessListFilter;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -115,14 +118,16 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
         long tooSoonClickDate = business.getTooSoonClickDate();
         if(tooSoonClickDate!=0) {
+            Log.d(LOG_TAG, business.getName()+" has a tooSoonClickDate");
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(business.getTooSoonClickDate());
             int month = calendar.get(Calendar.MONTH)+1;
             int day = calendar.get(Calendar.DATE);
             int year = calendar.get(Calendar.YEAR);
+            holder.mTextView_JustAteHereDate.setVisibility(View.VISIBLE);
             holder.mTextView_JustAteHereDate.setText("Just ate here on "+month+"/"+day+"/"+year);
-            holder.mCardView_CardView.invalidate();
         } else {
+            Log.d(LOG_TAG, business.getName()+" does not have a tooSoonClickDate");
             holder.mTextView_JustAteHereDate.setVisibility(View.GONE);
         }
 
@@ -144,43 +149,23 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                 // Get current date/time
                 long systemTime_ms = System.currentTimeMillis();
 
-                // Test
-//                Calendar calendar = Calendar.getInstance();
-//                calendar.setTimeInMillis(systemTime_ms);
-//                int month = calendar.get(Calendar.MONTH);
-//                int day = calendar.get(Calendar.DATE);
-//                int year = calendar.get(Calendar.YEAR);
-
                 // Update user records
                 mUserRecords.updateTooSoonClickDate(business, systemTime_ms);
                 mUserRecords.commit();
 
-                // Update current list
+                business.setTooSoonClickDate(systemTime_ms);
+                Log.d(LOG_TAG, "Updated tooSoonClickDate for " + business.getName() + " to " + systemTime_ms);
 
-                // Move item down the list
-                //
-                // This exact code appears in BusinessListFilter.  I would like to
-                // break it out into a function, but I'm not sure where to put it
-                // (where's best in terms of access, constants, etc)
-                //
-                if(position + BusinessListFilter.TOOSOON_PENALTY > mBusinessList.size()){ // Check for IndexOutOfBounds
-                    mBusinessList.add(business);
-                    Log.d(LOG_TAG, "Added "+business.getName()+" to end of ArrayList");
-                } else {
-                    int offset = position + BusinessListFilter.TOOSOON_PENALTY;
-                    mBusinessList.add(offset, business);
-                    Log.d(LOG_TAG, "Added " + business.getName() + " to index " + offset);
-                }
-
-                mBusinessList.set(position, null);
-                mBusinessList.removeAll(Collections.singleton(null));
+                // Update current list, move item down the list
+                mBusinessList = mBusinessListFilter.moveItemTooSoon(mBusinessList, mBusinessList.indexOf(business), business); // This returns a list with null values
+                mBusinessList.removeAll(Collections.singleton(null)); // Remove nulls
 
                 // Notify user
                 Snackbar.make(mCoordinatorLayout,
                         "Noted. You just ate at " + business.getName() + ". I won't suggest this again for a couple days.",
                         Snackbar.LENGTH_LONG).show();
 
-                // Update Suggestion List
+                // Update Suggestion List View
                 notifyDataSetChanged();
             }
         });
