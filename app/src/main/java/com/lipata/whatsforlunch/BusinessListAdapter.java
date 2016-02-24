@@ -29,6 +29,11 @@ import java.util.List;
  */
 public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapter.ViewHolder> {
 
+    // Button ID constants
+    public static final int LIKE = 0;
+    public static final int TOOSOON = 1;
+    public static final int DONTLIKE = 2;
+
     static public String LOG_TAG = BusinessListAdapter.class.getSimpleName();
     private List<Business> mBusinessList;
     private Context mContext;
@@ -56,6 +61,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         public ImageView mImageView_BusinessRatingUrl;
         public TextView mTextView_BusinessReviewCount;
         public TextView mTextView_JustAteHereDate;
+        public TextView mTextView_LikeDontLike;
         public Button mButton_TooSoon;
         public Button mButton_Like;
         public Button mButton_DontLike;
@@ -71,6 +77,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             mImageView_BusinessRatingUrl = (ImageView) v.findViewById(R.id.business_rating);
             mTextView_BusinessReviewCount = (TextView) v.findViewById(R.id.business_review_count);
             mTextView_JustAteHereDate = (TextView) v.findViewById(R.id.business_justateheredate);
+            mTextView_LikeDontLike = (TextView) v.findViewById(R.id.business_likeordontlike);
             mButton_TooSoon = (Button) v.findViewById(R.id.button_toosoon);
             mButton_Like = (Button) v.findViewById(R.id.button_like);
             mButton_DontLike = (Button) v.findViewById(R.id.button_dontlike);
@@ -130,6 +137,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
         holder.mTextView_BusinessAddress.setText(business.getLocation().getFormattedDisplayAddress());
 
+        // Dynamically add text based on UserRecords
         long tooSoonClickDate = business.getTooSoonClickDate();
         if(tooSoonClickDate!=0) {
             //Log.d(LOG_TAG, business.getName()+" has a tooSoonClickDate");
@@ -145,6 +153,14 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             holder.mTextView_JustAteHereDate.setVisibility(View.GONE);
         }
 
+        long dontlikeClickDate = business.getDontLikeClickDate();
+        if(dontlikeClickDate!=0){
+            holder.mTextView_LikeDontLike.setVisibility(View.VISIBLE);
+            holder.mTextView_LikeDontLike.setText("Don't like");
+        } else {
+            holder.mTextView_LikeDontLike.setVisibility(View.GONE);
+        }
+
         holder.mButton_Like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -157,21 +173,21 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         holder.mButton_TooSoon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Log.d(LOG_TAG, "Too Soon Clicked");
+                //Log.d(LOG_TAG, "Too Soon Clicked");
 
                 // Get current date/time
                 long systemTime_ms = System.currentTimeMillis();
 
                 // Update user records
-                mUserRecords.updateTooSoonClickDate(business, systemTime_ms);
+                mUserRecords.updateClickDate(business, systemTime_ms, TOOSOON);
                 mUserRecords.commit();
 
+                // Update object field
                 business.setTooSoonClickDate(systemTime_ms);
                 Log.d(LOG_TAG, "Updated tooSoonClickDate for " + business.getName() + " to " + systemTime_ms);
 
                 // Update current list, move item down the list
-                mBusinessList = mBusinessListFilter.moveItemTooSoon(mBusinessList, mBusinessList.indexOf(business), business); // This returns a list with null values
+                mBusinessList = mBusinessListFilter.moveItemToBottom(mBusinessList, mBusinessList.indexOf(business)); // This returns a list with null values
                 mBusinessList.removeAll(Collections.singleton(null)); // Remove nulls
 
                 // Notify user
@@ -187,9 +203,29 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         holder.mButton_DontLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                // Get current date/time
+                long systemTime_ms = System.currentTimeMillis();
+
+                // Update user records
+                mUserRecords.updateClickDate(business, systemTime_ms, DONTLIKE);
+                mUserRecords.commit();
+
+                // Update object field
+                business.setDontLikeClickDate(systemTime_ms) ;
+                Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + systemTime_ms);
+
+                // Update current list, move item down the list
+                mBusinessList = mBusinessListFilter.moveItemToBottom(mBusinessList, mBusinessList.indexOf(business)); // This returns a list with null values
+                mBusinessList.removeAll(Collections.singleton(null)); // Remove nulls
+
+                // Notify user
                 Snackbar.make(mCoordinatorLayout,
                         "Noted. You don't like " + business.getName() + ". I won't suggest this again for some time.",
                         Snackbar.LENGTH_LONG).show();
+
+                // Update Suggestion List View
+                notifyDataSetChanged();
             }
         });
 

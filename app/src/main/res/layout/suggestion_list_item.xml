@@ -134,6 +134,16 @@
         android:paddingBottom="4dp"
         android:textStyle="italic"
         />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/business_likeordontlike"
+        android:textSize="@dimen/cardview_buttons_text"
+        android:textColor="@color/material_text_gray"
+        android:paddingBottom="4dp"
+        android:textStyle="italic"
+        />
 
     <!-- 1/18/16 We could provide a summary of net likes to the user.
 

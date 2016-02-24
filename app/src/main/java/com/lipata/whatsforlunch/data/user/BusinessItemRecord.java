@@ -7,6 +7,7 @@ public class BusinessItemRecord {
 
     String Id;
     long tooSoonClickDate;
+    long dontLikeClickDate;
     int rating;
 
     public String getId() {
@@ -23,6 +24,14 @@ public class BusinessItemRecord {
 
     public void setTooSoonClickDate(long tooSoonClickDate) {
         this.tooSoonClickDate = tooSoonClickDate;
+    }
+
+    public long getDontLikeClickDate() {
+        return dontLikeClickDate;
+    }
+
+    public void setDontLikeClickDate(long dontLikeClickDate) {
+        this.dontLikeClickDate = dontLikeClickDate;
     }
 
     public int getRating() {

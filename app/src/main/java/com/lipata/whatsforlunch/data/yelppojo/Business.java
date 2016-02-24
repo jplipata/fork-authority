@@ -44,8 +44,9 @@ public class Business {
     private boolean isClosed;
     private double distance;
 
-    // My data
+    // My fields
     long tooSoonClickDate;
+    long dontLikeClickDate;
 
 
     public long getTooSoonClickDate() {
@@ -54,6 +55,14 @@ public class Business {
 
     public void setTooSoonClickDate(long tooSoonClickDate) {
         this.tooSoonClickDate = tooSoonClickDate;
+    }
+
+    public long getDontLikeClickDate() {
+        return dontLikeClickDate;
+    }
+
+    public void setDontLikeClickDate(long dontLikeClickDate) {
+        this.dontLikeClickDate = dontLikeClickDate;
     }
 
     /**

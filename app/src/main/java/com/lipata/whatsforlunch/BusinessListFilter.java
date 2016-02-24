@@ -17,6 +17,8 @@ import java.util.List;
 public class BusinessListFilter {
 
     public static long TOOSOON_THRESHOLD = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
+    public static int DONTLIKE_THRESHOLD = 90; // 90 days
+
     private static String LOG_TAG = BusinessListFilter.class.getSimpleName();
 
     List<Business> mBusinessList_Source;
@@ -47,26 +49,46 @@ public class BusinessListFilter {
                 BusinessItemRecord businessItemRecord = userRecordList.get(j);
                 if(businessItemRecord.getId().equals(businessId)){
                     long tooSoonClickDate = businessItemRecord.getTooSoonClickDate();
+                    long dontLikeClickDate = businessItemRecord.getDontLikeClickDate();
                     int rating = businessItemRecord.getRating();
-                    Log.d(LOG_TAG, "Match found. Id = " + businessId + " tooSoonClickDate = " + tooSoonClickDate + " rating = " + rating);
+                    Log.d(LOG_TAG, "Match found. Id = " + businessId + " tooSoonClickDate = "
+                            + tooSoonClickDate + " dontLikeClickDate = "+ dontLikeClickDate +
+                            " rating = " + rating);
 
                     // On match found, do:
 
                         // Handle the "Too Soon" case:
 
-                            // Update the `business` object to include tooSoonClickDate;
-                            business.setTooSoonClickDate(tooSoonClickDate);
+                            if(businessItemRecord.getTooSoonClickDate()!=0) {
+                                // Update the `business` object to include tooSoonClickDate;
+                                business.setTooSoonClickDate(tooSoonClickDate);
 
-                            // Calculate difference between current time and tooSoonClickDate
-                            long tooSoonDelta = System.currentTimeMillis()-tooSoonClickDate;
+                                // Calculate difference between current time and tooSoonClickDate
+                                long tooSoonDelta = System.currentTimeMillis() - tooSoonClickDate;
 
-                            if (tooSoonDelta < TOOSOON_THRESHOLD){
-                                // Move item down the list
-                                mBusinessList_Filtered = moveItemTooSoon(mBusinessList_Filtered, i, business);
+                                if (tooSoonDelta < TOOSOON_THRESHOLD) {
+                                    // Move item down the list
+                                    mBusinessList_Filtered = moveItemToBottom(mBusinessList_Filtered, i);
+                                }
+
                             }
 
+                        // Handle Dont Like case
 
-                        // Handle `rating` case.  If rating is high, move item up.  If rating is low, move item down.
+                            if(businessItemRecord.getDontLikeClickDate()!=0) {
+                                // Update the `business` object
+                                business.setDontLikeClickDate(dontLikeClickDate);
+
+                                // Calculate difference between current time
+                                long dontLikeDelta = System.currentTimeMillis() - dontLikeClickDate;
+                                long dontLikeDelta_days = dontLikeDelta / 1000 / 60 / 60 / 24; // Convert to days
+
+                                if (dontLikeDelta_days < DONTLIKE_THRESHOLD) {
+                                    // Move item down the list
+                                    mBusinessList_Filtered = moveItemToBottom(mBusinessList_Filtered, i);
+                                }
+
+                            }
 
 
                     break;  // Once you've found the match, there's no need to keep going. Exit the `for` loop
@@ -84,7 +106,8 @@ public class BusinessListFilter {
 
 
     // This returns a list with null values, nulls still need to be removed after new list is returned
-    List<Business> moveItemTooSoon (List<Business> businessList, int itemPosition, Business business){
+    List<Business> moveItemToBottom(List<Business> businessList, int itemPosition){
+        Business business = businessList.get(itemPosition);
         businessList.add(business);
         businessList.set(itemPosition, null);
         return businessList;

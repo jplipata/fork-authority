@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.lipata.whatsforlunch.BusinessListAdapter;
 import com.lipata.whatsforlunch.R;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 
@@ -50,8 +51,9 @@ public class UserRecords {
         Log.d(LOG_TAG, "BusinessItemRecord added");
     }
 
-    public void updateTooSoonClickDate(Business business, long time){
-        Log.d(LOG_TAG, "updateTooSoonClickDate()");
+
+    public void updateClickDate(Business business, long time, int buttonConstant){
+        Log.d(LOG_TAG, "updateClickDate()");
 
         // Check for item
         int itemIndex = getItemIndex(business.getId());
@@ -63,23 +65,42 @@ public class UserRecords {
             // if the item doesn't exist:
             BusinessItemRecord businessItemRecord = new BusinessItemRecord();
             businessItemRecord.setId(business.getId());
-            businessItemRecord.setTooSoonClickDate(time);
+
+            // Assign based on button type
+            switch(buttonConstant){
+                case BusinessListAdapter.TOOSOON:
+                    businessItemRecord.setTooSoonClickDate(time);
+                    break;
+                case BusinessListAdapter.DONTLIKE:
+                    businessItemRecord.setDontLikeClickDate(time);
+                    break;
+            }
+
             // Check
             Log.d(LOG_TAG, "businessItemRecord.  Id = " + businessItemRecord.getId() +
-                    " tooSoonClickDate = " + businessItemRecord.getTooSoonClickDate());
+                    " tooSoonClickDate = " + businessItemRecord.getTooSoonClickDate()
+                    + " dontlikeClickDate = " + businessItemRecord.getDontLikeClickDate());
             // Store data
             addRecord(businessItemRecord);
 
         } else {
             Log.d(LOG_TAG, "Item does exist.  Index = "+itemIndex);
 
-            // Update TooSoonClickDate
+            // Update ClickDate
             BusinessItemRecord record = mList.get(itemIndex);
-            record.setTooSoonClickDate(time);
+            switch (buttonConstant){
+                case BusinessListAdapter.TOOSOON:
+                    record.setTooSoonClickDate(time);
+                    break;
+                case BusinessListAdapter.DONTLIKE:
+                    record.setDontLikeClickDate(time);
+                    break;
+            }
             Log.d(LOG_TAG, "Item at index "+itemIndex+" updated");
 
             // Check
-            Log.d(LOG_TAG, record.getId()+" tooSoonClickDate = "+record.getTooSoonClickDate());
+            Log.d(LOG_TAG, record.getId()+" tooSoonClickDate = "+record.getTooSoonClickDate()
+                    + "dontlikeClickDate = " + record.getDontLikeClickDate());
         }
     }
 
