@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity
     protected TextView mTextView_Accuracy;
     protected RecyclerView mRecyclerView_suggestionList;
     private RecyclerView.LayoutManager mSuggestionListLayoutManager;
-    private RecyclerView.Adapter mSuggestionListAdapter;
+    private BusinessListAdapter mSuggestionListAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     UserRecords mUserRecords;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView_suggestionList.setHasFixedSize(true);
         mSuggestionListLayoutManager = new LinearLayoutManager(this);
         mRecyclerView_suggestionList.setLayoutManager(mSuggestionListLayoutManager);
+
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         mSwipeRefreshLayout.setColorSchemeColors(R.color.colorPrimary);
@@ -323,6 +325,9 @@ public class MainActivity extends AppCompatActivity
 
         mSuggestionListAdapter = new BusinessListAdapter(filteredBusinesses, this, mCoordinatorLayout, mUserRecords, businessListFilter);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
+        ItemTouchHelper.Callback callback = new BusinessTouchHelper(mSuggestionListAdapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(mRecyclerView_suggestionList);
     }
 
 

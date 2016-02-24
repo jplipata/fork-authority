@@ -235,4 +235,9 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     public int getItemCount() {
         return mBusinessList.size();
     }
+
+    public void remove(int position){
+        mBusinessList.remove(position);
+        notifyItemRemoved(position);
+    }
 }
