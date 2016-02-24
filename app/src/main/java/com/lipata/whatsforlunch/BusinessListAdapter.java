@@ -1,6 +1,8 @@
 package com.lipata.whatsforlunch;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lipata.whatsforlunch.data.user.UserRecords;
@@ -44,6 +47,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        public LinearLayout mLayout_BusinessHeader;
         public CardView mCardView_CardView;
         public ImageView mImageView_BusinessImage;
         public TextView mTextView_BusinessName;
@@ -58,6 +62,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
         public ViewHolder(View v) {
             super(v);
+            mLayout_BusinessHeader = (LinearLayout) v.findViewById(R.id.business_header_layout);
             mCardView_CardView = (CardView) v.findViewById(R.id.card_view);
             mImageView_BusinessImage = (ImageView) v.findViewById(R.id.business_image);
             mTextView_BusinessName = (TextView) v.findViewById(R.id.business_name);
@@ -84,6 +89,15 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
         // Get business at `position` index. This object's fields will be used to populate UI views
         final Business business = mBusinessList.get(position);
+
+        // Business Header Layout - clickable
+        holder.mLayout_BusinessHeader.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(business.getUrl()));
+                mContext.startActivity(browserIntent);
+            }
+        });
 
         // Business image
         Picasso.with(mContext)
@@ -118,7 +132,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
         long tooSoonClickDate = business.getTooSoonClickDate();
         if(tooSoonClickDate!=0) {
-            Log.d(LOG_TAG, business.getName()+" has a tooSoonClickDate");
+            //Log.d(LOG_TAG, business.getName()+" has a tooSoonClickDate");
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(business.getTooSoonClickDate());
             int month = calendar.get(Calendar.MONTH)+1;
@@ -127,7 +141,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             holder.mTextView_JustAteHereDate.setVisibility(View.VISIBLE);
             holder.mTextView_JustAteHereDate.setText("Just ate here on "+month+"/"+day+"/"+year);
         } else {
-            Log.d(LOG_TAG, business.getName()+" does not have a tooSoonClickDate");
+            //Log.d(LOG_TAG, business.getName()+" does not have a tooSoonClickDate");
             holder.mTextView_JustAteHereDate.setVisibility(View.GONE);
         }
 

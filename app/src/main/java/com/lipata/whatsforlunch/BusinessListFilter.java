@@ -17,7 +17,6 @@ import java.util.List;
 public class BusinessListFilter {
 
     public static long TOOSOON_THRESHOLD = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
-    public static int TOOSOON_PENALTY = 8; // Offset for items identified as "too soon"
     private static String LOG_TAG = BusinessListFilter.class.getSimpleName();
 
     List<Business> mBusinessList_Source;
@@ -55,7 +54,7 @@ public class BusinessListFilter {
 
                         // Handle the "Too Soon" case:
 
-                            // Update the `business` data to include tooSoonClickDate;
+                            // Update the `business` object to include tooSoonClickDate;
                             business.setTooSoonClickDate(tooSoonClickDate);
 
                             // Calculate difference between current time and tooSoonClickDate
