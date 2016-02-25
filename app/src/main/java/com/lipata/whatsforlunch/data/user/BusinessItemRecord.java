@@ -8,7 +8,7 @@ public class BusinessItemRecord {
     String Id;
     long tooSoonClickDate;
     long dontLikeClickDate;
-    int rating;
+    long dismissedClickDate;
 
     public String getId() {
         return Id;
@@ -34,13 +34,12 @@ public class BusinessItemRecord {
         this.dontLikeClickDate = dontLikeClickDate;
     }
 
-    public int getRating() {
-        return rating;
+    public long getDismissedDate() {
+        return dismissedClickDate;
     }
 
-    public void setRating(int rating) {
-        this.rating = rating;
+    public void setDismissedDate(long dismissedClickDate) {
+        this.dismissedClickDate = dismissedClickDate;
     }
-
 
 }

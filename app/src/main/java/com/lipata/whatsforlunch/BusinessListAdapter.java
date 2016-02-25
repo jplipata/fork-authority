@@ -33,6 +33,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     public static final int LIKE = 0;
     public static final int TOOSOON = 1;
     public static final int DONTLIKE = 2;
+    public static final int DISMISS = 3;
 
     static public String LOG_TAG = BusinessListAdapter.class.getSimpleName();
     private List<Business> mBusinessList;
@@ -236,8 +237,37 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         return mBusinessList.size();
     }
 
-    public void remove(int position){
+    public void dismiss(int position){
+
+        // UI Stuff:
+        // Get business and hold in temp variable
+        Business business = mBusinessList.get(position);
+
+        // Remove existing element
         mBusinessList.remove(position);
+
+        // Update RecyclerView to trigger animation
         notifyItemRemoved(position);
+
+        // Add business to bottom of list
+        mBusinessList.add(business);
+
+        // Update RecyclerView
+        notifyItemRangeChanged(position, getItemCount());
+
+        // Backend stuff:
+        // Get current date/time
+        long systemTime_ms = System.currentTimeMillis();
+
+        // Update user records
+        mUserRecords.updateClickDate(business, systemTime_ms, DISMISS);
+        mUserRecords.commit();
+
+        // Update object field
+        business.setDismissedDate(systemTime_ms); ;
+        Log.d(LOG_TAG, "Updated dismissedDate for " + business.getName() + " to " + systemTime_ms);
+
     }
+
+
 }

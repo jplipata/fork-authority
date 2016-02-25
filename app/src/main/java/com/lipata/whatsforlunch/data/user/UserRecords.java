@@ -74,12 +74,16 @@ public class UserRecords {
                 case BusinessListAdapter.DONTLIKE:
                     businessItemRecord.setDontLikeClickDate(time);
                     break;
+                case BusinessListAdapter.DISMISS:
+                    businessItemRecord.setDismissedDate(time);
+                    break;
             }
 
             // Check
             Log.d(LOG_TAG, "businessItemRecord.  Id = " + businessItemRecord.getId() +
                     " tooSoonClickDate = " + businessItemRecord.getTooSoonClickDate()
-                    + " dontlikeClickDate = " + businessItemRecord.getDontLikeClickDate());
+                    + " dontlikeClickDate = " + businessItemRecord.getDontLikeClickDate()
+                    + " dismissedDate = " + businessItemRecord.getDismissedDate());
             // Store data
             addRecord(businessItemRecord);
 
@@ -95,6 +99,8 @@ public class UserRecords {
                 case BusinessListAdapter.DONTLIKE:
                     record.setDontLikeClickDate(time);
                     break;
+                case BusinessListAdapter.DISMISS:
+                    record.setDismissedDate(time);
             }
             Log.d(LOG_TAG, "Item at index "+itemIndex+" updated");
 

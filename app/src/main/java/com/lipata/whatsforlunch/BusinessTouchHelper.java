@@ -24,6 +24,6 @@ public class BusinessTouchHelper extends ItemTouchHelper.SimpleCallback {
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
         int position = viewHolder.getAdapterPosition();
-        mBusinessListAdapter.remove(position);
+        mBusinessListAdapter.dismiss(position);
     }
 }

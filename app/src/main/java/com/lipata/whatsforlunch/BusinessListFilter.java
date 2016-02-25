@@ -17,7 +17,15 @@ import java.util.List;
 public class BusinessListFilter {
 
     public static long TOOSOON_THRESHOLD = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
-    public static int DONTLIKE_THRESHOLD = 90; // 90 days
+    public static int DONTLIKE_THRESHOLD_INDAYS = 90; // 90 days
+
+    /*
+     * The DISMISSED_THRESHOLD constant should be based on how long it typically takes a person to
+     * decide what to eat for lunch
+     * The amount of time should last long enough for one user 'session', i.e. as long as it takes to
+     * decide what to eat
+     */
+    public static long DISMISSED_THRESHOLD = 1000 * 60 * 30;
 
     private static String LOG_TAG = BusinessListFilter.class.getSimpleName();
 
@@ -50,10 +58,10 @@ public class BusinessListFilter {
                 if(businessItemRecord.getId().equals(businessId)){
                     long tooSoonClickDate = businessItemRecord.getTooSoonClickDate();
                     long dontLikeClickDate = businessItemRecord.getDontLikeClickDate();
-                    int rating = businessItemRecord.getRating();
+                    long dismissedDate = businessItemRecord.getDismissedDate();
                     Log.d(LOG_TAG, "Match found. Id = " + businessId + " tooSoonClickDate = "
                             + tooSoonClickDate + " dontLikeClickDate = "+ dontLikeClickDate +
-                            " rating = " + rating);
+                            " dismissedDate = "+dismissedDate);
 
                     // On match found, do:
 
@@ -67,8 +75,11 @@ public class BusinessListFilter {
                                 long tooSoonDelta = System.currentTimeMillis() - tooSoonClickDate;
 
                                 if (tooSoonDelta < TOOSOON_THRESHOLD) {
+                                    Log.d(LOG_TAG, "filter() Deemed too soon!");
                                     // Move item down the list
                                     mBusinessList_Filtered = moveItemToBottom(mBusinessList_Filtered, i);
+                                } else {
+                                    Log.d(LOG_TAG, "filter() TOOSOON expired");
                                 }
 
                             }
@@ -83,11 +94,28 @@ public class BusinessListFilter {
                                 long dontLikeDelta = System.currentTimeMillis() - dontLikeClickDate;
                                 long dontLikeDelta_days = dontLikeDelta / 1000 / 60 / 60 / 24; // Convert to days
 
-                                if (dontLikeDelta_days < DONTLIKE_THRESHOLD) {
+                                if (dontLikeDelta_days < DONTLIKE_THRESHOLD_INDAYS) {
+                                    Log.d(LOG_TAG, "filter() Deemed DON'T LIKE!");
                                     // Move item down the list
                                     mBusinessList_Filtered = moveItemToBottom(mBusinessList_Filtered, i);
+                                } else {
+                                    Log.d(LOG_TAG, "filter() DONT LIKE expired");
+
                                 }
 
+                            }
+                        // Handle Dismissed case
+
+                            if(businessItemRecord.getDismissedDate()!=0){
+                                business.setDismissedDate(dismissedDate);
+                                long dismissedDelta = System.currentTimeMillis() - dismissedDate;
+                                if (dismissedDelta < DISMISSED_THRESHOLD){
+                                    Log.d(LOG_TAG, "filter() Deemed dismissed!");
+                                    mBusinessList_Filtered = moveItemToBottom(mBusinessList_Filtered, i);
+                                } else {
+                                    Log.d(LOG_TAG, "filter() DISMISSED expired");
+
+                                }
                             }
 
 

@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity
     // Constants
     static final String SEARCH_TERM = "restaurants"; // This should not be user-definable at this time
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    static final double LOCATION_LIFESPAN = 10000; // "Age" of location data in milliseconds before it becomes "stale"
+    static final double LOCATION_LIFESPAN = 10 * 1000; // "Age" of location data in milliseconds before it becomes "stale"
     static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
     static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 

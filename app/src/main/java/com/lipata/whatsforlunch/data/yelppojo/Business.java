@@ -47,6 +47,7 @@ public class Business {
     // My fields
     long tooSoonClickDate;
     long dontLikeClickDate;
+    long dismissedDate;
 
 
     public long getTooSoonClickDate() {
@@ -63,6 +64,14 @@ public class Business {
 
     public void setDontLikeClickDate(long dontLikeClickDate) {
         this.dontLikeClickDate = dontLikeClickDate;
+    }
+
+    public long getDismissedDate() {
+        return dismissedDate;
+    }
+
+    public void setDismissedDate(long dismissedDate) {
+        this.dismissedDate = dismissedDate;
     }
 
     /**
