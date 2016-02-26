@@ -8,7 +8,6 @@ import android.support.v7.widget.helper.ItemTouchHelper;
  */
 public class BusinessTouchHelper extends ItemTouchHelper.SimpleCallback {
     private static final String LOG_TAG = BusinessTouchHelper.class.getSimpleName();
-    private BusinessListFilter mBusinessListFilter;
     private BusinessListAdapter mBusinessListAdapter;
 
     public BusinessTouchHelper(BusinessListAdapter adapter){

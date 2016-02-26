@@ -88,6 +88,11 @@ public class MainActivity extends AppCompatActivity
         mSuggestionListLayoutManager = new LinearLayoutManager(this);
         mRecyclerView_suggestionList.setLayoutManager(mSuggestionListLayoutManager);
 
+        mSuggestionListAdapter = new BusinessListAdapter(this, mCoordinatorLayout, mUserRecords);
+        mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
+        ItemTouchHelper.Callback callback = new BusinessTouchHelper(mSuggestionListAdapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(mRecyclerView_suggestionList);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         mSwipeRefreshLayout.setColorSchemeColors(R.color.colorPrimary);
@@ -322,12 +327,9 @@ public class MainActivity extends AppCompatActivity
         // Manipulate `businesses` to apply customization
         BusinessListFilter businessListFilter = new BusinessListFilter(businesses, this, mUserRecords);
         List<Business> filteredBusinesses = businessListFilter.filter();
+        mSuggestionListAdapter.setBusinessList(filteredBusinesses);
+        mSuggestionListAdapter.notifyDataSetChanged();
 
-        mSuggestionListAdapter = new BusinessListAdapter(filteredBusinesses, this, mCoordinatorLayout, mUserRecords, businessListFilter);
-        mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
-        ItemTouchHelper.Callback callback = new BusinessTouchHelper(mSuggestionListAdapter);
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(mRecyclerView_suggestionList);
     }
 
 

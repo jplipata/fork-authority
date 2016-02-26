@@ -42,13 +42,10 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     UserRecords mUserRecords;
     BusinessListFilter mBusinessListFilter;
 
-    public BusinessListAdapter(List<Business> businessList, Context context, CoordinatorLayout coordinatorLayout,
-                               UserRecords userRecords, BusinessListFilter businessListFilter){
-        this.mBusinessList = businessList;
+    public BusinessListAdapter(Context context, CoordinatorLayout coordinatorLayout, UserRecords userRecords){
         this.mContext = context;
         this.mCoordinatorLayout = coordinatorLayout;
         this.mUserRecords = userRecords;
-        this.mBusinessListFilter = businessListFilter;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -232,9 +229,17 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
     }
 
+    void setBusinessList(List<Business> businesses){
+        this.mBusinessList = businesses;
+    }
+
     @Override
     public int getItemCount() {
-        return mBusinessList.size();
+        if(mBusinessList==null){
+            return 0;
+        } else {
+            return mBusinessList.size();
+        }
     }
 
     public void dismiss(int position){
@@ -246,13 +251,13 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         // Remove existing element
         mBusinessList.remove(position);
 
-        // Update RecyclerView to trigger animation
+        // Update RecyclerView item (triggers animation)
         notifyItemRemoved(position);
 
         // Add business to bottom of list
         mBusinessList.add(business);
 
-        // Update RecyclerView
+        // Update other items in RecyclerView (this updates the item numbers in each CardView)
         notifyItemRangeChanged(position, getItemCount());
 
         // Backend stuff:
