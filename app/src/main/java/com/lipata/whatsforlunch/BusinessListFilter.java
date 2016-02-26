@@ -31,7 +31,6 @@ public class BusinessListFilter {
 
     List<Business> mBusinessList_Source;
     UserRecords mUserRecords;
-    List<Business> mBusinessList_Filtered = new ArrayList<>();
     Context mContext;
 
     public BusinessListFilter(Context context, UserRecords userRecords) {
@@ -41,13 +40,15 @@ public class BusinessListFilter {
 
     // Returns a filtered list
     List<Business> filter(List<Business> businessList_Source){
+
+        List<Business> businessList_Filtered = new ArrayList<>();
         this.mBusinessList_Source = businessList_Source; // Perhaps the member variable is un-necessary
 
         // Get user data
         List<BusinessItemRecord> userRecordList = mUserRecords.getList();
 
         // Iterate through API results, adjust order according to user records
-        mBusinessList_Filtered.addAll(mBusinessList_Source);
+        businessList_Filtered.addAll(mBusinessList_Source);
         for(int i=0; i<mBusinessList_Source.size(); i++){
             Business business = mBusinessList_Source.get(i);
             String businessId = business.getId();
@@ -77,7 +78,7 @@ public class BusinessListFilter {
                                 if (tooSoonDelta < TOOSOON_THRESHOLD) {
                                     Log.d(LOG_TAG, "filter() Deemed too soon!");
                                     // Move item down the list
-                                    mBusinessList_Filtered = moveItemToBottom(mBusinessList_Filtered, i);
+                                    businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
                                 } else {
                                     Log.d(LOG_TAG, "filter() TOOSOON expired");
                                 }
@@ -97,7 +98,7 @@ public class BusinessListFilter {
                                 if (dontLikeDelta_days < DONTLIKE_THRESHOLD_INDAYS) {
                                     Log.d(LOG_TAG, "filter() Deemed DON'T LIKE!");
                                     // Move item down the list
-                                    mBusinessList_Filtered = moveItemToBottom(mBusinessList_Filtered, i);
+                                    businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
                                 } else {
                                     Log.d(LOG_TAG, "filter() DONT LIKE expired");
 
@@ -111,7 +112,7 @@ public class BusinessListFilter {
                                 long dismissedDelta = System.currentTimeMillis() - dismissedDate;
                                 if (dismissedDelta < DISMISSED_THRESHOLD){
                                     Log.d(LOG_TAG, "filter() Deemed dismissed!");
-                                    mBusinessList_Filtered = moveItemToBottom(mBusinessList_Filtered, i);
+                                    businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
                                 } else {
                                     Log.d(LOG_TAG, "filter() DISMISSED expired");
 
@@ -126,10 +127,10 @@ public class BusinessListFilter {
         }
 
         // Remove null elements
-        mBusinessList_Filtered.removeAll(Collections.singleton(null));
+        businessList_Filtered.removeAll(Collections.singleton(null));
 
         // That's it! Return the filtered list.
-        return mBusinessList_Filtered;
+        return businessList_Filtered;
     }
 
 
