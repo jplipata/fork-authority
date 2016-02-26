@@ -42,10 +42,12 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     UserRecords mUserRecords;
     BusinessListFilter mBusinessListFilter;
 
-    public BusinessListAdapter(Context context, CoordinatorLayout coordinatorLayout, UserRecords userRecords){
+    public BusinessListAdapter(Context context, CoordinatorLayout coordinatorLayout,
+                               UserRecords userRecords, BusinessListFilter businessListFilter){
         this.mContext = context;
         this.mCoordinatorLayout = coordinatorLayout;
         this.mUserRecords = userRecords;
+        this.mBusinessListFilter = businessListFilter;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

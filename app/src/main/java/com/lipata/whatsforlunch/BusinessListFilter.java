@@ -34,14 +34,14 @@ public class BusinessListFilter {
     List<Business> mBusinessList_Filtered = new ArrayList<>();
     Context mContext;
 
-    public BusinessListFilter(List<Business> businessList_Source, Context context, UserRecords userRecords) {
-        this.mBusinessList_Source = businessList_Source;
+    public BusinessListFilter(Context context, UserRecords userRecords) {
         this.mUserRecords = userRecords;
         this.mContext = context;
     }
 
     // Returns a filtered list
-    List<Business> filter(){
+    List<Business> filter(List<Business> businessList_Source){
+        this.mBusinessList_Source = businessList_Source; // Perhaps the member variable is un-necessary
 
         // Get user data
         List<BusinessItemRecord> userRecordList = mUserRecords.getList();

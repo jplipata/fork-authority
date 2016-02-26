@@ -67,7 +67,9 @@ public class MainActivity extends AppCompatActivity
     private BusinessListAdapter mSuggestionListAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
+
     UserRecords mUserRecords;
+    BusinessListFilter mBusinessListFilter;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +78,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         mUserRecords = new UserRecords(this);
+        mBusinessListFilter = new BusinessListFilter(this, mUserRecords);
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
         mTextView_Latitude = (TextView) findViewById((R.id.latitude_text));
@@ -88,7 +91,7 @@ public class MainActivity extends AppCompatActivity
         mSuggestionListLayoutManager = new LinearLayoutManager(this);
         mRecyclerView_suggestionList.setLayoutManager(mSuggestionListLayoutManager);
 
-        mSuggestionListAdapter = new BusinessListAdapter(this, mCoordinatorLayout, mUserRecords);
+        mSuggestionListAdapter = new BusinessListAdapter(this, mCoordinatorLayout, mUserRecords, mBusinessListFilter);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
         ItemTouchHelper.Callback callback = new BusinessTouchHelper(mSuggestionListAdapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
@@ -325,8 +328,7 @@ public class MainActivity extends AppCompatActivity
         List<Business> businesses = yelpResponsePojo.getBusinesses();
 
         // Manipulate `businesses` to apply customization
-        BusinessListFilter businessListFilter = new BusinessListFilter(businesses, this, mUserRecords);
-        List<Business> filteredBusinesses = businessListFilter.filter();
+        List<Business> filteredBusinesses = mBusinessListFilter.filter(businesses);
         mSuggestionListAdapter.setBusinessList(filteredBusinesses);
         mSuggestionListAdapter.notifyDataSetChanged();
 
