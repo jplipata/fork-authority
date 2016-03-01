@@ -30,6 +30,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.lipata.whatsforlunch.api.yelp.AsyncYelpCall;
+import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.data.user.UserRecords;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 import com.lipata.whatsforlunch.data.yelppojo.YelpResponse;
@@ -45,9 +46,8 @@ public class MainActivity extends AppCompatActivity
         implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 
     // Constants
-    static final String SEARCH_TERM = "restaurants"; // This should not be user-definable at this time
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    static final double LOCATION_LIFESPAN = 10 * 1000; // "Age" of location data in milliseconds before it becomes "stale"
+
     static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
     static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView.LayoutManager mSuggestionListLayoutManager;
     private BusinessListAdapter mSuggestionListAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-
 
     UserRecords mUserRecords;
     BusinessListFilter mBusinessListFilter;
@@ -176,8 +175,8 @@ public class MainActivity extends AppCompatActivity
             requestLocationData();
         } else {
             String ll = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude() + "," + mLastLocation.getAccuracy();
-            Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + SEARCH_TERM);
-            new AsyncYelpCall(ll, SEARCH_TERM, this).execute();
+            Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
+            new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, this).execute();
         }
     }
 
@@ -255,7 +254,7 @@ public class MainActivity extends AppCompatActivity
         Log.d(LOG_TAG, "currentTime = " + currentTime);
         Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
 
-        if ((currentTime - mLocationUpdateTimestamp) > LOCATION_LIFESPAN){
+        if ((currentTime - mLocationUpdateTimestamp) > AppSettings.LOCATION_LIFESPAN){
             return true;
         } else {
             return false;}

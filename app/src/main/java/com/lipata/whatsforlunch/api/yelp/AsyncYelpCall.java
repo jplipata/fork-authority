@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.lipata.whatsforlunch.ApiKeys;
 import com.lipata.whatsforlunch.MainActivity;
+import com.lipata.whatsforlunch.data.AppSettings;
 
 /**
  * Created by jlipatap on 1/21/16.
@@ -27,7 +28,7 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... strings) {
-        return yelpApi.searchForBusinessesByLocation(userSearch, userLocation);
+        return yelpApi.searchForBusinessesByLocation(userSearch, userLocation, AppSettings.SEARCH_RADIUS);
     }
 
     @Override

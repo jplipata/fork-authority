@@ -6,10 +6,6 @@ import android.util.Log;
 import com.beust.jcommander.Parameter;
 import com.lipata.whatsforlunch.ApiKeys;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -74,12 +70,12 @@ public class YelpAPI {
    * @param location <tt>String</tt> of the location
    * @return <tt>String</tt> JSON Response
    */
-  public String searchForBusinessesByLocation(String term, String location) {
+  public String searchForBusinessesByLocation(String term, String location, int radius) {
     OAuthRequest request = createOAuthRequest(SEARCH_PATH);
     request.addQuerystringParameter("term", term);
-      Log.d("YelpAPI", "Location = " +location);
+      Log.d("YelpAPI", "Location = " + location);
     request.addQuerystringParameter("ll", location); //latitude,longitude
-    //request.addQuerystringParameter("limit", String.valueOf(SEARCH_LIMIT));
+    request.addQuerystringParameter("radius_filter", Integer.toString(radius));
     return sendRequestAndGetResponse(request);
   }
 
@@ -128,7 +124,7 @@ public class YelpAPI {
    * @param yelpApi <tt>YelpAPI</tt> service instance
    * @param yelpApiCli <tt>YelpAPICLI</tt> command line arguments
    */
-  private static void queryAPI(YelpAPI yelpApi, YelpAPICLI yelpApiCli) {
+  /*private static void queryAPI(YelpAPI yelpApi, YelpAPICLI yelpApiCli) {
     String searchResponseJSON =
         yelpApi.searchForBusinessesByLocation(yelpApiCli.term, yelpApiCli.location);
 
@@ -154,7 +150,7 @@ public class YelpAPI {
     System.out.println(String.format("Result for business \"%s\" found:", firstBusinessID));
     System.out.println(businessResponseJSON);
   }
-
+*/
   /**
    * Command-line interface for the sample Yelp API runner.
    */

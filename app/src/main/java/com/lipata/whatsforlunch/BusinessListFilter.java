@@ -15,6 +15,7 @@ import java.util.List;
  * Created by jlipatap on 1/17/16.
  */
 public class BusinessListFilter {
+    private static String LOG_TAG = BusinessListFilter.class.getSimpleName();
 
     public static long TOOSOON_THRESHOLD = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
     public static int DONTLIKE_THRESHOLD_INDAYS = 90; // 90 days
@@ -27,9 +28,6 @@ public class BusinessListFilter {
      */
     public static long DISMISSED_THRESHOLD = 1000 * 60 * 30;
 
-    private static String LOG_TAG = BusinessListFilter.class.getSimpleName();
-
-    List<Business> mBusinessList_Source;
     UserRecords mUserRecords;
     Context mContext;
 
@@ -42,15 +40,14 @@ public class BusinessListFilter {
     List<Business> filter(List<Business> businessList_Source){
 
         List<Business> businessList_Filtered = new ArrayList<>();
-        this.mBusinessList_Source = businessList_Source; // Perhaps the member variable is un-necessary
 
         // Get user data
         List<BusinessItemRecord> userRecordList = mUserRecords.getList();
 
         // Iterate through API results, adjust order according to user records
-        businessList_Filtered.addAll(mBusinessList_Source);
-        for(int i=0; i<mBusinessList_Source.size(); i++){
-            Business business = mBusinessList_Source.get(i);
+        businessList_Filtered.addAll(businessList_Source);
+        for(int i=0; i<businessList_Source.size(); i++){
+            Business business = businessList_Source.get(i);
             String businessId = business.getId();
 
             // Look for this `businessId` in the user records
@@ -80,7 +77,7 @@ public class BusinessListFilter {
                                     // Move item down the list
                                     businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
                                 } else {
-                                    Log.d(LOG_TAG, "filter() TOOSOON expired");
+                                    Log.d(LOG_TAG, "filter() TooSoon EXPIRED");
                                 }
 
                             }
@@ -100,7 +97,7 @@ public class BusinessListFilter {
                                     // Move item down the list
                                     businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
                                 } else {
-                                    Log.d(LOG_TAG, "filter() DONT LIKE expired");
+                                    Log.d(LOG_TAG, "filter() DontLike EXPIRED");
 
                                 }
 
@@ -114,7 +111,7 @@ public class BusinessListFilter {
                                     Log.d(LOG_TAG, "filter() Deemed dismissed!");
                                     businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
                                 } else {
-                                    Log.d(LOG_TAG, "filter() DISMISSED expired");
+                                    Log.d(LOG_TAG, "filter() Dismissed EXPIRED");
 
                                 }
                             }
