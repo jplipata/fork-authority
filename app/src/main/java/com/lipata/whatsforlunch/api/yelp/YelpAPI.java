@@ -3,7 +3,6 @@ package com.lipata.whatsforlunch.api.yelp;
 
 import android.util.Log;
 
-import com.beust.jcommander.Parameter;
 import com.google.gson.Gson;
 import com.lipata.whatsforlunch.ApiKeys;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
@@ -122,50 +121,59 @@ public class YelpAPI {
     return response.getBody();
   }
 
-  /**
-   * Queries the Search API based on the command line arguments and takes the first result to query
-   * the Business API.
-   * 
-   * @param yelpApi <tt>YelpAPI</tt> service instance
-   * @param yelpApiCli <tt>YelpAPICLI</tt> command line arguments
-   */
-  /*private static void queryAPI(YelpAPI yelpApi, YelpAPICLI yelpApiCli) {
-    String searchResponseJSON =
-        yelpApi.searchForBusinessesByLocation(yelpApiCli.term, yelpApiCli.location);
-
-    JSONParser parser = new JSONParser();
-    JSONObject response = null;
-    try {
-      response = (JSONObject) parser.parse(searchResponseJSON);
-    } catch (ParseException pe) {
-      System.out.println("Error: could not parse JSON response:");
-      System.out.println(searchResponseJSON);
-      System.exit(1);
-    }
-
-    JSONArray businesses = (JSONArray) response.get("businesses");
-    JSONObject firstBusiness = (JSONObject) businesses.get(0);
-    String firstBusinessID = firstBusiness.get("id").toString();
-    System.out.println(String.format(
-        "%s businesses found, querying business info for the top result \"%s\" ...",
-        businesses.size(), firstBusinessID));
-
-    // Select the first business and display business details
-    String businessResponseJSON = yelpApi.searchByBusinessId(firstBusinessID.toString());
-    System.out.println(String.format("Result for business \"%s\" found:", firstBusinessID));
-    System.out.println(businessResponseJSON);
+  // Created by JP Lipata
+  // Public method that parses JSON response from Yelp API and converts to POJO using GSON
+  public List<Business> parseYelpResponse(String yelpResponse_Json){
+    Log.d(LOG_TAG, "parseYelpResponse()");
+    Gson gson = new Gson();
+    YelpResponse yelpResponsePojo = gson.fromJson(yelpResponse_Json, YelpResponse.class);
+    return yelpResponsePojo.getBusinesses();
   }
-*/
-  /**
-   * Command-line interface for the sample Yelp API runner.
-   */
-  private static class YelpAPICLI {
-    @Parameter(names = {"-q", "--term"}, description = "Search Query Term")
-    public String term = DEFAULT_TERM;
 
-    @Parameter(names = {"-l", "--location"}, description = "Location to be Queried")
-    public String location = DEFAULT_LOCATION;
-  }
+//  /**
+//   * Queries the Search API based on the command line arguments and takes the first result to query
+//   * the Business API.
+//   *
+//   * @param yelpApi <tt>YelpAPI</tt> service instance
+//   * @param yelpApiCli <tt>YelpAPICLI</tt> command line arguments
+//   */
+//  private static void queryAPI(YelpAPI yelpApi, YelpAPICLI yelpApiCli) {
+//    String searchResponseJSON =
+//        yelpApi.searchForBusinessesByLocation(yelpApiCli.term, yelpApiCli.location);
+//
+//    JSONParser parser = new JSONParser();
+//    JSONObject response = null;
+//    try {
+//      response = (JSONObject) parser.parse(searchResponseJSON);
+//    } catch (ParseException pe) {
+//      System.out.println("Error: could not parse JSON response:");
+//      System.out.println(searchResponseJSON);
+//      System.exit(1);
+//    }
+//
+//    JSONArray businesses = (JSONArray) response.get("businesses");
+//    JSONObject firstBusiness = (JSONObject) businesses.get(0);
+//    String firstBusinessID = firstBusiness.get("id").toString();
+//    System.out.println(String.format(
+//        "%s businesses found, querying business info for the top result \"%s\" ...",
+//        businesses.size(), firstBusinessID));
+//
+//    // Select the first business and display business details
+//    String businessResponseJSON = yelpApi.searchByBusinessId(firstBusinessID.toString());
+//    System.out.println(String.format("Result for business \"%s\" found:", firstBusinessID));
+//    System.out.println(businessResponseJSON);
+//  }
+
+//  /**
+//   * Command-line interface for the sample Yelp API runner.
+//   */
+//  private static class YelpAPICLI {
+//    @Parameter(names = {"-q", "--term"}, description = "Search Query Term")
+//    public String term = DEFAULT_TERM;
+//
+//    @Parameter(names = {"-l", "--location"}, description = "Location to be Queried")
+//    public String location = DEFAULT_LOCATION;
+//  }
 
 //  /**
 //   * Main entry for sample Yelp API requests.
@@ -180,12 +188,4 @@ public class YelpAPI {
 //    queryAPI(yelpApi, yelpApiCli);
 //  }
 
-
-  // Public method that parses JSON response from Yelp API and converts to POJO using GSON
-  public List<Business> parseYelpResponse(String yelpResponse_Json){
-    Log.d(LOG_TAG, "parseYelpResponse()");
-    Gson gson = new Gson();
-    YelpResponse yelpResponsePojo = gson.fromJson(yelpResponse_Json, YelpResponse.class);
-    return yelpResponsePojo.getBusinesses();
-  }
 }
