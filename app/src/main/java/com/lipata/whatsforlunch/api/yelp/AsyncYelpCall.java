@@ -45,7 +45,7 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
         Log.d(LOG_TAG, yelpResponse_Json);
         List<Business> businessList = yelpApi.parseYelpResponse(yelpResponse_Json);
 
-        // Manipulate `businesses` to apply customization
+        // Manipulate `businessList` to apply customization
         List<Business> filteredBusinesses = mBusinessListFilter.filter(businessList);
         mBusinessListAdapter.setBusinessList(filteredBusinesses);
         mBusinessListAdapter.notifyDataSetChanged();
