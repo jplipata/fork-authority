@@ -198,7 +198,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                 }
 
                 Snackbar.make(mCoordinatorLayout,
-                        "Noted. You like " + business.getName() + ". I will suggest this more often.",
+                        "Noted. You like " + business.getName() + ". I have moved this to the top of the list.",
                         Snackbar.LENGTH_LONG).show();
 
             }
