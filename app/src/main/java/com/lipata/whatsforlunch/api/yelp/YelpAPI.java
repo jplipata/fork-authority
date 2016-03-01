@@ -122,7 +122,8 @@ public class YelpAPI {
   }
 
   // Created by JP Lipata
-  // Public method that parses JSON response from Yelp API and converts to POJO using GSON
+  // Public method that parses JSON response from Yelp API and converts to POJO as defined in
+  // data.yelppojo using GSON
   public List<Business> parseYelpResponse(String yelpResponse_Json){
     Log.d(LOG_TAG, "parseYelpResponse()");
     Gson gson = new Gson();

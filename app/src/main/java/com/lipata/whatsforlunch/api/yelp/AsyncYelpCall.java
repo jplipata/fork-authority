@@ -19,16 +19,16 @@ import java.util.List;
 public class AsyncYelpCall extends AsyncTask<String, Void, String> {
 
     private static final String LOG_TAG = AsyncYelpCall.class.getSimpleName();
-    YelpAPI yelpApi = new YelpAPI(ApiKeys.CONSUMER_KEY, ApiKeys.CONSUMER_SECRET, ApiKeys.TOKEN, ApiKeys.TOKEN_SECRET);
-    String userLocation;
-    String userSearch;
+    YelpAPI mYelpApi = new YelpAPI(ApiKeys.CONSUMER_KEY, ApiKeys.CONSUMER_SECRET, ApiKeys.TOKEN, ApiKeys.TOKEN_SECRET);
+    String mUserLocation;
+    String mUserSearch;
     BusinessListFilter mBusinessListFilter;
     BusinessListAdapter mBusinessListAdapter;
 
     public AsyncYelpCall(String userLocation, String userSearch, BusinessListFilter businessListFilter,
                          BusinessListAdapter mBusinessListAdapter) {
-        this.userLocation = userLocation;
-        this.userSearch = userSearch;
+        this.mUserLocation = userLocation;
+        this.mUserSearch = userSearch;
         this.mBusinessListFilter = businessListFilter;
         this.mBusinessListAdapter = mBusinessListAdapter;
 
@@ -36,14 +36,14 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... strings) {
-        return yelpApi.searchForBusinessesByLocation(userSearch, userLocation, AppSettings.SEARCH_RADIUS);
+        return mYelpApi.searchForBusinessesByLocation(mUserSearch, mUserLocation, AppSettings.SEARCH_RADIUS);
     }
 
     @Override
     protected void onPostExecute(String yelpResponse_Json) {
         super.onPostExecute(yelpResponse_Json);
         Log.d(LOG_TAG, yelpResponse_Json);
-        List<Business> businessList = yelpApi.parseYelpResponse(yelpResponse_Json);
+        List<Business> businessList = mYelpApi.parseYelpResponse(yelpResponse_Json);
 
         // Manipulate `businessList` to apply customization
         List<Business> filteredBusinesses = mBusinessListFilter.filter(businessList);
