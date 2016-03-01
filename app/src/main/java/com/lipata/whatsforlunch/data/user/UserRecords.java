@@ -19,6 +19,7 @@ import java.util.List;
  */
 public class UserRecords {
     private static String LOG_TAG = UserRecords.class.getSimpleName();
+    public static int LIKE_FLAG = -1;
     List<BusinessItemRecord> mList;
     Context mContext;
 
@@ -52,7 +53,7 @@ public class UserRecords {
     }
 
 
-    public void updateClickDate(Business business, long time, int buttonConstant){
+    public void updateClickDate(Business business, long time, int buttonId){
         Log.d(LOG_TAG, "updateClickDate()");
 
         // Check for item
@@ -67,7 +68,7 @@ public class UserRecords {
             businessItemRecord.setId(business.getId());
 
             // Assign based on button type
-            switch(buttonConstant){
+            switch(buttonId){
                 case BusinessListAdapter.TOOSOON:
                     businessItemRecord.setTooSoonClickDate(time);
                     break;
@@ -77,6 +78,8 @@ public class UserRecords {
                 case BusinessListAdapter.DISMISS:
                     businessItemRecord.setDismissedDate(time);
                     break;
+                case BusinessListAdapter.LIKE:
+                    businessItemRecord.setDontLikeClickDate(time); // Use "-1" for "Like"
             }
 
             // Check
@@ -92,7 +95,7 @@ public class UserRecords {
 
             // Update ClickDate
             BusinessItemRecord record = mList.get(itemIndex);
-            switch (buttonConstant){
+            switch (buttonId){
                 case BusinessListAdapter.TOOSOON:
                     record.setTooSoonClickDate(time);
                     break;

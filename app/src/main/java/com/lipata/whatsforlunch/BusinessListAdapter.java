@@ -140,6 +140,8 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
         // Dynamically add text based on UserRecords
         long tooSoonClickDate = business.getTooSoonClickDate();
+        long dontlikeClickDate = business.getDontLikeClickDate();
+
         if(tooSoonClickDate!=0) {
             //Log.d(LOG_TAG, business.getName()+" has a tooSoonClickDate");
             Calendar calendar = Calendar.getInstance();
@@ -154,8 +156,10 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             holder.mTextView_JustAteHereDate.setVisibility(View.GONE);
         }
 
-        long dontlikeClickDate = business.getDontLikeClickDate();
-        if(dontlikeClickDate!=0){
+        if(dontlikeClickDate==-1){
+            holder.mTextView_LikeDontLike.setVisibility(View.VISIBLE);
+            holder.mTextView_LikeDontLike.setText("You like this");
+        } else if(dontlikeClickDate!=0){
             holder.mTextView_LikeDontLike.setVisibility(View.VISIBLE);
             holder.mTextView_LikeDontLike.setText("Don't like");
         } else {
@@ -165,9 +169,38 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         holder.mButton_Like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                // Backend stuff
+                // Update UserRecords
+                mUserRecords.updateClickDate(business, UserRecords.LIKE_FLAG, LIKE);
+                mUserRecords.commit();
+
+                // Update object field
+                business.setDontLikeClickDate(UserRecords.LIKE_FLAG) ;
+                Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + business.getDontLikeClickDate());
+
+                // UI stuff
+                if(position!=0) {
+
+                    mBusinessList.remove(position);
+
+                    // Update RecyclerView item (triggers animation)
+                    notifyItemRemoved(position);
+
+                    // Add business to top of list
+                    mBusinessList.add(0, business);
+
+                    // Update other items in RecyclerView (this updates the item numbers in each CardView)
+                    notifyItemRangeChanged(0, getItemCount());
+                    //uiUpdated = true;
+                } else {
+                    notifyItemChanged(0);
+                }
+
                 Snackbar.make(mCoordinatorLayout,
                         "Noted. You like " + business.getName() + ". I will suggest this more often.",
                         Snackbar.LENGTH_LONG).show();
+
             }
         });
 

@@ -30,6 +30,10 @@ public class BusinessListManager {
 
         List<Business> businessList_Filtered = new ArrayList<>();
 
+        // Items added to the top of the list must be added at the end of the operation,
+        // otherwise indexes get shifted and the filter goes haywire
+        TopStack topStack = new TopStack();
+
         // Get user data
         List<BusinessItemRecord> userRecordList = mUserRecords.getList();
 
@@ -46,34 +50,32 @@ public class BusinessListManager {
                     long tooSoonClickDate = businessItemRecord.getTooSoonClickDate();
                     long dontLikeClickDate = businessItemRecord.getDontLikeClickDate();
                     long dismissedDate = businessItemRecord.getDismissedDate();
-                    Log.d(LOG_TAG, "Match found. Id = " + businessId + " tooSoonClickDate = "
+                    Log.d(LOG_TAG, "Match found! Id = " + businessId + " tooSoonClickDate = "
                             + tooSoonClickDate + " dontLikeClickDate = "+ dontLikeClickDate +
                             " dismissedDate = "+dismissedDate);
 
                     // On match found, do:
 
-                        // Handle the "Too Soon" case:
+                        // Handle Like case
 
-                            if(businessItemRecord.getTooSoonClickDate()!=0) {
-                                // Update the `business` object to include tooSoonClickDate;
-                                business.setTooSoonClickDate(tooSoonClickDate);
+                            if(dontLikeClickDate==-1){
+                                Log.d(LOG_TAG,"filter() deemed LIKE");
 
-                                // Calculate difference between current time and tooSoonClickDate
-                                long tooSoonDelta = System.currentTimeMillis() - tooSoonClickDate;
+                                // Update the `business` object
+                                business.setDontLikeClickDate(UserRecords.LIKE_FLAG);
 
-                                if (tooSoonDelta < AppSettings.TOOSOON_THRESHOLD) {
-                                    Log.d(LOG_TAG, "filter() Deemed too soon!");
-                                    // Move item down the list
-                                    businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
+                                // Move item to top of list
+                                if(i!=0) { // Check if item is not already at top of list
+                                    topStack.addItemToTopStack(business);
+                                    businessList_Filtered.set(i, null);
                                 } else {
-                                    Log.d(LOG_TAG, "filter() TooSoon EXPIRED");
+                                    // Item is already at top of list
                                 }
-
                             }
 
                         // Handle Dont Like case
 
-                            if(businessItemRecord.getDontLikeClickDate()!=0) {
+                            if (dontLikeClickDate > 0) {
                                 // Update the `business` object
                                 business.setDontLikeClickDate(dontLikeClickDate);
 
@@ -87,10 +89,29 @@ public class BusinessListManager {
                                     businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
                                 } else {
                                     Log.d(LOG_TAG, "filter() DontLike EXPIRED");
-
                                 }
 
                             }
+
+                        // Handle the "Too Soon" case:
+
+                        if(tooSoonClickDate!=0) {
+                            // Update the `business` object to include tooSoonClickDate;
+                            business.setTooSoonClickDate(tooSoonClickDate);
+
+                            // Calculate difference between current time and tooSoonClickDate
+                            long tooSoonDelta = System.currentTimeMillis() - tooSoonClickDate;
+
+                            if (tooSoonDelta < AppSettings.TOOSOON_THRESHOLD) {
+                                Log.d(LOG_TAG, "filter() Deemed too soon!");
+                                // Move item down the list
+                                businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
+                            } else {
+                                Log.d(LOG_TAG, "filter() TooSoon EXPIRED");
+                            }
+
+                        }
+
                         // Handle Dismissed case
 
                             if(businessItemRecord.getDismissedDate()!=0){
@@ -115,8 +136,29 @@ public class BusinessListManager {
         // Remove null elements
         businessList_Filtered.removeAll(Collections.singleton(null));
 
+        // Add items from TopStack
+        businessList_Filtered.addAll(0, topStack.getTopStack());
+
         // That's it! Return the filtered list.
         return businessList_Filtered;
+    }
+
+    class TopStack {
+
+        List<Business> mTopStack;
+
+        public TopStack() {
+            this.mTopStack = new ArrayList<>();
+        }
+
+        // Adds items to list of items to be sorted at top of array, to be added at end of filter process
+        void addItemToTopStack(Business business){
+            mTopStack.add(0, business);
+        }
+
+        List<Business> getTopStack(){
+            return mTopStack;
+        }
     }
 
 
@@ -125,6 +167,20 @@ public class BusinessListManager {
         Business business = businessList.get(itemPosition);
         businessList.add(business);
         businessList.set(itemPosition, null);
+        Log.d(LOG_TAG, "moveItemToBottom() Item " + itemPosition + " moved to bottom");
+        return businessList;
+    }
+
+    // This returns a list with null values, nulls still need to be removed after new list is returned
+    public List<Business> moveItemToTop(List<Business> businessList, int itemPosition){
+        if(itemPosition!=0) {
+            Business business = businessList.get(itemPosition);
+            businessList.add(0, business);//
+            businessList.set(itemPosition+1, null); // Needs "+1" because you've added a new item at index 0 so the others have shifted down
+            Log.d(LOG_TAG, "moveItemToTop() Item "+ itemPosition + " moved to top");
+        } else {
+            Log.d(LOG_TAG, "moveItemToTop() Item is already on top");
+        }
         return businessList;
     }
 }

@@ -7,7 +7,7 @@ public class BusinessItemRecord {
 
     String Id;
     long tooSoonClickDate;
-    long dontLikeClickDate;
+    long dontLikeClickDate; // A value of "-1" means "Like"
     long dismissedClickDate;
 
     public String getId() {
