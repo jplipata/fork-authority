@@ -4,7 +4,10 @@ package com.lipata.whatsforlunch.api.yelp;
 import android.util.Log;
 
 import com.beust.jcommander.Parameter;
+import com.google.gson.Gson;
 import com.lipata.whatsforlunch.ApiKeys;
+import com.lipata.whatsforlunch.data.yelppojo.Business;
+import com.lipata.whatsforlunch.data.yelppojo.YelpResponse;
 
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.model.OAuthRequest;
@@ -12,6 +15,8 @@ import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
+
+import java.util.List;
 
 /**
  * Code sample for accessing the Yelp API V2.
@@ -25,11 +30,11 @@ import org.scribe.oauth.OAuthService;
  * 
  */
 public class YelpAPI {
+  private static final String LOG_TAG = YelpAPI.class.getSimpleName();
 
   private static final String API_HOST = "api.yelp.com";
   private static final String DEFAULT_TERM = "dinner";
   private static final String DEFAULT_LOCATION = "San Francisco, CA";
-  private static final int SEARCH_LIMIT = 10;
   private static final String SEARCH_PATH = "/v2/search";
   private static final String BUSINESS_PATH = "/v2/business";
 
@@ -174,4 +179,13 @@ public class YelpAPI {
 //    YelpAPI yelpApi = new YelpAPI(CONSUMER_KEY, CONSUMER_SECRET, TOKEN, TOKEN_SECRET);
 //    queryAPI(yelpApi, yelpApiCli);
 //  }
+
+
+  public List<Business> parseYelpResponse(String yelpResponse_Json){
+    Log.d(LOG_TAG, "parseYelpResponse()");
+    Gson gson = new Gson();
+    YelpResponse yelpResponsePojo = gson.fromJson(yelpResponse_Json, YelpResponse.class);
+    return yelpResponsePojo.getBusinesses();
+
+  }
 }

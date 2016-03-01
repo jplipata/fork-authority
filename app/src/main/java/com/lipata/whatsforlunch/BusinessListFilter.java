@@ -37,7 +37,7 @@ public class BusinessListFilter {
     }
 
     // Returns a filtered list
-    List<Business> filter(List<Business> businessList_Source){
+    public List<Business> filter(List<Business> businessList_Source){
 
         List<Business> businessList_Filtered = new ArrayList<>();
 

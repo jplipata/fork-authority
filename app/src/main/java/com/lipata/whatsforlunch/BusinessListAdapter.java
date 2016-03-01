@@ -231,7 +231,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
     }
 
-    void setBusinessList(List<Business> businesses){
+    public void setBusinessList(List<Business> businesses){
         this.mBusinessList = businesses;
     }
 

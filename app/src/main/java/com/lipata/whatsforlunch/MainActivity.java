@@ -28,14 +28,9 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.gson.Gson;
 import com.lipata.whatsforlunch.api.yelp.AsyncYelpCall;
 import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.data.user.UserRecords;
-import com.lipata.whatsforlunch.data.yelppojo.Business;
-import com.lipata.whatsforlunch.data.yelppojo.YelpResponse;
-
-import java.util.List;
 
 /**
  *  This Android app gets device location, queries the Yelp API for restaurant recommendations,
@@ -176,7 +171,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             String ll = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude() + "," + mLastLocation.getAccuracy();
             Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
-            new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, this).execute();
+            new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListFilter, mSuggestionListAdapter).execute();
         }
     }
 
@@ -317,24 +312,6 @@ public class MainActivity extends AppCompatActivity
         Log.d(LOG_TAG, "Location Updates Stopped");
     }
 
-    // Public methods
-
-    // I made this `public` in order for it to be called from api.yelp.AsyncYelpCall.class  Is there a better way?
-    public void parseYelpResponse(String yelpResponse_Json){
-        Log.d(LOG_TAG, "parseYelpResponse()");
-        Gson gson = new Gson();
-        YelpResponse yelpResponsePojo = gson.fromJson(yelpResponse_Json, YelpResponse.class);
-        List<Business> businesses = yelpResponsePojo.getBusinesses();
-
-        // Manipulate `businesses` to apply customization
-        List<Business> filteredBusinesses = mBusinessListFilter.filter(businesses);
-        mSuggestionListAdapter.setBusinessList(filteredBusinesses);
-        mSuggestionListAdapter.notifyDataSetChanged();
-
-    }
-
-
-
     // MainActivity template menu override methods
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -364,7 +341,6 @@ public class MainActivity extends AppCompatActivity
     public void onSaveInstanceState(Bundle savedInstanceState){
         savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, mLocationUpdateTimestamp);
         super.onSaveInstanceState(savedInstanceState);
-
     }
 
 }
