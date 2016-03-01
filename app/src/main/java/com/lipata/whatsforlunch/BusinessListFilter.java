@@ -3,6 +3,7 @@ package com.lipata.whatsforlunch;
 import android.content.Context;
 import android.util.Log;
 
+import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.data.user.BusinessItemRecord;
 import com.lipata.whatsforlunch.data.user.UserRecords;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
@@ -16,17 +17,6 @@ import java.util.List;
  */
 public class BusinessListFilter {
     private static String LOG_TAG = BusinessListFilter.class.getSimpleName();
-
-    public static long TOOSOON_THRESHOLD = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
-    public static int DONTLIKE_THRESHOLD_INDAYS = 90; // 90 days
-
-    /*
-     * The DISMISSED_THRESHOLD constant should be based on how long it typically takes a person to
-     * decide what to eat for lunch
-     * The amount of time should last long enough for one user 'session', i.e. as long as it takes to
-     * decide what to eat
-     */
-    public static long DISMISSED_THRESHOLD = 1000 * 60 * 30;
 
     UserRecords mUserRecords;
     Context mContext;
@@ -72,7 +62,7 @@ public class BusinessListFilter {
                                 // Calculate difference between current time and tooSoonClickDate
                                 long tooSoonDelta = System.currentTimeMillis() - tooSoonClickDate;
 
-                                if (tooSoonDelta < TOOSOON_THRESHOLD) {
+                                if (tooSoonDelta < AppSettings.TOOSOON_THRESHOLD) {
                                     Log.d(LOG_TAG, "filter() Deemed too soon!");
                                     // Move item down the list
                                     businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
@@ -92,7 +82,7 @@ public class BusinessListFilter {
                                 long dontLikeDelta = System.currentTimeMillis() - dontLikeClickDate;
                                 long dontLikeDelta_days = dontLikeDelta / 1000 / 60 / 60 / 24; // Convert to days
 
-                                if (dontLikeDelta_days < DONTLIKE_THRESHOLD_INDAYS) {
+                                if (dontLikeDelta_days < AppSettings.DONTLIKE_THRESHOLD_INDAYS) {
                                     Log.d(LOG_TAG, "filter() Deemed DON'T LIKE!");
                                     // Move item down the list
                                     businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
@@ -107,7 +97,7 @@ public class BusinessListFilter {
                             if(businessItemRecord.getDismissedDate()!=0){
                                 business.setDismissedDate(dismissedDate);
                                 long dismissedDelta = System.currentTimeMillis() - dismissedDate;
-                                if (dismissedDelta < DISMISSED_THRESHOLD){
+                                if (dismissedDelta < AppSettings.DISMISSED_THRESHOLD){
                                     Log.d(LOG_TAG, "filter() Deemed dismissed!");
                                     businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
                                 } else {
