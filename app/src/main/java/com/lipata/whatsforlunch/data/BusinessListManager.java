@@ -1,9 +1,8 @@
-package com.lipata.whatsforlunch;
+package com.lipata.whatsforlunch.data;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.data.user.BusinessItemRecord;
 import com.lipata.whatsforlunch.data.user.UserRecords;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
@@ -15,13 +14,13 @@ import java.util.List;
 /**
  * Created by jlipatap on 1/17/16.
  */
-public class BusinessListFilter {
-    private static String LOG_TAG = BusinessListFilter.class.getSimpleName();
+public class BusinessListManager {
+    private static String LOG_TAG = BusinessListManager.class.getSimpleName();
 
     UserRecords mUserRecords;
     Context mContext;
 
-    public BusinessListFilter(Context context, UserRecords userRecords) {
+    public BusinessListManager(Context context, UserRecords userRecords) {
         this.mUserRecords = userRecords;
         this.mContext = context;
     }
@@ -122,7 +121,7 @@ public class BusinessListFilter {
 
 
     // This returns a list with null values, nulls still need to be removed after new list is returned
-    List<Business> moveItemToBottom(List<Business> businessList, int itemPosition){
+    public List<Business> moveItemToBottom(List<Business> businessList, int itemPosition){
         Business business = businessList.get(itemPosition);
         businessList.add(business);
         businessList.set(itemPosition, null);

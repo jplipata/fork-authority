@@ -30,6 +30,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.lipata.whatsforlunch.api.yelp.AsyncYelpCall;
 import com.lipata.whatsforlunch.data.AppSettings;
+import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.user.UserRecords;
 
 /**
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     UserRecords mUserRecords;
-    BusinessListFilter mBusinessListFilter;
+    BusinessListManager mBusinessListManager;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         mUserRecords = new UserRecords(this);
-        mBusinessListFilter = new BusinessListFilter(this, mUserRecords);
+        mBusinessListManager = new BusinessListManager(this, mUserRecords);
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
         mTextView_Latitude = (TextView) findViewById((R.id.latitude_text));
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity
         mSuggestionListLayoutManager = new LinearLayoutManager(this);
         mRecyclerView_suggestionList.setLayoutManager(mSuggestionListLayoutManager);
 
-        mSuggestionListAdapter = new BusinessListAdapter(this, mCoordinatorLayout, mUserRecords, mBusinessListFilter);
+        mSuggestionListAdapter = new BusinessListAdapter(this, mCoordinatorLayout, mUserRecords, mBusinessListManager);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
         ItemTouchHelper.Callback callback = new BusinessTouchHelper(mSuggestionListAdapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
@@ -171,7 +172,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             String ll = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude() + "," + mLastLocation.getAccuracy();
             Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
-            new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListFilter, mSuggestionListAdapter).execute();
+            new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, mSuggestionListAdapter).execute();
         }
     }
 

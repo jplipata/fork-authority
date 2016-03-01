@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.lipata.whatsforlunch.ApiKeys;
 import com.lipata.whatsforlunch.BusinessListAdapter;
-import com.lipata.whatsforlunch.BusinessListFilter;
+import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 
@@ -22,14 +22,14 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
     YelpAPI mYelpApi = new YelpAPI(ApiKeys.CONSUMER_KEY, ApiKeys.CONSUMER_SECRET, ApiKeys.TOKEN, ApiKeys.TOKEN_SECRET);
     String mUserLocation;
     String mUserSearch;
-    BusinessListFilter mBusinessListFilter;
+    BusinessListManager mBusinessListManager;
     BusinessListAdapter mBusinessListAdapter;
 
-    public AsyncYelpCall(String userLocation, String userSearch, BusinessListFilter businessListFilter,
+    public AsyncYelpCall(String userLocation, String userSearch, BusinessListManager businessListManager,
                          BusinessListAdapter mBusinessListAdapter) {
         this.mUserLocation = userLocation;
         this.mUserSearch = userSearch;
-        this.mBusinessListFilter = businessListFilter;
+        this.mBusinessListManager = businessListManager;
         this.mBusinessListAdapter = mBusinessListAdapter;
 
     }
@@ -46,7 +46,7 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
         List<Business> businessList = mYelpApi.parseYelpResponse(yelpResponse_Json);
 
         // Manipulate `businessList` to apply customization
-        List<Business> filteredBusinesses = mBusinessListFilter.filter(businessList);
+        List<Business> filteredBusinesses = mBusinessListManager.filter(businessList);
         mBusinessListAdapter.setBusinessList(filteredBusinesses);
         mBusinessListAdapter.notifyDataSetChanged();
     }

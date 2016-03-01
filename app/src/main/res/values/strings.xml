@@ -1,12 +1,17 @@
 <resources>
+    <!-- UI - App -->
     <string name="app_name">What\'s For Lunch?</string>
     <string name="action_settings">Settings</string>
+
+    <!-- UI - Location Strings -->
     <string name="no_location_detected">No Location Detected</string>
     <string name="latitude_label">Latitude:</string>
     <string name="longitude_label">Longitude:</string>
 
+    <!-- UI - Suggestion List Strings -->
+    <string name="moved_to_bottom">. I have moved this to the bottom of the list.</string>
+
     <!-- Shared Preferences Strings -->
     <string name="SharedPrefsFile">userData</string>
     <string name="UserRecordList">UserRecordList</string>
-
 </resources>

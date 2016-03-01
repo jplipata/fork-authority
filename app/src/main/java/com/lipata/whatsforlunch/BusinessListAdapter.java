@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.user.UserRecords;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 import com.squareup.picasso.Picasso;
@@ -28,6 +29,7 @@ import java.util.List;
  * Created by jlipata on 1/1/16.
  */
 public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapter.ViewHolder> {
+    private static final String LOG_TAG = BusinessListAdapter.class.getSimpleName();
 
     // Button ID constants
     public static final int LIKE = 0;
@@ -35,19 +37,18 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     public static final int DONTLIKE = 2;
     public static final int DISMISS = 3;
 
-    static public String LOG_TAG = BusinessListAdapter.class.getSimpleName();
     private List<Business> mBusinessList;
     private Context mContext;
     private CoordinatorLayout mCoordinatorLayout;
     UserRecords mUserRecords;
-    BusinessListFilter mBusinessListFilter;
+    BusinessListManager mBusinessListManager;
 
     public BusinessListAdapter(Context context, CoordinatorLayout coordinatorLayout,
-                               UserRecords userRecords, BusinessListFilter businessListFilter){
+                               UserRecords userRecords, BusinessListManager businessListManager){
         this.mContext = context;
         this.mCoordinatorLayout = coordinatorLayout;
         this.mUserRecords = userRecords;
-        this.mBusinessListFilter = businessListFilter;
+        this.mBusinessListManager = businessListManager;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -187,12 +188,12 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                 Log.d(LOG_TAG, "Updated tooSoonClickDate for " + business.getName() + " to " + systemTime_ms);
 
                 // Update current list, move item down the list
-                mBusinessList = mBusinessListFilter.moveItemToBottom(mBusinessList, mBusinessList.indexOf(business)); // This returns a list with null values
+                mBusinessList = mBusinessListManager.moveItemToBottom(mBusinessList, mBusinessList.indexOf(business)); // This returns a list with null values
                 mBusinessList.removeAll(Collections.singleton(null)); // Remove nulls
 
                 // Notify user
                 Snackbar.make(mCoordinatorLayout,
-                        "Noted. You just ate at " + business.getName() + ". I have moved this to the bottom of the list.",
+                        "Noted. You just ate at " + business.getName() + mContext.getString(R.string.moved_to_bottom),
                         Snackbar.LENGTH_LONG).show();
 
                 // Update Suggestion List View
@@ -216,13 +217,13 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                 Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + systemTime_ms);
 
                 // Update current list, move item down the list
-                mBusinessList = mBusinessListFilter.moveItemToBottom(mBusinessList, mBusinessList.indexOf(business)); // This returns a list with null values
+                mBusinessList = mBusinessListManager.moveItemToBottom(mBusinessList, mBusinessList.indexOf(business)); // This returns a list with null values
                 mBusinessList.removeAll(Collections.singleton(null)); // Remove nulls
 
                 // Notify user
                 Snackbar.make(mCoordinatorLayout,
-                        "Noted. You don't like " + business.getName() + ". I won't suggest this again for some time.",
-                        Snackbar.LENGTH_LONG).show();
+                        "Noted. You don't like " + business.getName() + mContext.getString(R.string.moved_to_bottom),
+                                Snackbar.LENGTH_LONG).show();
 
                 // Update Suggestion List View
                 notifyDataSetChanged();
