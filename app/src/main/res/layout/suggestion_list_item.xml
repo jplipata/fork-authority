@@ -94,7 +94,7 @@
         android:background="@color/cardview_light_background"
         android:textSize="@dimen/cardview_buttons_text"
         android:textColor="@color/material_text_gray"
-        android:drawableTop="@drawable/thumb_up_outline"/>
+        />
 
     <Button
         android:layout_width="0dp"
@@ -120,7 +120,7 @@
         android:background="@color/cardview_light_background"
         android:textSize="@dimen/cardview_buttons_text"
         android:textColor="@color/material_text_gray"
-        android:drawableTop="@drawable/thumb_down_outline"/>
+        />
 
     </LinearLayout>
 

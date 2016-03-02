@@ -74,7 +74,9 @@ public class BusinessListManager {
                                 // Update the `business` object
                                 business.setDontLikeClickDate(UserRecords.LIKE_FLAG);
 
-                                // Move item to top of list
+                                // Move item to top of list, but only if
+                                // a) it is not already at the top of the list
+                                // b) it is not 'too soon' or c) 'dismissed'
                                 if(i!=0 && tooSoonDelta>=AppSettings.TOOSOON_THRESHOLD
                                         && dismissedDelta>=AppSettings.DISMISSED_THRESHOLD) { // Check if item is not already at top of list
                                     topStack.addItemToTopStack(business);

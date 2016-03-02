@@ -166,6 +166,21 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             holder.mTextView_LikeDontLike.setVisibility(View.GONE);
         }
 
+        // Like button icon
+        if(business.getDontLikeClickDate()==-1){
+            holder.mButton_Like.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.thumb_up_fill, 0, 0);
+        } else {
+            holder.mButton_Like.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.thumb_up_outline, 0, 0);
+        }
+
+        // Dont Like button icon
+        if(business.getDontLikeClickDate()>0){
+            holder.mButton_DontLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.thumb_down_fill, 0, 0);
+        } else {
+            holder.mButton_DontLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.thumb_down_outline, 0, 0);
+        }
+
+        // Click listeners
         holder.mButton_Like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
