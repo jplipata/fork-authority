@@ -31,7 +31,7 @@ import java.util.List;
 public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapter.ViewHolder> {
     private static final String LOG_TAG = BusinessListAdapter.class.getSimpleName();
 
-    // Button ID constants
+    // Button IDs
     public static final int LIKE = 0;
     public static final int TOOSOON = 1;
     public static final int DONTLIKE = 2;
@@ -166,14 +166,14 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             holder.mTextView_LikeDontLike.setVisibility(View.GONE);
         }
 
-        // Like button icon
+        // Like button dynamic icon
         if(business.getDontLikeClickDate()==-1){
             holder.mButton_Like.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.thumb_up_fill, 0, 0);
         } else {
             holder.mButton_Like.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.thumb_up_outline, 0, 0);
         }
 
-        // Dont Like button icon
+        // Dont Like button dynamic icon
         if(business.getDontLikeClickDate()>0){
             holder.mButton_DontLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.thumb_down_fill, 0, 0);
         } else {
@@ -185,36 +185,52 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             @Override
             public void onClick(View v) {
 
-                // Backend stuff
-                // Update UserRecords
-                mUserRecords.updateClickDate(business, UserRecords.LIKE_FLAG, LIKE);
-                mUserRecords.commit();
+                if(business.getDontLikeClickDate()!=UserRecords.LIKE_FLAG) {
 
-                // Update object field
-                business.setDontLikeClickDate(UserRecords.LIKE_FLAG) ;
-                Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + business.getDontLikeClickDate());
+                    // Backend stuff
+                    // Update UserRecords
+                    mUserRecords.updateClickDate(business, UserRecords.LIKE_FLAG, LIKE);
+                    mUserRecords.commit();
 
-                // UI stuff
-                if(position!=0) {
+                    // Update object field
+                    business.setDontLikeClickDate(UserRecords.LIKE_FLAG);
+                    Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + business.getDontLikeClickDate());
 
-                    mBusinessList.remove(position);
+                    // UI stuff
+                    if (position != 0) {
 
-                    // Update RecyclerView item (triggers animation)
-                    notifyItemRemoved(position);
+                        mBusinessList.remove(position);
 
-                    // Add business to top of list
-                    mBusinessList.add(0, business);
+                        // Update RecyclerView item (triggers animation)
+                        notifyItemRemoved(position);
 
-                    // Update other items in RecyclerView (this updates the item numbers in each CardView)
-                    notifyItemRangeChanged(0, getItemCount());
-                    //uiUpdated = true;
+                        // Add business to top of list
+                        mBusinessList.add(0, business);
+
+                        // Update other items in RecyclerView (this updates the item numbers in each CardView)
+                        notifyItemRangeChanged(0, getItemCount());
+                    } else {
+                        notifyItemChanged(0);
+                    }
+
+                    Snackbar.make(mCoordinatorLayout,
+                            "Noted. You like " + business.getName() + ". I have moved this to the top of the list.",
+                            Snackbar.LENGTH_LONG).show();
                 } else {
-                    notifyItemChanged(0);
-                }
+                    // Unlike
 
-                Snackbar.make(mCoordinatorLayout,
-                        "Noted. You like " + business.getName() + ". I have moved this to the top of the list.",
-                        Snackbar.LENGTH_LONG).show();
+                    // Backend stuff
+                    // Update UserRecords
+                    mUserRecords.updateClickDate(business, 0, LIKE);
+                    mUserRecords.commit();
+
+                    // Update object field
+                    business.setDontLikeClickDate(0);
+                    Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + business.getDontLikeClickDate());
+
+                    notifyItemChanged(position);
+
+                }
 
             }
         });
@@ -253,28 +269,43 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             @Override
             public void onClick(View v) {
 
-                // Get current date/time
-                long systemTime_ms = System.currentTimeMillis();
+                if(business.getDontLikeClickDate()<=0) {
+                    // Get current date/time
+                    long systemTime_ms = System.currentTimeMillis();
 
-                // Update user records
-                mUserRecords.updateClickDate(business, systemTime_ms, DONTLIKE);
-                mUserRecords.commit();
+                    // Update user records
+                    mUserRecords.updateClickDate(business, systemTime_ms, DONTLIKE);
+                    mUserRecords.commit();
 
-                // Update object field
-                business.setDontLikeClickDate(systemTime_ms) ;
-                Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + systemTime_ms);
+                    // Update object field
+                    business.setDontLikeClickDate(systemTime_ms);
+                    Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + systemTime_ms);
 
-                // Update current list, move item down the list
-                mBusinessList = mBusinessListManager.moveItemToBottom(mBusinessList, mBusinessList.indexOf(business)); // This returns a list with null values
-                mBusinessList.removeAll(Collections.singleton(null)); // Remove nulls
+                    // Update current list, move item down the list
+                    mBusinessList = mBusinessListManager.moveItemToBottom(mBusinessList, mBusinessList.indexOf(business)); // This returns a list with null values
+                    mBusinessList.removeAll(Collections.singleton(null)); // Remove nulls
 
-                // Notify user
-                Snackbar.make(mCoordinatorLayout,
-                        "Noted. You don't like " + business.getName() + mContext.getString(R.string.moved_to_bottom),
-                                Snackbar.LENGTH_LONG).show();
+                    // Notify user
+                    Snackbar.make(mCoordinatorLayout,
+                            "Noted. You don't like " + business.getName() + mContext.getString(R.string.moved_to_bottom),
+                            Snackbar.LENGTH_LONG).show();
 
-                // Update Suggestion List View
-                notifyDataSetChanged();
+                    // Update Suggestion List View
+                    notifyDataSetChanged();
+                } else {
+                    // Un-Don't Like
+
+                    // Backend stuff
+                    // Update UserRecords
+                    mUserRecords.updateClickDate(business, 0, DONTLIKE);
+                    mUserRecords.commit();
+
+                    // Update object field
+                    business.setDontLikeClickDate(0);
+                    Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + business.getDontLikeClickDate());
+
+                    notifyItemChanged(position);
+                }
             }
         });
 

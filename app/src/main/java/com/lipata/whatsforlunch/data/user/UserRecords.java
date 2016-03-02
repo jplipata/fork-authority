@@ -104,6 +104,8 @@ public class UserRecords {
                     break;
                 case BusinessListAdapter.DISMISS:
                     record.setDismissedDate(time);
+                case BusinessListAdapter.LIKE:
+                    record.setDontLikeClickDate(time); // Use "-1" for "Like"
             }
             Log.d(LOG_TAG, "Item at index "+itemIndex+" updated");
 
