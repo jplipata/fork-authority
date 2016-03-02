@@ -22,7 +22,6 @@ import com.lipata.whatsforlunch.data.yelppojo.Business;
 import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -240,6 +239,28 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             public void onClick(View v) {
                 //Log.d(LOG_TAG, "Too Soon Clicked");
 
+                // UI Stuff:
+                // Get business and hold in temp variable
+                Business business = mBusinessList.get(position);
+
+                // Remove existing element
+                mBusinessList.remove(position);
+
+                // Update RecyclerView item (triggers animation)
+                notifyItemRemoved(position);
+
+                // Add business to bottom of list
+                mBusinessList.add(business);
+
+                // Update other items in RecyclerView (this updates the item numbers in each CardView)
+                notifyItemRangeChanged(position, getItemCount());
+
+                // Notify user
+                Snackbar.make(mCoordinatorLayout,
+                        "Noted. You just ate at " + business.getName() + mContext.getString(R.string.moved_to_bottom),
+                        Snackbar.LENGTH_LONG).show();
+
+                // Backend stuff
                 // Get current date/time
                 long systemTime_ms = System.currentTimeMillis();
 
@@ -251,17 +272,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                 business.setTooSoonClickDate(systemTime_ms);
                 Log.d(LOG_TAG, "Updated tooSoonClickDate for " + business.getName() + " to " + systemTime_ms);
 
-                // Update current list, move item down the list
-                mBusinessList = mBusinessListManager.moveItemToBottom(mBusinessList, mBusinessList.indexOf(business)); // This returns a list with null values
-                mBusinessList.removeAll(Collections.singleton(null)); // Remove nulls
-
-                // Notify user
-                Snackbar.make(mCoordinatorLayout,
-                        "Noted. You just ate at " + business.getName() + mContext.getString(R.string.moved_to_bottom),
-                        Snackbar.LENGTH_LONG).show();
-
-                // Update Suggestion List View
-                notifyDataSetChanged();
             }
         });
 
@@ -270,6 +280,29 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             public void onClick(View v) {
 
                 if(business.getDontLikeClickDate()<=0) {
+
+                    // UI Stuff:
+                    // Get business and hold in temp variable
+                    Business business = mBusinessList.get(position);
+
+                    // Remove existing element
+                    mBusinessList.remove(position);
+
+                    // Update RecyclerView item (triggers animation)
+                    notifyItemRemoved(position);
+
+                    // Add business to bottom of list
+                    mBusinessList.add(business);
+
+                    // Update other items in RecyclerView (this updates the item numbers in each CardView)
+                    notifyItemRangeChanged(position, getItemCount());
+
+                    // Notify user
+                    Snackbar.make(mCoordinatorLayout,
+                            "Noted. You don't like " + business.getName() + mContext.getString(R.string.moved_to_bottom),
+                            Snackbar.LENGTH_LONG).show();
+
+                    // Backend stuff
                     // Get current date/time
                     long systemTime_ms = System.currentTimeMillis();
 
@@ -281,17 +314,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                     business.setDontLikeClickDate(systemTime_ms);
                     Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + systemTime_ms);
 
-                    // Update current list, move item down the list
-                    mBusinessList = mBusinessListManager.moveItemToBottom(mBusinessList, mBusinessList.indexOf(business)); // This returns a list with null values
-                    mBusinessList.removeAll(Collections.singleton(null)); // Remove nulls
-
-                    // Notify user
-                    Snackbar.make(mCoordinatorLayout,
-                            "Noted. You don't like " + business.getName() + mContext.getString(R.string.moved_to_bottom),
-                            Snackbar.LENGTH_LONG).show();
-
-                    // Update Suggestion List View
-                    notifyDataSetChanged();
                 } else {
                     // Un-Don't Like
 
