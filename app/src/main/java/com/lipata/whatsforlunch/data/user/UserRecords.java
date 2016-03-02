@@ -19,7 +19,6 @@ import java.util.List;
  */
 public class UserRecords {
     private static String LOG_TAG = UserRecords.class.getSimpleName();
-    public static int LIKE_FLAG = -1;
     List<BusinessItemRecord> mList;
     Context mContext;
 

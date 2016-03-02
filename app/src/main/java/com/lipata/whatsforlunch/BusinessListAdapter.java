@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lipata.whatsforlunch.data.BusinessListManager;
+import com.lipata.whatsforlunch.data.user.BusinessItemRecord;
 import com.lipata.whatsforlunch.data.user.UserRecords;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
 import com.squareup.picasso.Picasso;
@@ -184,15 +185,15 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             @Override
             public void onClick(View v) {
 
-                if(business.getDontLikeClickDate()!=UserRecords.LIKE_FLAG) {
+                if(business.getDontLikeClickDate()!= BusinessItemRecord.LIKE_FLAG) {
 
                     // Backend stuff
                     // Update UserRecords
-                    mUserRecords.updateClickDate(business, UserRecords.LIKE_FLAG, LIKE);
+                    mUserRecords.updateClickDate(business, BusinessItemRecord.LIKE_FLAG, LIKE);
                     mUserRecords.commit();
 
                     // Update object field
-                    business.setDontLikeClickDate(UserRecords.LIKE_FLAG);
+                    business.setDontLikeClickDate(BusinessItemRecord.LIKE_FLAG);
                     Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + business.getDontLikeClickDate());
 
                     // UI stuff

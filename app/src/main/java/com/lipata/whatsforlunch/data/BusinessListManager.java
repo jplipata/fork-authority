@@ -72,7 +72,7 @@ public class BusinessListManager {
                                 Log.d(LOG_TAG, "filter() deemed LIKE");
 
                                 // Update the `business` object
-                                business.setDontLikeClickDate(UserRecords.LIKE_FLAG);
+                                business.setDontLikeClickDate(BusinessItemRecord.LIKE_FLAG);
 
                                 // Move item to top of list, but only if
                                 // a) it is not already at the top of the list
