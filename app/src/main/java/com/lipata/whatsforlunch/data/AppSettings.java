@@ -4,7 +4,7 @@ package com.lipata.whatsforlunch.data;
  * Created by jlipata on 2/29/16.
  */
 public class AppSettings {
-    public static String SEARCH_TERM = "restaurants"; // This should not be user-definable at this time
+    public static String SEARCH_TERM = "lunch";
     public static double LOCATION_LIFESPAN = 10 * 1000; // "Age" of location data in milliseconds before it becomes "stale"
     public static int SEARCH_RADIUS = 1000; // Search radius in meters. If the value is too large, a AREA_TOO_LARGE error may be returned. The max value is 40000 meters (25 miles).
 
@@ -13,7 +13,7 @@ public class AppSettings {
 
     /*
      * The DISMISSED_THRESHOLD constant should be based on how long it typically takes a person to
-     * decide what to eat for lunch
+     * decide what to eat for lunch.
      * The amount of time should last long enough for one user 'session', i.e. as long as it takes to
      * decide what to eat
      */

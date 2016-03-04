@@ -139,7 +139,7 @@ public class UserRecords {
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(mContext.getString(R.string.UserRecordList), jsonString);
-        editor.commit();
+        editor.apply();
 
         // Check
         String check = sharedPreferences.getString(mContext.getString(R.string.UserRecordList), null);
