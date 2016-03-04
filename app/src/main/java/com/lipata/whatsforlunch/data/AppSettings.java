@@ -4,10 +4,12 @@ package com.lipata.whatsforlunch.data;
  * Created by jlipata on 2/29/16.
  */
 public class AppSettings {
+    // Yelp query
     public static String SEARCH_TERM = "lunch";
-    public static double LOCATION_LIFESPAN = 10 * 1000; // "Age" of location data in milliseconds before it becomes "stale"
     public static int SEARCH_RADIUS = 1000; // Search radius in meters. If the value is too large, a AREA_TOO_LARGE error may be returned. The max value is 40000 meters (25 miles).
 
+    // Timings
+    public static double LOCATION_LIFESPAN = 10 * 1000; // "Age" of location data in milliseconds before it becomes "stale"
     public static long TOOSOON_THRESHOLD = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
     public static int DONTLIKE_THRESHOLD_INDAYS = 90; // 90 days
 
