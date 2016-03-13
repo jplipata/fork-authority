@@ -338,6 +338,10 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         this.mBusinessList = businesses;
     }
 
+    public List<Business> getBusinessList(){
+        return mBusinessList;
+    }
+    
     @Override
     public int getItemCount() {
         if(mBusinessList==null){

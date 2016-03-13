@@ -40,10 +40,9 @@ import com.lipata.whatsforlunch.data.user.UserRecords;
 
 public class MainActivity extends AppCompatActivity
         implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
-
-    // Constants
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    // Constants
     static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
     static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
@@ -123,13 +122,14 @@ public class MainActivity extends AppCompatActivity
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
     }
 
+
     @Override
-    protected void onStart() {
-        super.onStart();
-        boolean isLocationStale = isLocationStale();
-        Log.d(LOG_TAG, "onStart()... isLocationStale() = " + isLocationStale);
-        if(isLocationStale) {
-            mGoogleApiClient.connect(); // Calling this at onStart() as per Google API documentation
+    protected void onResume(){
+        super.onResume();
+
+        // Check whether there are suggestion items in the RecyclerView.  If not, load some.
+        if(mSuggestionListAdapter.getItemCount()==0){
+                mGoogleApiClient.connect();
         }
     }
 
@@ -137,23 +137,17 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         Log.d(LOG_TAG, "onPause");
-//        if (mGoogleApiClient.isConnected()) {
-//            stopLocationUpdates();
-//            mGoogleApiClient.disconnect();
-//        }
-
-    }
-
-    // Is stopping location updates and disconnecting redundant? I'm already doing this in onPause().  However the API doc says to always
-    // call disconnect() in onStop().  UPDATE -- I've decided to only stopLocationUpdates() and disconnect at onStop()
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(LOG_TAG, "onStop()");
         if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
             mGoogleApiClient.disconnect();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(LOG_TAG, "onStop()");
+
     }
 
     // Callback method for Google Play Services
@@ -340,8 +334,8 @@ public class MainActivity extends AppCompatActivity
     // TODO: Retain recyclerview state
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState){
-        savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, mLocationUpdateTimestamp);
         super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, mLocationUpdateTimestamp);
     }
 
 }
