@@ -28,10 +28,16 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.lipata.whatsforlunch.api.yelp.AsyncYelpCall;
 import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.user.UserRecords;
+import com.lipata.whatsforlunch.data.yelppojo.Business;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  *  This Android app gets device location, queries the Yelp API for restaurant recommendations,
@@ -44,6 +50,7 @@ public class MainActivity extends AppCompatActivity
 
     // Constants
     static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
+    static final String SUGGESTIONLIST_KEY = "suggestionList";
     static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
     // Location stuff
@@ -87,6 +94,7 @@ public class MainActivity extends AppCompatActivity
 
         mSuggestionListAdapter = new BusinessListAdapter(this, mCoordinatorLayout, mUserRecords, mBusinessListManager);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
+
         ItemTouchHelper.Callback callback = new BusinessTouchHelper(mSuggestionListAdapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(mRecyclerView_suggestionList);
@@ -97,7 +105,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onRefresh() {
                 Log.d(LOG_TAG, "Pulldown refresh.  onRefresh()");
-                if(isLocationStale()) {
+                if (isLocationStale()) {
                     executeSequence();
                 } else {
                     Toast.makeText(MainActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
@@ -106,20 +114,28 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        if (savedInstanceState!=null){
+        // Restore state
+        if (savedInstanceState != null) {
             mLocationUpdateTimestamp = savedInstanceState.getLong(LOCATION_UPDATE_TIMESTAMP_KEY);
+
+            String storedSuggestionList = savedInstanceState.getString(SUGGESTIONLIST_KEY, null);
+            if (storedSuggestionList != null) {
+                Type listType = new TypeToken<List<Business>>(){}.getType();
+                List<Business> retrievedBusinessList = new Gson().fromJson(storedSuggestionList, listType);
+                mSuggestionListAdapter.setBusinessList(retrievedBusinessList);
+            }
         }
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
-                .build();
+                .addApi(LocationServices.API).build();
 
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
-                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+                .setInterval(300)        // in milliseconds
+                .setFastestInterval(3000); // in milliseconds
     }
 
 
@@ -129,7 +145,7 @@ public class MainActivity extends AppCompatActivity
 
         // Check whether there are suggestion items in the RecyclerView.  If not, load some.
         if(mSuggestionListAdapter.getItemCount()==0){
-                mGoogleApiClient.connect();
+               mGoogleApiClient.connect();
         }
     }
 
@@ -143,12 +159,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(LOG_TAG, "onStop()");
-
-    }
 
     // Callback method for Google Play Services
     @Override
@@ -269,7 +279,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void requestLocationData(){
+    private void requestLocationData() {
 
         Log.d(LOG_TAG, "Creating LocationRequest...");
         Toast.makeText(this, "Getting location...", Toast.LENGTH_SHORT).show();
@@ -336,6 +346,10 @@ public class MainActivity extends AppCompatActivity
     public void onSaveInstanceState(Bundle savedInstanceState){
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, mLocationUpdateTimestamp);
+
+        String suggestionListStr = new Gson().toJson(mSuggestionListAdapter.getBusinessList());
+        savedInstanceState.putString(SUGGESTIONLIST_KEY, suggestionListStr);
+
     }
 
 }
