@@ -351,11 +351,11 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         }
     }
 
-    public void dismiss(int position){
+    public void dismiss(final int position){
 
         // UI Stuff:
         // Get business and hold in temp variable
-        Business business = mBusinessList.get(position);
+        final Business business = mBusinessList.get(position);
 
         // Remove existing element
         mBusinessList.remove(position);
@@ -364,22 +364,37 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         notifyItemRemoved(position);
 
         // Add business to bottom of list
-        mBusinessList.add(business);
+
+        // Temporarily changing functionality.  Trying out removing the card completely instead of moving to bottom
+        // mBusinessList.add(business);
 
         // Update other items in RecyclerView (this updates the item numbers in each CardView)
         notifyItemRangeChanged(position, getItemCount());
 
-        // Backend stuff:
-        // Get current date/time
-        long systemTime_ms = System.currentTimeMillis();
+        Snackbar.make(mCoordinatorLayout, business.getName()+" dismissed.", Snackbar.LENGTH_LONG)
+                .setAction("UNDO", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mBusinessList.add(position, business);
+                        notifyItemInserted(position);
+                        notifyItemRangeChanged(position, getItemCount());
+                    }
+                })
+              //  .setActionTextColor(ColorStateList.createFromXml(R.color.material_text_gray))
+                .show();
 
-        // Update user records
-        mUserRecords.updateClickDate(business, systemTime_ms, DISMISS);
-        mUserRecords.commit();
-
-        // Update object field
-        business.setDismissedDate(systemTime_ms); ;
-        Log.d(LOG_TAG, "Updated dismissedDate for " + business.getName() + " to " + systemTime_ms);
+//        Temporarily disabling this
+//        // Backend stuff:
+//        // Get current date/time
+//        long systemTime_ms = System.currentTimeMillis();
+//
+//        // Update user records
+//        mUserRecords.updateClickDate(business, systemTime_ms, DISMISS);
+//        mUserRecords.commit();
+//
+//        // Update object field
+//        business.setDismissedDate(systemTime_ms); ;
+//        Log.d(LOG_TAG, "Updated dismissedDate for " + business.getName() + " to " + systemTime_ms);
 
     }
 

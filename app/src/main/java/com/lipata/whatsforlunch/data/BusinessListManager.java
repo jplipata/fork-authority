@@ -120,17 +120,20 @@ public class BusinessListManager {
                         }
 
                         // Handle Dismissed case
-
-                            if(businessItemRecord.getDismissedDate()!=0){
-                                business.setDismissedDate(dismissedDate);
-                                if (dismissedDelta < AppSettings.DISMISSED_THRESHOLD){
-                                    Log.d(LOG_TAG, "filter() Deemed dismissed!");
-                                    businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
-                                } else {
-                                    Log.d(LOG_TAG, "filter() Dismissed EXPIRED");
-
-                                }
-                            }
+                        // Temporarily ignoring this case
+                        // Dismissed items will not be filtered, i.e. if the user refreshes, any dismissed
+                        // items will 'come back'
+//
+//                            if(businessItemRecord.getDismissedDate()!=0){
+//                                business.setDismissedDate(dismissedDate);
+//                                if (dismissedDelta < AppSettings.DISMISSED_THRESHOLD){
+//                                    Log.d(LOG_TAG, "filter() Deemed dismissed!");
+//                                    businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
+//                                } else {
+//                                    Log.d(LOG_TAG, "filter() Dismissed EXPIRED");
+//
+//                                }
+//                            }
 
 
                     break;  // Once you've found the match, there's no need to keep going. Exit the `for` loop
