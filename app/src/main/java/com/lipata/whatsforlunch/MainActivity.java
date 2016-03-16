@@ -134,8 +134,8 @@ public class MainActivity extends AppCompatActivity
 
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(300)        // in milliseconds
-                .setFastestInterval(3000); // in milliseconds
+                .setInterval(1000)        // in milliseconds
+                .setFastestInterval(1000); // in milliseconds
     }
 
 
@@ -314,6 +314,7 @@ public class MainActivity extends AppCompatActivity
 
     protected void stopLocationUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        mGoogleApiClient.disconnect();
         Log.d(LOG_TAG, "Location Updates Stopped");
     }
 
