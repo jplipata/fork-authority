@@ -40,15 +40,17 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     private List<Business> mBusinessList;
     private Context mContext;
     private CoordinatorLayout mCoordinatorLayout;
+    private RecyclerView.LayoutManager mLayoutManager;
     UserRecords mUserRecords;
     BusinessListManager mBusinessListManager;
 
     public BusinessListAdapter(Context context, CoordinatorLayout coordinatorLayout,
-                               UserRecords userRecords, BusinessListManager businessListManager){
+                               UserRecords userRecords, BusinessListManager businessListManager, RecyclerView.LayoutManager linearLayoutManager){
         this.mContext = context;
         this.mCoordinatorLayout = coordinatorLayout;
         this.mUserRecords = userRecords;
         this.mBusinessListManager = businessListManager;
+        this.mLayoutManager = linearLayoutManager;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -378,9 +380,13 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                         mBusinessList.add(position, business);
                         notifyItemInserted(position);
                         notifyItemRangeChanged(position, getItemCount());
+
+                        if(position==0){
+                            mLayoutManager.scrollToPosition(0);
+                        }
                     }
                 })
-              //  .setActionTextColor(ColorStateList.createFromXml(R.color.material_text_gray))
+                .setActionTextColor(mContext.getResources().getColor(R.color.text_white))
                 .show();
 
 //        Temporarily disabling this
