@@ -6,10 +6,10 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +18,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity
     protected RecyclerView mRecyclerView_suggestionList;
     private RecyclerView.LayoutManager mSuggestionListLayoutManager;
     private BusinessListAdapter mSuggestionListAdapter;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    //private SwipeRefreshLayout mSwipeRefreshLayout;
 
     UserRecords mUserRecords;
     BusinessListManager mBusinessListManager;
@@ -99,18 +100,32 @@ public class MainActivity extends AppCompatActivity
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(mRecyclerView_suggestionList);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-        mSwipeRefreshLayout.setColorSchemeColors(R.color.colorPrimary);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        // Temporarily disabling swipe to refresh in lieu of FAB
+//        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+//        mSwipeRefreshLayout.setColorSchemeColors(R.color.colorPrimary);
+//        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                Log.d(LOG_TAG, "Pulldown refresh.  onRefresh()");
+//                if (isLocationStale()) {
+//                    executeSequence();
+//                } else {
+//                    Toast.makeText(MainActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
+//                }
+//                mSwipeRefreshLayout.setRefreshing(false);
+//            }
+//        });
+
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onRefresh() {
-                Log.d(LOG_TAG, "Pulldown refresh.  onRefresh()");
+            public void onClick(View view) {
                 if (isLocationStale()) {
                     executeSequence();
                 } else {
                     Toast.makeText(MainActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
                 }
-                mSwipeRefreshLayout.setRefreshing(false);
             }
         });
 
@@ -126,6 +141,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+        // Location stuff
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -168,7 +184,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     void executeSequence(){
+        Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT).show();
         getLocation();
+
         // If getLastLocation() returned null, start a Location Request to get device location
         // Else, query yelp with existing location arguments
         if (mLastLocation == null || isLocationStale()) {
@@ -282,7 +300,7 @@ public class MainActivity extends AppCompatActivity
     private void requestLocationData() {
 
         Log.d(LOG_TAG, "Creating LocationRequest...");
-        Toast.makeText(this, "Getting location...", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Getting location...", Toast.LENGTH_SHORT).show();
 
         // Check for Location permission
         boolean isPermissionMissing = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -309,7 +327,7 @@ public class MainActivity extends AppCompatActivity
         mTextView_Latitude.setText(Double.toString(latitude));
         mTextView_Longitude.setText(Double.toString(longitude));
         mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
-        Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
     }
 
     protected void stopLocationUpdates() {
