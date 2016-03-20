@@ -9,7 +9,7 @@ Provides a list of nearby restaurants for you to choose from (powered by Yelp)
 
 "Just Ate Here" removes it for a couple days
 
-Dismiss cards to help narrow down options
+Swipe cards away to help narrow down options
 
 whatsforlunch will remember your preferences for next time
 
