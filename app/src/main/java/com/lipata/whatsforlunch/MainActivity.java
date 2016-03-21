@@ -19,6 +19,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,6 +71,8 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView.LayoutManager mSuggestionListLayoutManager;
     private BusinessListAdapter mSuggestionListAdapter;
     //private SwipeRefreshLayout mSwipeRefreshLayout;
+    FloatingActionButton mFAB_refresh;
+    Animation mRefreshAnimation;
 
     UserRecords mUserRecords;
     BusinessListManager mBusinessListManager;
@@ -117,8 +121,8 @@ public class MainActivity extends AppCompatActivity
 //        });
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFAB_refresh = (FloatingActionButton) findViewById(R.id.fab);
+        mFAB_refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (isLocationStale()) {
@@ -185,6 +189,11 @@ public class MainActivity extends AppCompatActivity
 
     void executeSequence(){
         Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT).show();
+
+        mRefreshAnimation = AnimationUtils.loadAnimation(this, R.anim.spin);
+        mRefreshAnimation.setRepeatCount(Animation.INFINITE);
+        mFAB_refresh.startAnimation(mRefreshAnimation);
+
         getLocation();
 
         // If getLastLocation() returned null, start a Location Request to get device location
@@ -194,7 +203,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             String ll = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude() + "," + mLastLocation.getAccuracy();
             Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
-            new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, mSuggestionListAdapter).execute();
+            new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, mSuggestionListAdapter, this).execute();
         }
     }
 
@@ -267,6 +276,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     // Helper methods
+
+    public void stopRefreshAnimation(){
+        mRefreshAnimation.cancel();
+    }
+
     private boolean isLocationStale(){
         long currentTime = SystemClock.elapsedRealtime();
         Log.d(LOG_TAG, "currentTime = " + currentTime);
