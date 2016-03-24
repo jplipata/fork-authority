@@ -27,7 +27,7 @@ The design similarity to Yelp is intentional.  Since this is basically a custom 
 
 ###### Code Quality
 - Refactor: MainActivity is a "god object" and needs to be broken out into a better architecture
-- Replace iteration in BusinessListManager with hashmap
+- Replace iterative List appraoch to UserRecords/BusinessListManager with hashmap
 - Replace AsyncTask with something better (e.g. Retrofit)
 - Refactor: RecyclerView.Adapter onClick handlers should be defined in ViewHolder
 
