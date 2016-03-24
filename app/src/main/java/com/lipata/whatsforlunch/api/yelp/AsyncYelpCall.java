@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.lipata.whatsforlunch.ApiKeys;
 import com.lipata.whatsforlunch.BusinessListAdapter;
+import com.lipata.whatsforlunch.MainActivity;
 import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
@@ -24,13 +25,15 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
     String mUserSearch;
     BusinessListManager mBusinessListManager;
     BusinessListAdapter mBusinessListAdapter;
+    MainActivity mMainActivity;
 
     public AsyncYelpCall(String userLocation, String userSearch, BusinessListManager businessListManager,
-                         BusinessListAdapter mBusinessListAdapter) {
+                         BusinessListAdapter businessListAdapter, MainActivity mainActivity) {
         this.mUserLocation = userLocation;
         this.mUserSearch = userSearch;
         this.mBusinessListManager = businessListManager;
-        this.mBusinessListAdapter = mBusinessListAdapter;
+        this.mBusinessListAdapter = businessListAdapter;
+        this.mMainActivity = mainActivity;
 
     }
 
@@ -49,5 +52,6 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
         List<Business> filteredBusinesses = mBusinessListManager.filter(businessList);
         mBusinessListAdapter.setBusinessList(filteredBusinesses);
         mBusinessListAdapter.notifyDataSetChanged();
+        mMainActivity.stopRefreshAnimation();
     }
 }

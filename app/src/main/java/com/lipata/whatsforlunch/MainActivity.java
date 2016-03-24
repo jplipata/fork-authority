@@ -1,6 +1,7 @@
 package com.lipata.whatsforlunch;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -19,8 +20,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity
     private BusinessListAdapter mSuggestionListAdapter;
     //private SwipeRefreshLayout mSwipeRefreshLayout;
     FloatingActionButton mFAB_refresh;
-    Animation mRefreshAnimation;
+    ObjectAnimator mFAB_refreshAnimation;
 
     UserRecords mUserRecords;
     BusinessListManager mBusinessListManager;
@@ -121,6 +120,7 @@ public class MainActivity extends AppCompatActivity
 //        });
 
 
+        // Set up FAB and refresh animation
         mFAB_refresh = (FloatingActionButton) findViewById(R.id.fab);
         mFAB_refresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,6 +132,10 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+        mFAB_refreshAnimation = ObjectAnimator.ofFloat(mFAB_refresh, View.ROTATION, 360);
+        mFAB_refreshAnimation.setDuration(1500);
+        mFAB_refreshAnimation.setRepeatCount(ObjectAnimator.INFINITE);
+        mFAB_refreshAnimation.setInterpolator(null);
 
         // Restore state
         if (savedInstanceState != null) {
@@ -189,10 +193,10 @@ public class MainActivity extends AppCompatActivity
 
     void executeSequence(){
         Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT).show();
-
-        mRefreshAnimation = AnimationUtils.loadAnimation(this, R.anim.spin);
-        mRefreshAnimation.setRepeatCount(Animation.INFINITE);
-        mFAB_refresh.startAnimation(mRefreshAnimation);
+        Log.d(LOG_TAG, "Starting animation");
+        if(!mFAB_refreshAnimation.isRunning()) {
+            mFAB_refreshAnimation.start();
+        }
 
         getLocation();
 
@@ -278,7 +282,9 @@ public class MainActivity extends AppCompatActivity
     // Helper methods
 
     public void stopRefreshAnimation(){
-        mRefreshAnimation.cancel();
+        Log.d(LOG_TAG, "Stop animation");
+        //mRefreshAnimation.cancel();
+        mFAB_refreshAnimation.cancel();
     }
 
     private boolean isLocationStale(){
