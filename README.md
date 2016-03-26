@@ -1,13 +1,10 @@
 # whatsforlunch
 A tool to help you answer the toughest question of the day -- What's for lunch?!
 
-<table cellspacing="0" cellpadding="0">
-<tr>
-<td><center>Provides a list of nearby restaurants for you to choose from (powered by Yelp)</center></td>
-<td><img src="https://github.com/tenprint/whatsforlunch/blob/master/screencaptures/whatsforlunch-listofplaces.gif" width="350"></td>
-</tr>
-</table>
+Provides a list of nearby restaurants for you to choose from (powered by Yelp)
+<img src="https://github.com/tenprint/whatsforlunch/blob/master/screencaptures/whatsforlunch-listofplaces.gif" width="350" align="right">
 
+<img src="https://github.com/tenprint/whatsforlunch/blob/master/screencaptures/whatsforlunch-listofplaces.gif" width="350" align="left">
 
 "Liking" a restaurant moves it to the top of the list
 
