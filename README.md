@@ -1,12 +1,11 @@
 # whatsforlunch
 A tool to help you answer the toughest question of the day -- What's for lunch?!
 
+Provides a list of nearby restaurants for you to choose from (powered by Yelp)
+<img src="https://github.com/tenprint/whatsforlunch/blob/master/screencaptures/whatsforlunch-listofplaces.gif" width="300">
 
-|---|---|
-| Provides a list of nearby restaurants for you to choose from (powered by Yelp)  |  <img src="https://github.com/tenprint/whatsforlunch/blob/master/screencaptures/whatsforlunch-listofplaces.gif" width="325">
-| <img src="https://github.com/tenprint/whatsforlunch/blob/master/screencaptures/whatsforlunch-like.gif" width="325">  | "Liking" a restaurant moves it to the top of the list  |  
-
-
+"Liking" a restaurant moves it to the top of the list
+<img src="https://github.com/tenprint/whatsforlunch/blob/master/screencaptures/whatsforlunch-like.gif" width="300">  
 
 
 "Don't like" removes it
@@ -27,6 +26,7 @@ The design similarity to Yelp is intentional.  Since this is basically a custom 
 - Need icon
 - User definable settings
 - Get more results
+- "Just ate here" active state icon
 - Bug: if the user denies location permission and selects "never ask again", it will render the app useless (Marshmallow and above)
 
 ###### Code Quality
