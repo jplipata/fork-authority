@@ -1,10 +1,10 @@
 # whatsforlunch
 A tool to help you answer the toughest question of the day -- What's for lunch?!
 
-<table>
+<table cellspacing="0" cellpadding="0">
 <tr>
-<td>Provides a list of nearby restaurants for you to choose from (powered by Yelp)</td>
-<td><img src="https://github.com/tenprint/whatsforlunch/blob/master/screencaptures/whatsforlunch-listofplaces.gif" width="300"></td>
+<td><center>Provides a list of nearby restaurants for you to choose from (powered by Yelp)</center></td>
+<td><img src="https://github.com/tenprint/whatsforlunch/blob/master/screencaptures/whatsforlunch-listofplaces.gif" width="350"></td>
 </tr>
 </table>
 
@@ -37,5 +37,3 @@ The design similarity to Yelp is intentional.  Since this is basically a custom 
 - Replace AsyncTask with something better (e.g. Retrofit)
 - Replace findViewById with Butterknife
 - Refactor: RecyclerView.Adapter onClick handlers should be defined in ViewHolder
-
-
