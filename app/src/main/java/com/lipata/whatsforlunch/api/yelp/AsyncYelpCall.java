@@ -2,6 +2,7 @@ package com.lipata.whatsforlunch.api.yelp;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.lipata.whatsforlunch.ApiKeys;
 import com.lipata.whatsforlunch.BusinessListAdapter;
@@ -26,14 +27,16 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
     BusinessListManager mBusinessListManager;
     BusinessListAdapter mBusinessListAdapter;
     MainActivity mMainActivity;
+    Toast mToast;
 
     public AsyncYelpCall(String userLocation, String userSearch, BusinessListManager businessListManager,
-                         BusinessListAdapter businessListAdapter, MainActivity mainActivity) {
+                         BusinessListAdapter businessListAdapter, MainActivity mainActivity, Toast toast) {
         this.mUserLocation = userLocation;
         this.mUserSearch = userSearch;
         this.mBusinessListManager = businessListManager;
         this.mBusinessListAdapter = businessListAdapter;
         this.mMainActivity = mainActivity;
+        this.mToast = toast;
 
     }
 
@@ -52,6 +55,9 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
         List<Business> filteredBusinesses = mBusinessListManager.filter(businessList);
         mBusinessListAdapter.setBusinessList(filteredBusinesses);
         mBusinessListAdapter.notifyDataSetChanged();
+
+        // UI stuff -- This probably shouldn't be here
         mMainActivity.stopRefreshAnimation();
+        mToast.cancel();
     }
 }

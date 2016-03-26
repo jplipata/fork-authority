@@ -192,7 +192,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     void executeSequence(){
-        Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT).show();
+        final Toast toast = Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT);
+        toast.show();
         Log.d(LOG_TAG, "Starting animation");
         if(!mFAB_refreshAnimation.isRunning()) {
             mFAB_refreshAnimation.start();
@@ -207,7 +208,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             String ll = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude() + "," + mLastLocation.getAccuracy();
             Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
-            new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, mSuggestionListAdapter, this).execute();
+            new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, mSuggestionListAdapter, this, toast).execute();
         }
     }
 
