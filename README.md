@@ -2,7 +2,8 @@
 A tool to help you answer the toughest question of the day -- What's for lunch?!
 
 Provides a list of nearby restaurants for you to choose from (powered by Yelp)
-<img src="https://github.com/tenprint/whatsforlunch/blob/master/screencaptures/whatsforlunch-listofplaces.gif" width="300">
+
+<img src="https://cloud.githubusercontent.com/assets/11450465/14062934/505f6230-f388-11e5-8cba-6428e8ff6b1d.gif" width="300">
 
 "Liking" a restaurant moves it to the top of the list
 <img src="https://github.com/tenprint/whatsforlunch/blob/master/screencaptures/whatsforlunch-like.gif" width="300">  
