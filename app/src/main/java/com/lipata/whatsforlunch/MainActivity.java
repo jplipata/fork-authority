@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity
         mSuggestionListAdapter = new BusinessListAdapter(this, mCoordinatorLayout, mUserRecords, mBusinessListManager, mSuggestionListLayoutManager);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
 
-        ItemTouchHelper.Callback callback = new BusinessTouchHelper(mSuggestionListAdapter);
+        ItemTouchHelper.Callback callback = new ListItemTouchHelper(mSuggestionListAdapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(mRecyclerView_suggestionList);
 

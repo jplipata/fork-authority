@@ -6,12 +6,12 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 /**
  * Created by jlipata on 2/23/16.
  */
-public class BusinessTouchHelper extends ItemTouchHelper.SimpleCallback {
-    private static final String LOG_TAG = BusinessTouchHelper.class.getSimpleName();
+public class ListItemTouchHelper extends ItemTouchHelper.SimpleCallback {
+    private static final String LOG_TAG = ListItemTouchHelper.class.getSimpleName();
     private BusinessListAdapter mBusinessListAdapter;
 
-    public BusinessTouchHelper(BusinessListAdapter adapter){
-        super(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+    public ListItemTouchHelper(BusinessListAdapter adapter){
+        super(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         this.mBusinessListAdapter=adapter;
     }
 
