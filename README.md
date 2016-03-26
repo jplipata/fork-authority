@@ -26,7 +26,7 @@ The design similarity to Yelp is intentional.  Since this is basically a custom 
 - Bug: if the user denies location permission and selects "never ask again", it will render the app useless (Marshmallow and above)
 
 ###### Code Quality
-- Refactor: MainActivity is a "god object" and needs to be broken out into smaller classes.  Overall architecture needs to be improved.
+- Refactor: Overall architecture needs to be improved.  E.g. MainActivity is a "god object" and needs to be broken out into smaller classes.  
 - Replace iterative List appraoch to UserRecords/BusinessListManager with hashmap
 - Replace AsyncTask with something better (e.g. Retrofit)
 - Replace findViewById with Butterknife
