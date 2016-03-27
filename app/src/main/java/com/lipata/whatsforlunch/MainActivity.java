@@ -217,10 +217,12 @@ public class MainActivity extends AppCompatActivity
             NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
             boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
+            // If connected to network make Yelp API call, if no network, notify user
             if(isConnected) {
                 new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, mSuggestionListAdapter, this, toast).execute();
             } else {
-                Snackbar.make(mCoordinatorLayout, "No network", Snackbar.LENGTH_INDEFINITE).show();
+                Snackbar.make(mCoordinatorLayout, "No network. Try again when you are connected to the internet.",
+                        Snackbar.LENGTH_INDEFINITE).show();
                 stopRefreshAnimation();
             }
         }
