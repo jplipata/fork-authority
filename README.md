@@ -3,18 +3,23 @@ A tool to help you answer the toughest question of the day -- What's for lunch?!
 
 Provides a list of nearby restaurants for you to choose from (powered by Yelp)
 
-<img src="https://cloud.githubusercontent.com/assets/11450465/14062934/505f6230-f388-11e5-8cba-6428e8ff6b1d.gif" width="300">
+<img src="https://cloud.githubusercontent.com/assets/11450465/14062934/505f6230-f388-11e5-8cba-6428e8ff6b1d.gif" width="275">
 
 "Liking" a restaurant moves it to the top of the list
-<img src="https://github.com/tenprint/whatsforlunch/blob/master/screencaptures/whatsforlunch-like.gif" width="300">  
 
-
+<img src="https://cloud.githubusercontent.com/assets/11450465/14063068/0980f214-f38f-11e5-830a-9b7c83fefe61.gif" width="275">  
 "Don't like" removes it
 
+<img src="https://cloud.githubusercontent.com/assets/11450465/14063069/148cb490-f38f-11e5-9018-5560d72a85d9.gif" width="275">  
 "Just ate here" removes it for a couple days
 
+<img src="https://cloud.githubusercontent.com/assets/11450465/14063070/1c92cbc0-f38f-11e5-80d0-80e35ae3c3a6.gif" width="275"> 
 Swipe cards away to help narrow down options
 
+<img src="https://cloud.githubusercontent.com/assets/11450465/14063072/23027b72-f38f-11e5-8b01-af4bbf7de382.gif" width="275"> 
+Click the Refresh button to start over
+
+<img src="https://cloud.githubusercontent.com/assets/11450465/14063074/28212a04-f38f-11e5-9d22-9fa426829fd5.gif" width="275"> 
 whatsforlunch will remember your preferences for next time
 
 #### Developer Notes
