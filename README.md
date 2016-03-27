@@ -2,7 +2,7 @@
 A tool to help you answer the toughest question of the day -- What's for lunch?!
 
 #### Background
-No matter how many stars a restaurant has on Yelp, you'll get sick of it if you eat there everyday.  #whatsforlunch let's you specify things like "just ate here", "like", or "don't like".  The app will provide you with a list of customized Yelp responses based on your feedback.
+No matter how many stars a restaurant has on Yelp, you'll get sick of it if you eat there everyday.  #whatsforlunch let's you specify things like "just ate here", "like", or "don't like".  The app will provide you with a list of customized Yelp responses based on your feedback.  You can also "swipe to dismiss" to help narrow down your options.
 
 #### How It Works
 Provides a list of nearby restaurants for you to choose from (powered by Yelp)
