@@ -264,6 +264,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public View getCoordinatorLayout(){
+        return mCoordinatorLayout;
+    }
+
     // Callback method for Google Play Services
     @Override
     public void onConnectionSuspended(int cause) {

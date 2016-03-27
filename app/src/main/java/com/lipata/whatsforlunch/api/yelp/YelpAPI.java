@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.lipata.whatsforlunch.ApiKeys;
-import com.lipata.whatsforlunch.data.yelppojo.Business;
 import com.lipata.whatsforlunch.data.yelppojo.YelpResponse;
 
 import org.scribe.builder.ServiceBuilder;
@@ -14,8 +13,6 @@ import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
-
-import java.util.List;
 
 /**
  * Code sample for accessing the Yelp API V2.
@@ -124,11 +121,11 @@ public class YelpAPI {
   // Created by JP Lipata
   // Public method that parses JSON response from Yelp API and converts to POJO as defined in
   // data.yelppojo using GSON
-  public List<Business> parseYelpResponse(String yelpResponse_Json){
+  public YelpResponse parseYelpResponse(String yelpResponse_Json){
     Log.d(LOG_TAG, "parseYelpResponse()");
     Gson gson = new Gson();
     YelpResponse yelpResponsePojo = gson.fromJson(yelpResponse_Json, YelpResponse.class);
-    return yelpResponsePojo.getBusinesses();
+    return yelpResponsePojo;
   }
 
 //  /**

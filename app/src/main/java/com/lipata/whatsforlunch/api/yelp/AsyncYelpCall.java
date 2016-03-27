@@ -1,6 +1,7 @@
 package com.lipata.whatsforlunch.api.yelp;
 
 import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -10,6 +11,7 @@ import com.lipata.whatsforlunch.MainActivity;
 import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.data.yelppojo.Business;
+import com.lipata.whatsforlunch.data.yelppojo.YelpResponse;
 
 import java.util.List;
 
@@ -49,12 +51,31 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String yelpResponse_Json) {
         super.onPostExecute(yelpResponse_Json);
         Log.d(LOG_TAG, yelpResponse_Json);
-        List<Business> businessList = mYelpApi.parseYelpResponse(yelpResponse_Json);
 
-        // Manipulate `businessList` to apply customization
-        List<Business> filteredBusinesses = mBusinessListManager.filter(businessList);
-        mBusinessListAdapter.setBusinessList(filteredBusinesses);
-        mBusinessListAdapter.notifyDataSetChanged();
+        YelpResponse yelpResponse = mYelpApi.parseYelpResponse(yelpResponse_Json);
+        List<Business> businessList = yelpResponse.getBusinesses();
+
+        // Handle Yelp API "error"
+        if(yelpResponse.getError()!=null){
+            Log.e(LOG_TAG, "YELP API ERROR RETURNED: " + yelpResponse.getError().getText()
+                    + " ID: " + yelpResponse.getError().getId());
+            Snackbar.make(mMainActivity.getCoordinatorLayout(), "Yelp API Error: "
+                    +  yelpResponse.getError().getText(), Snackbar.LENGTH_INDEFINITE).show();
+        }
+        // Handle case where there's no error but no results are returned
+        // I have not encountered this case, but imagine that it could happen
+        else if (businessList.size()==0) {
+            Log.d(LOG_TAG, "Yelp API returned no results");
+            Snackbar.make(mMainActivity.getCoordinatorLayout(), "No businesses found.", Snackbar.LENGTH_INDEFINITE).show();
+        }
+
+        // Handle expected results
+        else {
+            // Manipulate `businessList` to apply customization
+            List<Business> filteredBusinesses = mBusinessListManager.filter(businessList);
+            mBusinessListAdapter.setBusinessList(filteredBusinesses);
+            mBusinessListAdapter.notifyDataSetChanged();
+        }
 
         // UI stuff -- This probably shouldn't be here
         mMainActivity.stopRefreshAnimation();

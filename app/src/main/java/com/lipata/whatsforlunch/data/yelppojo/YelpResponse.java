@@ -1,8 +1,11 @@
 
 package com.lipata.whatsforlunch.data.yelppojo;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
@@ -11,6 +14,28 @@ public class YelpResponse {
     private Region region;
     private int total;
     private List<Business> businesses = new ArrayList<Business>();
+
+    @SerializedName("error")
+    private Error error;
+
+    /**
+     *
+     * @return
+     * The error
+     */
+    public Error getError() {
+        return error;
+    }
+
+    /**
+     *
+     * @param error
+     * The error
+     */
+    public void setError(Error error) {
+        this.error = error;
+    }
+
 
     /**
      * 
