@@ -33,15 +33,16 @@ The design similarity to Yelp is intentional.  Since this is basically a custom 
 
 ##### Enhancement Backlog
 ###### UI/Functionality
-- Need icon
+- Need app icon
 - User definable settings
+- Replace text location coordinates with map view
 - Get more results
-- "Just ate here" active state icon
+- "Just ate here" active state icon and dynamic text based on state
 - Bug: if the user denies location permission and selects "never ask again", it will render the app useless (Marshmallow and above)
 
 ###### Code Quality
 - Refactor: Overall architecture needs to be improved.  E.g. MainActivity is a "god object" and needs to be broken out into smaller classes.  
-- Replace iterative List appraoch to UserRecords/BusinessListManager with hashmap
+- Replace iterative List approach to UserRecords/BusinessListManager with hashmap
 - Replace AsyncTask with something better (e.g. Retrofit)
 - Replace findViewById with Butterknife
 - Refactor: RecyclerView.Adapter onClick handlers should be defined in ViewHolder
