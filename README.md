@@ -25,7 +25,7 @@ Provides a list of nearby restaurants for you to choose from (powered by Yelp)
 #### Developer Notes
 This is my first Android app.  There are many areas that can be improved upon.  A lot of this is 'throw away code' that was written just to get things working that needs massive clean up. See development roadmap below.
 
-The design similarity to Yelp is intentional.  Since this is basically a custom front-end for Yelp data, I wanted it to have a seemless UI feel. I also thought it would be a good exercise to try to replicate the Yelp UI from scratch.
+The design similarity to Yelp is intentional.  Since this is basically a custom front-end for Yelp data, I wanted it to have a seemless UI feel. I also thought it would be a good exercise to try to replicate the Yelp UI from scratch ("great artists steal").
 
 ##### Enhancement Backlog
 ###### UI/Functionality
