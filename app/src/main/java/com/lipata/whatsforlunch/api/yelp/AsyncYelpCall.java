@@ -49,6 +49,7 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String yelpResponse_Json) {
+
         super.onPostExecute(yelpResponse_Json);
         Log.d(LOG_TAG, yelpResponse_Json);
 
@@ -62,6 +63,7 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
             Snackbar.make(mMainActivity.getCoordinatorLayout(), "Yelp API Error: "
                     +  yelpResponse.getError().getText(), Snackbar.LENGTH_INDEFINITE).show();
         }
+
         // Handle case where there's no error but no results are returned
         // I have not encountered this case, but imagine that it could happen
         else if (businessList.size()==0) {

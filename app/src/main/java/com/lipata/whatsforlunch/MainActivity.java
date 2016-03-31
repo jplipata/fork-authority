@@ -209,9 +209,6 @@ public class MainActivity extends AppCompatActivity
         if (mLastLocation == null || isLocationStale()) {
             requestLocationData();
         } else {
-            String ll = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude() + "," + mLastLocation.getAccuracy();
-            Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
-
             // Check for network connectivity
             ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
@@ -219,6 +216,8 @@ public class MainActivity extends AppCompatActivity
 
             // If connected to network make Yelp API call, if no network, notify user
             if(isConnected) {
+                String ll = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude() + "," + mLastLocation.getAccuracy();
+                Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
                 new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, mSuggestionListAdapter, this, toast).execute();
             } else {
                 Snackbar.make(mCoordinatorLayout, "No network. Try again when you are connected to the internet.",
@@ -244,7 +243,7 @@ public class MainActivity extends AppCompatActivity
                     }
 
                 } else {
-                    Snackbar.make(mCoordinatorLayout, "Location Permission Required", Snackbar.LENGTH_LONG);                }
+                    Snackbar.make(mCoordinatorLayout, "Location Permission Required", Snackbar.LENGTH_LONG).show();                }
                 return;
             }
         }
