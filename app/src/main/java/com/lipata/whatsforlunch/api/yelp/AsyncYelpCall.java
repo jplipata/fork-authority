@@ -44,7 +44,17 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... strings) {
-        return mYelpApi.searchForBusinessesByLocation(mUserSearch, mUserLocation, AppSettings.SEARCH_RADIUS);
+
+        String yelpResponse = "";
+
+        try {
+            yelpResponse = mYelpApi.searchForBusinessesByLocation(mUserSearch, mUserLocation, AppSettings.SEARCH_RADIUS);
+
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "AsyncTask Error: " + e.toString());
+        }
+
+        return yelpResponse;
     }
 
     @Override

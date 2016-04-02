@@ -54,9 +54,15 @@ public class Location {
     public String getFormattedDisplayAddress(){
         String formattedDisplayAddress = "";
 
-        formattedDisplayAddress += displayAddress.get(0);
-        formattedDisplayAddress += ", ";
-        formattedDisplayAddress += displayAddress.get(1);
+        if(displayAddress.size() > 0) {
+
+            formattedDisplayAddress += displayAddress.get(0);
+
+            if (displayAddress.size() > 1) {
+                formattedDisplayAddress += ", ";
+                formattedDisplayAddress += displayAddress.get(1);
+            }
+        }
 
         return formattedDisplayAddress;
     }

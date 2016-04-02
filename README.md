@@ -1,5 +1,5 @@
 # whatsforlunch
-A tool to help you answer the toughest question of the day -- What's for lunch?!
+A tool to help you answer the toughest question of the day: What's for lunch?!?
 
 #### Background
 No matter how many stars a restaurant has on Yelp, you'll get sick of it if you eat there everyday.  #whatsforlunch let's you specify things like "just ate here", "like", or "don't like".  The app will provide you with a list of customized Yelp search results based on your feedback.  You can also "swipe to dismiss" to help narrow down your options.
@@ -33,6 +33,7 @@ The design similarity to Yelp is intentional.  Since this is basically a custom 
 ##### Enhancement Backlog
 ###### UI/Functionality
 - Need app icon
+- Provide feedback to user when device Location is not enabled
 - User definable settings
 - Replace text location coordinates with map view
 - Get more results
@@ -40,8 +41,8 @@ The design similarity to Yelp is intentional.  Since this is basically a custom 
 - Bug: if the user denies location permission and selects "never ask again", it will render the app useless (Marshmallow and above)
 
 ###### Code Quality
-- Refactor: Overall architecture needs to be improved, implement MVP pattern. (Currently, MainActivity is a "god object" and needs to be broken out into smaller classes.)
+- Refactor: Overall architecture needs to be improved, implement e.g. MVP pattern. (Currently, MainActivity is a "god object" and needs to be broken out into smaller classes.)
 - Replace iterative List approach to UserRecords/BusinessListManager with hashmap
-- Replace AsyncTask with something better (e.g. Retrofit)
+- Replace AsyncTask with something better (e.g. RxJava/Retrofit)
 - Replace findViewById with Butterknife
 - Refactor: RecyclerView.Adapter onClick handlers should be defined in ViewHolder
