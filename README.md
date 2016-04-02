@@ -2,9 +2,9 @@
 A tool to help you answer the toughest question of the day: What's for lunch?!?
 
 #### Background
-No matter how many stars a restaurant has on Yelp, you'll get sick of it if you eat there everyday.  #whatsforlunch let's you specify things like "just ate here", "like", or "don't like".  The app will provide you with a list of customized Yelp search results based on your feedback.  You can also "swipe to dismiss" to help narrow down your options.
-
 <img src="https://cloud.githubusercontent.com/assets/11450465/14062934/505f6230-f388-11e5-8cba-6428e8ff6b1d.gif" width="325" align="right">
+
+No matter how many stars a restaurant has on Yelp, you'll get sick of it if you eat there everyday.  #whatsforlunch let's you specify things like "just ate here", "like", or "don't like".  The app will provide you with a list of customized Yelp search results based on your feedback.  You can also "swipe to dismiss" to help narrow down your options.
 
 #### How It Works
 
@@ -22,7 +22,6 @@ Click the Refresh button to start over
 
 whatsforlunch will remember your preferences for next time
 
-<br>
 #### Developer Notes
 This is my first Android app.  There are many areas that can be improved upon.  A lot of this is 'throw away code' that was written just to get things working that needs massive clean up. See development roadmap below.
 
