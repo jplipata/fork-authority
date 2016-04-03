@@ -181,6 +181,14 @@ public class DeviceLocation implements GoogleApiClient.ConnectionCallbacks,
         return mLocationRequest;
     }
 
+    public long getLocationUpdateTimestamp(){
+        return  mLocationUpdateTimestamp;
+    }
+
+    // Setters
+    public void setLocationUpdateTimestamp(long timestamp){
+        mLocationUpdateTimestamp = timestamp;
+    }
 
     // TODO Implement this
 //    void isEnabledOnDevice(){

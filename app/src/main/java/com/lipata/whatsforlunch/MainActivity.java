@@ -46,10 +46,6 @@ public class MainActivity extends AppCompatActivity {
     static final String SUGGESTIONLIST_KEY = "suggestionList"; // TODO: This should go in R.strings
     static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
-    // Location stuff
-    DeviceLocation deviceLocation;
-    long mLocationUpdateTimestamp; // in milliseconds
-
     // Views
     protected CoordinatorLayout mCoordinatorLayout;
     protected TextView mTextView_Latitude;
@@ -62,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton mFAB_refresh;
     ObjectAnimator mFAB_refreshAnimation;
 
+    DeviceLocation deviceLocation;
     UserRecords mUserRecords;
     BusinessListManager mBusinessListManager;
 
@@ -126,9 +123,13 @@ public class MainActivity extends AppCompatActivity {
         mFAB_refreshAnimation.setRepeatCount(ObjectAnimator.INFINITE);
         mFAB_refreshAnimation.setInterpolator(null);
 
+        // Location stuff
+        deviceLocation = new DeviceLocation(this);
+        deviceLocation.initialize();
+
         // Restore state
         if (savedInstanceState != null) {
-            mLocationUpdateTimestamp = savedInstanceState.getLong(LOCATION_UPDATE_TIMESTAMP_KEY);
+            deviceLocation.setLocationUpdateTimestamp(savedInstanceState.getLong(LOCATION_UPDATE_TIMESTAMP_KEY));
 
             String storedSuggestionList = savedInstanceState.getString(SUGGESTIONLIST_KEY, null);
             if (storedSuggestionList != null) {
@@ -137,10 +138,6 @@ public class MainActivity extends AppCompatActivity {
                 mSuggestionListAdapter.setBusinessList(retrievedBusinessList);
             }
         }
-
-        // Location stuff
-        deviceLocation = new DeviceLocation(this);
-        deviceLocation.initialize();
     }
 
     @Override
@@ -160,74 +157,6 @@ public class MainActivity extends AppCompatActivity {
         if (deviceLocation.getClient().isConnected()) {
             deviceLocation.stopLocationUpdates();
         }
-    }
-
-    // Callback for Marshmallow requestPermissions() response
-    // This must live in the Activity class
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    if(deviceLocation.getClient().isConnected()) {
-                        deviceLocation.requestLocationUpdates();
-                    } else {
-                        deviceLocation.getClient().connect();
-                    }
-
-                } else {
-                    Snackbar.make(mCoordinatorLayout, "Location Permission Required", Snackbar.LENGTH_LONG).show();                }
-                return;
-            }
-        }
-    }
-
-    // Business Logic
-    public void executeSequence(){
-        final Toast toast = Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT);
-        toast.show();
-        Log.d(LOG_TAG, "Starting animation");
-        if(!mFAB_refreshAnimation.isRunning()) {
-            mFAB_refreshAnimation.start();
-        }
-
-        deviceLocation.getLocation();
-
-        // If getLastLocation() returned null, start a Location Request to get device location
-        // Else, query yelp with existing location arguments
-        if (deviceLocation.getLastLocation() == null || deviceLocation.isLocationStale()) {
-            deviceLocation.requestLocationData();
-        } else {
-            // Check for network connectivity
-            ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-            boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-
-            // If connected to network make Yelp API call, if no network, notify user
-            if(isConnected) {
-                String ll = deviceLocation.getLastLocation().getLatitude() + ","
-                        + deviceLocation.getLastLocation().getLongitude() + ","
-                        + deviceLocation.getLastLocation().getAccuracy();
-                Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
-                new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, mSuggestionListAdapter, this, toast).execute();
-            } else {
-                Snackbar.make(mCoordinatorLayout, "No network. Try again when you are connected to the internet.",
-                        Snackbar.LENGTH_INDEFINITE).show();
-                stopRefreshAnimation();
-            }
-        }
-    }
-
-    // Getters
-    public RecyclerView.LayoutManager getRecyclerViewLayoutManager(){
-        return mSuggestionListLayoutManager;
-    }
-
-    public View getCoordinatorLayout(){
-        return mCoordinatorLayout;
     }
 
     // UI methods
@@ -269,6 +198,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Callback for Marshmallow requestPermissions() response
+    // This must live in the Activity class
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    if(deviceLocation.getClient().isConnected()) {
+                        deviceLocation.requestLocationUpdates();
+                    } else {
+                        deviceLocation.getClient().connect();
+                    }
+
+                } else {
+                    Snackbar.make(mCoordinatorLayout, "Location Permission Required", Snackbar.LENGTH_LONG).show();                }
+                return;
+            }
+        }
+    }
+
+    // Retain Activity state
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, deviceLocation.getLocationUpdateTimestamp());
+
+        // TODO Should this be done with a Parcelable instead?
+        String suggestionListStr = new Gson().toJson(mSuggestionListAdapter.getBusinessList());
+        savedInstanceState.putString(SUGGESTIONLIST_KEY, suggestionListStr);
+
+    }
 
     // MainActivity template menu override methods
     @Override
@@ -293,17 +256,50 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // Retain Activity state
-    // TODO: Retain recyclerview state
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState){
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, mLocationUpdateTimestamp);
+    // Getters
+    public RecyclerView.LayoutManager getRecyclerViewLayoutManager(){
+        return mSuggestionListLayoutManager;
+    }
 
-        // TODO Should this be done with a Parcelable instead?
-        String suggestionListStr = new Gson().toJson(mSuggestionListAdapter.getBusinessList());
-        savedInstanceState.putString(SUGGESTIONLIST_KEY, suggestionListStr);
+    public View getCoordinatorLayout(){
+        return mCoordinatorLayout;
+    }
 
+    // Business Logic
+    // TODO This should be handled somewhere else
+    public void executeSequence(){
+        final Toast toast = Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT);
+        toast.show();
+        Log.d(LOG_TAG, "Starting animation");
+        if(!mFAB_refreshAnimation.isRunning()) {
+            mFAB_refreshAnimation.start();
+        }
+
+        deviceLocation.getLocation();
+
+        // If getLastLocation() returned null, start a Location Request to get device location
+        // Else, query yelp with existing location arguments
+        if (deviceLocation.getLastLocation() == null || deviceLocation.isLocationStale()) {
+            deviceLocation.requestLocationData();
+        } else {
+            // Check for network connectivity
+            ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+            // If connected to network make Yelp API call, if no network, notify user
+            if(isConnected) {
+                String ll = deviceLocation.getLastLocation().getLatitude() + ","
+                        + deviceLocation.getLastLocation().getLongitude() + ","
+                        + deviceLocation.getLastLocation().getAccuracy();
+                Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
+                new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, mSuggestionListAdapter, this, toast).execute();
+            } else {
+                Snackbar.make(mCoordinatorLayout, "No network. Try again when you are connected to the internet.",
+                        Snackbar.LENGTH_INDEFINITE).show();
+                stopRefreshAnimation();
+            }
+        }
     }
 
 }
