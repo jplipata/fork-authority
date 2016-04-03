@@ -376,6 +376,14 @@ public class MainActivity extends AppCompatActivity
         Log.d(LOG_TAG, "Location Updates Stopped");
     }
 
+    public RecyclerView.LayoutManager getRecyclerViewLayoutManager(){
+        return mSuggestionListLayoutManager;
+    }
+
+    public RecyclerView getRecyclerView(){
+        return mRecyclerView_suggestionList;
+    }
+
     // MainActivity template menu override methods
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -92,5 +92,6 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
         // UI stuff -- This probably shouldn't be here
         mMainActivity.stopRefreshAnimation();
         mToast.cancel();
+        mMainActivity.getRecyclerViewLayoutManager().scrollToPosition(0);
     }
 }
