@@ -1,19 +1,14 @@
 package com.lipata.whatsforlunch;
 
-import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,15 +21,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.lipata.whatsforlunch.api.DeviceLocation;
 import com.lipata.whatsforlunch.api.yelp.AsyncYelpCall;
 import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.data.BusinessListManager;
@@ -49,19 +38,16 @@ import java.util.List;
  *  and uses GSON to parse and display the response.
  */
 
-public class MainActivity extends AppCompatActivity
-        implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
+public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     // Constants
-    static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
-    static final String SUGGESTIONLIST_KEY = "suggestionList";
+    static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp"; // TODO: This should go in R.strings
+    static final String SUGGESTIONLIST_KEY = "suggestionList"; // TODO: This should go in R.strings
     static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
     // Location stuff
-    protected GoogleApiClient mGoogleApiClient;
-    protected Location mLastLocation;
-    private LocationRequest mLocationRequest;
+    DeviceLocation deviceLocation;
     long mLocationUpdateTimestamp; // in milliseconds
 
     // Views
@@ -128,7 +114,7 @@ public class MainActivity extends AppCompatActivity
         mFAB_refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isLocationStale()) {
+                if (deviceLocation.isLocationStale()) {
                     executeSequence();
                 } else {
                     Toast.makeText(MainActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
@@ -153,18 +139,9 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Location stuff
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .addApi(LocationServices.API).build();
-
-        mLocationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(1000)        // in milliseconds
-                .setFastestInterval(1000); // in milliseconds
+        deviceLocation = new DeviceLocation(this);
+        deviceLocation.initialize();
     }
-
 
     @Override
     protected void onResume(){
@@ -172,7 +149,7 @@ public class MainActivity extends AppCompatActivity
 
         // Check whether there are suggestion items in the RecyclerView.  If not, load some.
         if(mSuggestionListAdapter.getItemCount()==0){
-               mGoogleApiClient.connect();
+               deviceLocation.getClient().connect();
         }
     }
 
@@ -180,21 +157,36 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         Log.d(LOG_TAG, "onPause");
-        if (mGoogleApiClient.isConnected()) {
-            stopLocationUpdates();
-            mGoogleApiClient.disconnect();
+        if (deviceLocation.getClient().isConnected()) {
+            deviceLocation.stopLocationUpdates();
         }
     }
 
-
-    // Callback method for Google Play Services
+    // Callback for Marshmallow requestPermissions() response
+    // This must live in the Activity class
     @Override
-    public void onConnected(Bundle connectionHint) {
-        Log.d(LOG_TAG, "onConnected()");
-        executeSequence();
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    if(deviceLocation.getClient().isConnected()) {
+                        deviceLocation.requestLocationUpdates();
+                    } else {
+                        deviceLocation.getClient().connect();
+                    }
+
+                } else {
+                    Snackbar.make(mCoordinatorLayout, "Location Permission Required", Snackbar.LENGTH_LONG).show();                }
+                return;
+            }
+        }
     }
 
-    void executeSequence(){
+    // Business Logic
+    public void executeSequence(){
         final Toast toast = Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT);
         toast.show();
         Log.d(LOG_TAG, "Starting animation");
@@ -202,12 +194,12 @@ public class MainActivity extends AppCompatActivity
             mFAB_refreshAnimation.start();
         }
 
-        getLocation();
+        deviceLocation.getLocation();
 
         // If getLastLocation() returned null, start a Location Request to get device location
         // Else, query yelp with existing location arguments
-        if (mLastLocation == null || isLocationStale()) {
-            requestLocationData();
+        if (deviceLocation.getLastLocation() == null || deviceLocation.isLocationStale()) {
+            deviceLocation.requestLocationData();
         } else {
             // Check for network connectivity
             ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -216,7 +208,9 @@ public class MainActivity extends AppCompatActivity
 
             // If connected to network make Yelp API call, if no network, notify user
             if(isConnected) {
-                String ll = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude() + "," + mLastLocation.getAccuracy();
+                String ll = deviceLocation.getLastLocation().getLatitude() + ","
+                        + deviceLocation.getLastLocation().getLongitude() + ","
+                        + deviceLocation.getLastLocation().getAccuracy();
                 Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
                 new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, mSuggestionListAdapter, this, toast).execute();
             } else {
@@ -227,38 +221,34 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // Callback for Marshmallow requestPermissions() response
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    if(mGoogleApiClient.isConnected()) {
-                        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-                    } else {
-                        mGoogleApiClient.connect();
-                    }
-
-                } else {
-                    Snackbar.make(mCoordinatorLayout, "Location Permission Required", Snackbar.LENGTH_LONG).show();                }
-                return;
-            }
-        }
+    // Getters
+    public RecyclerView.LayoutManager getRecyclerViewLayoutManager(){
+        return mSuggestionListLayoutManager;
     }
 
-    // Callback method for Google Play Services
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
-        // onConnectionFailed.
-        // https://developers.google.com/android/reference/com/google/android/gms/common/ConnectionResult
+    public View getCoordinatorLayout(){
+        return mCoordinatorLayout;
+    }
 
-        int errorCode = result.getErrorCode();
+    // UI methods
 
-        Log.i(LOG_TAG, "GoogleApiClient Connection failed: ConnectionResult.getErrorCode() = " + errorCode);
+    public void updateLocationViews(double latitude, double longitude, float accuracy){
+        mTextView_Latitude.setText(Double.toString(latitude));
+        mTextView_Longitude.setText(Double.toString(longitude));
+        mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
+        //Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
+    }
+
+    public void stopRefreshAnimation(){
+        Log.d(LOG_TAG, "Stop animation");
+        //mRefreshAnimation.cancel();
+        mFAB_refreshAnimation.cancel();
+    }
+
+    public void onGoogleApiConnectionFailed(int errorCode){
+
+        // TODO This logic should probably live somewhere else, e.g. Presenter.  Maybe it's better
+        // to just have a `public display(String textToBeDisplayed)` and have the logic handled elsewhere
 
         switch (errorCode){
             case 1:
@@ -279,110 +269,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public View getCoordinatorLayout(){
-        return mCoordinatorLayout;
-    }
-
-    // Callback method for Google Play Services
-    @Override
-    public void onConnectionSuspended(int cause) {
-        // The connection to Google Play services was lost for some reason. We call connect() to
-        // attempt to re-establish the connection.
-        Log.i(LOG_TAG, "Connection suspended");
-        mGoogleApiClient.connect();
-    }
-
-    // Callback method for LocationRequest
-    @Override
-    public void onLocationChanged(Location location) {
-        Log.d(LOG_TAG, "Location Changed");
-        getLocation();
-    }
-
-    // Helper methods
-
-    public void stopRefreshAnimation(){
-        Log.d(LOG_TAG, "Stop animation");
-        //mRefreshAnimation.cancel();
-        mFAB_refreshAnimation.cancel();
-    }
-
-    private boolean isLocationStale(){
-        long currentTime = SystemClock.elapsedRealtime();
-        Log.d(LOG_TAG, "currentTime = " + currentTime);
-        Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
-
-        if ((currentTime - mLocationUpdateTimestamp) > AppSettings.LOCATION_LIFESPAN){
-            return true;
-        } else {
-            return false;}
-    }
-
-    private void getLocation(){
-        Log.d(LOG_TAG, "getLocation()...");
-
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        mLocationUpdateTimestamp = SystemClock.elapsedRealtime();
-        Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
-
-        if (mLastLocation != null) {
-            double latitude = mLastLocation.getLatitude();
-            double longitude = mLastLocation.getLongitude();
-            float accuracy = mLastLocation.getAccuracy();
-            Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
-            updateLocationViews(latitude, longitude, accuracy);
-            stopLocationUpdates();
-        } else {
-            Log.d(LOG_TAG, "mLastLocation = null");
-        }
-    }
-
-    private void requestLocationData() {
-
-        Log.d(LOG_TAG, "Creating LocationRequest...");
-        //Toast.makeText(this, "Getting location...", Toast.LENGTH_SHORT).show();
-
-        // Check for Location permission
-        boolean isPermissionMissing = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED;
-        Log.d(LOG_TAG, "isPermissionMissing = " + isPermissionMissing);
-
-        if(isPermissionMissing) {
-            // If permission is missing, we need to ask for it.  See onRequestPermissionResult() callback
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID);
-        } else {
-
-            // Else, permission has already been granted.  Proceed with requestLocationUpdates...
-            if(mGoogleApiClient.isConnected()) {
-                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-            } else {
-                mGoogleApiClient.connect();
-            }
-        }
-    }
-
-    private void updateLocationViews(double latitude, double longitude, float accuracy){
-        mTextView_Latitude.setText(Double.toString(latitude));
-        mTextView_Longitude.setText(Double.toString(longitude));
-        mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
-        //Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
-    }
-
-    protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        mGoogleApiClient.disconnect();
-        Log.d(LOG_TAG, "Location Updates Stopped");
-    }
-
-    public RecyclerView.LayoutManager getRecyclerViewLayoutManager(){
-        return mSuggestionListLayoutManager;
-    }
-
-    public RecyclerView getRecyclerView(){
-        return mRecyclerView_suggestionList;
-    }
 
     // MainActivity template menu override methods
     @Override
@@ -414,6 +300,7 @@ public class MainActivity extends AppCompatActivity
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, mLocationUpdateTimestamp);
 
+        // TODO Should this be done with a Parcelable instead?
         String suggestionListStr = new Gson().toJson(mSuggestionListAdapter.getBusinessList());
         savedInstanceState.putString(SUGGESTIONLIST_KEY, suggestionListStr);
 
