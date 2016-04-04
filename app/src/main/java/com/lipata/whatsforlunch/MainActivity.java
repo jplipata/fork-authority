@@ -23,7 +23,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.lipata.whatsforlunch.api.DeviceLocation;
+import com.lipata.whatsforlunch.api.GooglePlayApi;
 import com.lipata.whatsforlunch.api.yelp.AsyncYelpCall;
 import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.data.BusinessListManager;
@@ -54,11 +54,11 @@ public class MainActivity extends AppCompatActivity {
     protected RecyclerView mRecyclerView_suggestionList;
     private RecyclerView.LayoutManager mSuggestionListLayoutManager;
     private BusinessListAdapter mSuggestionListAdapter;
-    //private SwipeRefreshLayout mSwipeRefreshLayout;
     FloatingActionButton mFAB_refresh;
     ObjectAnimator mFAB_refreshAnimation;
 
-    DeviceLocation deviceLocation;
+    // App modules
+    GooglePlayApi mGooglePlayApi;
     UserRecords mUserRecords;
     BusinessListManager mBusinessListManager;
 
@@ -89,29 +89,12 @@ public class MainActivity extends AppCompatActivity {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(mRecyclerView_suggestionList);
 
-        // Temporarily disabling swipe to refresh in lieu of FAB
-//        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-//        mSwipeRefreshLayout.setColorSchemeColors(R.color.colorPrimary);
-//        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                Log.d(LOG_TAG, "Pulldown refresh.  onRefresh()");
-//                if (isLocationStale()) {
-//                    executeSequence();
-//                } else {
-//                    Toast.makeText(MainActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
-//                }
-//                mSwipeRefreshLayout.setRefreshing(false);
-//            }
-//        });
-
-
         // Set up FAB and refresh animation
         mFAB_refresh = (FloatingActionButton) findViewById(R.id.fab);
         mFAB_refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (deviceLocation.isLocationStale()) {
+                if (mGooglePlayApi.isLocationStale()) {
                     executeSequence();
                 } else {
                     Toast.makeText(MainActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
@@ -123,13 +106,12 @@ public class MainActivity extends AppCompatActivity {
         mFAB_refreshAnimation.setRepeatCount(ObjectAnimator.INFINITE);
         mFAB_refreshAnimation.setInterpolator(null);
 
-        // Location stuff
-        deviceLocation = new DeviceLocation(this);
-        deviceLocation.initialize();
+        // Location API
+        mGooglePlayApi = new GooglePlayApi(this);
 
         // Restore state
         if (savedInstanceState != null) {
-            deviceLocation.setLocationUpdateTimestamp(savedInstanceState.getLong(LOCATION_UPDATE_TIMESTAMP_KEY));
+            mGooglePlayApi.setLocationUpdateTimestamp(savedInstanceState.getLong(LOCATION_UPDATE_TIMESTAMP_KEY));
 
             String storedSuggestionList = savedInstanceState.getString(SUGGESTIONLIST_KEY, null);
             if (storedSuggestionList != null) {
@@ -146,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Check whether there are suggestion items in the RecyclerView.  If not, load some.
         if(mSuggestionListAdapter.getItemCount()==0){
-               deviceLocation.getClient().connect();
+               mGooglePlayApi.getClient().connect();
         }
     }
 
@@ -154,8 +136,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.d(LOG_TAG, "onPause");
-        if (deviceLocation.getClient().isConnected()) {
-            deviceLocation.stopLocationUpdates();
+        if (mGooglePlayApi.getClient().isConnected()) {
+            mGooglePlayApi.stopLocationUpdates();
         }
     }
 
@@ -208,10 +190,10 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    if(deviceLocation.getClient().isConnected()) {
-                        deviceLocation.requestLocationUpdates();
+                    if(mGooglePlayApi.getClient().isConnected()) {
+                        mGooglePlayApi.requestLocationUpdates();
                     } else {
-                        deviceLocation.getClient().connect();
+                        mGooglePlayApi.getClient().connect();
                     }
 
                 } else {
@@ -225,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState){
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, deviceLocation.getLocationUpdateTimestamp());
+        savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, mGooglePlayApi.getLocationUpdateTimestamp());
 
         // TODO Should this be done with a Parcelable instead?
         String suggestionListStr = new Gson().toJson(mSuggestionListAdapter.getBusinessList());
@@ -269,21 +251,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Business Logic
-    // TODO This should be handled somewhere else
+    // TODO This is a hodge podge of UI + business logic.  Needs to be organized.
     public void executeSequence(){
+
+        // UI
         final Toast toast = Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT);
         toast.show();
+
         Log.d(LOG_TAG, "Starting animation");
         if(!mFAB_refreshAnimation.isRunning()) {
             mFAB_refreshAnimation.start();
         }
 
-        deviceLocation.showLocation();
+        // Business Logic
+
+        mGooglePlayApi.showLocation();
 
         // If getLastLocation() returned null, start a Location Request to get device location
         // Else, query yelp with existing location arguments
-        if (deviceLocation.getLastLocation() == null || deviceLocation.isLocationStale()) {
-            deviceLocation.requestLocationData();
+        if (mGooglePlayApi.getLastLocation() == null || mGooglePlayApi.isLocationStale()) {
+            mGooglePlayApi.requestLocationData();
         } else {
             // Check for network connectivity
             ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -292,12 +279,14 @@ public class MainActivity extends AppCompatActivity {
 
             // If connected to network make Yelp API call, if no network, notify user
             if(isConnected) {
-                String ll = deviceLocation.getLastLocation().getLatitude() + ","
-                        + deviceLocation.getLastLocation().getLongitude() + ","
-                        + deviceLocation.getLastLocation().getAccuracy();
+                String ll = mGooglePlayApi.getLastLocation().getLatitude() + ","
+                        + mGooglePlayApi.getLastLocation().getLongitude() + ","
+                        + mGooglePlayApi.getLastLocation().getAccuracy();
                 Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
                 new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, this, toast).execute();
             } else {
+
+                // UI
                 Snackbar.make(mCoordinatorLayout, "No network. Try again when you are connected to the internet.",
                         Snackbar.LENGTH_INDEFINITE).show();
                 stopRefreshAnimation();

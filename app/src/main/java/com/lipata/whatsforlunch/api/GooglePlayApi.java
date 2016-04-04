@@ -1,7 +1,6 @@
 package com.lipata.whatsforlunch.api;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -21,10 +20,10 @@ import com.lipata.whatsforlunch.data.AppSettings;
 /**
  * Created by jlipata on 4/2/16.
  */
-public class DeviceLocation implements GoogleApiClient.ConnectionCallbacks,
+public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-    private static final String LOG_TAG = DeviceLocation.class.getSimpleName();
+    private static final String LOG_TAG = GooglePlayApi.class.getSimpleName();
 
     final int LOCATION_REQUEST_INTERVAL = 1000; // in milliseconds
     final int LOCATION_REQUEST_FASTEST_INTERVAL = 1000;// in milliseconds
@@ -36,14 +35,9 @@ public class DeviceLocation implements GoogleApiClient.ConnectionCallbacks,
     private LocationRequest mLocationRequest;
     long mLocationUpdateTimestamp; // in milliseconds
 
-    public DeviceLocation(MainActivity mainActivity) {
+    public GooglePlayApi(MainActivity mainActivity) {
         this.mMainActivity = mainActivity;
-    }
 
-    // Public methods
-
-    // TODO Should this just go in the constructor?
-    public void initialize(){
         mGoogleApiClient = new GoogleApiClient.Builder(mMainActivity)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -56,7 +50,9 @@ public class DeviceLocation implements GoogleApiClient.ConnectionCallbacks,
                 .setFastestInterval(LOCATION_REQUEST_FASTEST_INTERVAL);
     }
 
-    // TODO This method is really more of a UI method.  Should probably live somewhere else
+    // Public methods
+
+    // TODO This is a mix of UI updates + API calls. Needs to be organized.
     public void showLocation(){
         Log.d(LOG_TAG, "showLocation()...");
 
@@ -91,8 +87,6 @@ public class DeviceLocation implements GoogleApiClient.ConnectionCallbacks,
 
     public void requestLocationData() {
 
-        Log.d(LOG_TAG, "Creating LocationRequest...");
-
         // Check for Location permission
         boolean isPermissionMissing = ContextCompat.checkSelfPermission(mMainActivity, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED;
@@ -100,15 +94,17 @@ public class DeviceLocation implements GoogleApiClient.ConnectionCallbacks,
 
         if(isPermissionMissing) {
             // If permission is missing, we need to ask for it.  See onRequestPermissionResult() callback
-            ActivityCompat.requestPermissions((Activity) mMainActivity,
+            ActivityCompat.requestPermissions(mMainActivity,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID);
         } else {
 
             // Else, permission has already been granted.  Proceed with requestLocationUpdates...
             if(mGoogleApiClient.isConnected()) {
+                Log.d(LOG_TAG, "Google API is connected.  Requesting Location Updates...");
                 LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             } else {
+                Log.d(LOG_TAG, "Google API not connected.  Reconnecting...");
                 mGoogleApiClient.connect();
             }
         }
