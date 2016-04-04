@@ -57,8 +57,8 @@ public class DeviceLocation implements GoogleApiClient.ConnectionCallbacks,
     }
 
     // TODO This method is really more of a UI method.  Should probably live somewhere else
-    public void getLocation(){
-        Log.d(LOG_TAG, "getLocation()...");
+    public void showLocation(){
+        Log.d(LOG_TAG, "showLocation()...");
 
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         mLocationUpdateTimestamp = SystemClock.elapsedRealtime();
@@ -164,7 +164,7 @@ public class DeviceLocation implements GoogleApiClient.ConnectionCallbacks,
     @Override
     public void onLocationChanged(Location location) {
         Log.d(LOG_TAG, "Location Changed");
-        getLocation();
+        showLocation();
     }
 
     // Getters

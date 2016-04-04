@@ -1,6 +1,5 @@
 package com.lipata.whatsforlunch;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.CoordinatorLayout;
@@ -38,19 +37,19 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     public static final int DISMISS = 3;
 
     private List<Business> mBusinessList;
-    private Context mContext;
+    private MainActivity mMainActivity;
     private CoordinatorLayout mCoordinatorLayout;
     private RecyclerView.LayoutManager mLayoutManager;
     UserRecords mUserRecords;
     BusinessListManager mBusinessListManager;
 
-    public BusinessListAdapter(Context context, CoordinatorLayout coordinatorLayout,
-                               UserRecords userRecords, BusinessListManager businessListManager, RecyclerView.LayoutManager linearLayoutManager){
-        this.mContext = context;
-        this.mCoordinatorLayout = coordinatorLayout;
+    public BusinessListAdapter(MainActivity mainActivity,
+                               UserRecords userRecords, BusinessListManager businessListManager){
+        this.mMainActivity = mainActivity;
+        this.mCoordinatorLayout = mainActivity.getCoordinatorLayout();
         this.mUserRecords = userRecords;
         this.mBusinessListManager = businessListManager;
-        this.mLayoutManager = linearLayoutManager;
+        this.mLayoutManager = mainActivity.getRecyclerViewLayoutManager();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -105,12 +104,12 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             @Override
             public void onClick(View v){
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(business.getUrl()));
-                mContext.startActivity(browserIntent);
+                mMainActivity.startActivity(browserIntent);
             }
         });
 
         // Business image
-        Picasso.with(mContext)
+        Picasso.with(mMainActivity)
                 .load(business.getImageUrl()).fit()
                 .into(holder.mImageView_BusinessImage);
 
@@ -118,7 +117,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         holder.mTextView_BusinessName.setText(position + 1 + ". " + business.getName());
 
         // Business rating image
-        Picasso.with(mContext)
+        Picasso.with(mMainActivity)
                 .load(business.getRatingImgUrlLarge()).fit()
                 .into(holder.mImageView_BusinessRatingUrl);
 
@@ -260,7 +259,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 // Notify user
                 Snackbar.make(mCoordinatorLayout,
-                        "Noted. You just ate at " + business.getName() + mContext.getString(R.string.moved_to_bottom),
+                        "Noted. You just ate at " + business.getName() + mMainActivity.getString(R.string.moved_to_bottom),
                         Snackbar.LENGTH_LONG).show();
 
                 // Backend stuff
@@ -302,7 +301,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                     // Notify user
                     Snackbar.make(mCoordinatorLayout,
-                            "Noted. You don't like " + business.getName() + mContext.getString(R.string.moved_to_bottom),
+                            "Noted. You don't like " + business.getName() + mMainActivity.getString(R.string.moved_to_bottom),
                             Snackbar.LENGTH_LONG).show();
 
                     // Backend stuff
@@ -386,7 +385,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                         }
                     }
                 })
-                .setActionTextColor(mContext.getResources().getColor(R.color.text_white))
+                .setActionTextColor(mMainActivity.getResources().getColor(R.color.text_white))
                 .show();
 
 //        Temporarily disabling this

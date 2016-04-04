@@ -32,12 +32,12 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
     Toast mToast;
 
     public AsyncYelpCall(String userLocation, String userSearch, BusinessListManager businessListManager,
-                         BusinessListAdapter businessListAdapter, MainActivity mainActivity, Toast toast) {
+                         MainActivity mainActivity, Toast toast) {
         this.mUserLocation = userLocation;
         this.mUserSearch = userSearch;
         this.mBusinessListManager = businessListManager;
-        this.mBusinessListAdapter = businessListAdapter;
         this.mMainActivity = mainActivity;
+        this.mBusinessListAdapter = mainActivity.getSuggestionListAdapter();
         this.mToast = toast;
 
     }

@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         mSuggestionListLayoutManager = new LinearLayoutManager(this);
         mRecyclerView_suggestionList.setLayoutManager(mSuggestionListLayoutManager);
 
-        mSuggestionListAdapter = new BusinessListAdapter(this, mCoordinatorLayout, mUserRecords, mBusinessListManager, mSuggestionListLayoutManager);
+        mSuggestionListAdapter = new BusinessListAdapter(this, mUserRecords, mBusinessListManager);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
 
         ItemTouchHelper.Callback callback = new ListItemTouchHelper(mSuggestionListAdapter);
@@ -230,7 +230,6 @@ public class MainActivity extends AppCompatActivity {
         // TODO Should this be done with a Parcelable instead?
         String suggestionListStr = new Gson().toJson(mSuggestionListAdapter.getBusinessList());
         savedInstanceState.putString(SUGGESTIONLIST_KEY, suggestionListStr);
-
     }
 
     // MainActivity template menu override methods
@@ -261,8 +260,12 @@ public class MainActivity extends AppCompatActivity {
         return mSuggestionListLayoutManager;
     }
 
-    public View getCoordinatorLayout(){
+    public CoordinatorLayout getCoordinatorLayout(){
         return mCoordinatorLayout;
+    }
+
+    public BusinessListAdapter getSuggestionListAdapter() {
+        return mSuggestionListAdapter;
     }
 
     // Business Logic
@@ -275,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
             mFAB_refreshAnimation.start();
         }
 
-        deviceLocation.getLocation();
+        deviceLocation.showLocation();
 
         // If getLastLocation() returned null, start a Location Request to get device location
         // Else, query yelp with existing location arguments
@@ -293,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
                         + deviceLocation.getLastLocation().getLongitude() + ","
                         + deviceLocation.getLastLocation().getAccuracy();
                 Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
-                new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, mSuggestionListAdapter, this, toast).execute();
+                new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, this, toast).execute();
             } else {
                 Snackbar.make(mCoordinatorLayout, "No network. Try again when you are connected to the internet.",
                         Snackbar.LENGTH_INDEFINITE).show();
