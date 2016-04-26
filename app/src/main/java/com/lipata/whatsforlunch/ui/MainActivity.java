@@ -1,4 +1,4 @@
-package com.lipata.whatsforlunch;
+package com.lipata.whatsforlunch.ui;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.lipata.whatsforlunch.R;
 import com.lipata.whatsforlunch.api.GooglePlayApi;
 import com.lipata.whatsforlunch.api.yelp.AsyncYelpCall;
 import com.lipata.whatsforlunch.data.AppSettings;
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     protected TextView mTextView_Longitude;
     protected TextView mTextView_Accuracy;
     protected RecyclerView mRecyclerView_suggestionList;
-    private RecyclerView.LayoutManager mSuggestionListLayoutManager;
+    private LinearLayoutManager mSuggestionListLayoutManager;
     private BusinessListAdapter mSuggestionListAdapter;
     FloatingActionButton mFAB_refresh;
     ObjectAnimator mFAB_refreshAnimation;
@@ -88,6 +89,9 @@ public class MainActivity extends AppCompatActivity {
         ItemTouchHelper.Callback callback = new ListItemTouchHelper(mSuggestionListAdapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(mRecyclerView_suggestionList);
+
+        mRecyclerView_suggestionList.addOnScrollListener(new BusinessListScrollListener(mSuggestionListLayoutManager));
+
 
         // Set up FAB and refresh animation
         mFAB_refresh = (FloatingActionButton) findViewById(R.id.fab);
@@ -238,6 +242,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Getters
+
+    //TODO RecyclerView.LayoutManager has been replaced by android.support.v7.widget.LinearLayoutManager.  For some reason this still works, but it could cause problems later.
     public RecyclerView.LayoutManager getRecyclerViewLayoutManager(){
         return mSuggestionListLayoutManager;
     }

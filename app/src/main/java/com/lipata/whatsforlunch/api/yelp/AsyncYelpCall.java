@@ -6,8 +6,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.lipata.whatsforlunch.ApiKeys;
-import com.lipata.whatsforlunch.BusinessListAdapter;
-import com.lipata.whatsforlunch.MainActivity;
+import com.lipata.whatsforlunch.ui.BusinessListAdapter;
+import com.lipata.whatsforlunch.ui.MainActivity;
 import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.data.yelppojo.Business;

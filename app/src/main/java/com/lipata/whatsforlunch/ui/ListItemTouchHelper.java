@@ -1,4 +1,4 @@
-package com.lipata.whatsforlunch;
+package com.lipata.whatsforlunch.ui;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
