@@ -1,10 +1,14 @@
 package com.lipata.whatsforlunch.api;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -14,6 +18,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.lipata.whatsforlunch.api.yelp.AsyncYelpCall;
 import com.lipata.whatsforlunch.ui.MainActivity;
 import com.lipata.whatsforlunch.data.AppSettings;
 
@@ -52,14 +57,15 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     // Public methods
 
-    // TODO This is a mix of UI updates + API calls. Needs to be organized.
-    public void showLocation(){
-        Log.d(LOG_TAG, "showLocation()...");
+    public void showLastLocation(){
+        Log.d(LOG_TAG, "showLastLocation()...");
 
+        // Get last location & update timestamp
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         mLocationUpdateTimestamp = SystemClock.elapsedRealtime();
         Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
 
+        // If LastLocation is not null, pass to MainActivity to be displayed
         if (mLastLocation != null) {
             double latitude = mLastLocation.getLatitude();
             double longitude = mLastLocation.getLongitude();
@@ -85,7 +91,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
             return false;}
     }
 
-    public void requestLocationData() {
+    public void checkPermissionsAndRequestLocation() {
 
         // Check for Location permission
         boolean isPermissionMissing = ContextCompat.checkSelfPermission(mMainActivity, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -125,13 +131,46 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         Log.d(LOG_TAG, "Location updates stopped and client disconnected");
     }
 
+    public void callYelpApi(){
+        /*
+        * This code is not placed in the onConnected callback because it can also be called when the
+        * Google API client is already connected.
+        */
+
+        showLastLocation();
+
+        // If getLastLocation() returned null, start a Location Request to get device location
+        // Else, query yelp with existing location arguments
+        if (getLastLocation() == null || isLocationStale()) {
+            checkPermissionsAndRequestLocation();
+        } else {
+            // Check for network connectivity
+            ConnectivityManager cm = (ConnectivityManager)mMainActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+            // If connected to network make Yelp API call, if no network, notify user
+            if(isConnected) {
+                String ll = getLastLocation().getLatitude() + ","
+                        + getLastLocation().getLongitude() + ","
+                        + getLastLocation().getAccuracy();
+                Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
+                new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mMainActivity).execute();
+            } else {
+
+                // UI
+                Snackbar.make(mMainActivity.getCoordinatorLayout(), "No network. Try again when you are connected to the internet.",
+                        Snackbar.LENGTH_INDEFINITE).show();
+                mMainActivity.stopRefreshAnimation();
+            }
+        }
+    }
+
     // Callbacks for Google Play API
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.d(LOG_TAG, "onConnected()");
-
-        //TODO Implement presenter so that we're not talking directly to the UI
-        mMainActivity.executeSequence();
+        callYelpApi();
     }
 
     @Override
@@ -144,8 +183,17 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
         Log.i(LOG_TAG, "GoogleApiClient Connection failed: ConnectionResult.getErrorCode() = " + errorCode);
 
-        // TODO The error code should be passed to the Presenter class (once it's written)
-        mMainActivity.onGoogleApiConnectionFailed(errorCode);
+        switch (errorCode){
+            case 1:
+                mMainActivity.showSnackBarIndefinite("ERROR: Google Play services is missing on this device");
+                break;
+            case 2:
+                mMainActivity.showSnackBarIndefinite("ERROR: The installed version of Google Play services is out of date.");
+                break;
+            default:
+                mMainActivity.showSnackBarIndefinite("ERROR: Google API Client, error code: " + errorCode);
+                break;
+        }
     }
 
     @Override
@@ -160,7 +208,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     @Override
     public void onLocationChanged(Location location) {
         Log.d(LOG_TAG, "Location Changed");
-        showLocation();
+        showLastLocation();
     }
 
     // Getters

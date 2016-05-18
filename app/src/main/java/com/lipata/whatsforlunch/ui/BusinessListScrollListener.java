@@ -19,8 +19,6 @@ public class BusinessListScrollListener extends RecyclerView.OnScrollListener {
     int firstVisibleItemPosition;
     int lastVisibleItemPosition;
 
-
-
     public BusinessListScrollListener(LinearLayoutManager layoutManager) {
         this.mLayoutManager = layoutManager;
         mApiCall = new TestApiCall();
@@ -36,15 +34,15 @@ public class BusinessListScrollListener extends RecyclerView.OnScrollListener {
          firstVisibleItemPosition = mLayoutManager.findFirstVisibleItemPosition();
          lastVisibleItemPosition = mLayoutManager.findLastVisibleItemPosition();
 
-        Log.d(LOG_TAG, "visibleItemCount "+visibleItemCount+" | totalItemCount "+totalItemCount
+        Log.v(LOG_TAG, "visibleItemCount "+visibleItemCount+" | totalItemCount "+totalItemCount
                 +" | firstVisibleItemPosition "+firstVisibleItemPosition+" | lastVisibleItemPosition "+lastVisibleItemPosition);
 
         if(lastVisibleItemPosition+1 == totalItemCount) {
-            if (mApiCall.isInProgress() == false) {
-                Log.d(LOG_TAG, "LOAD MORE ITEMS");
+            if (!mApiCall.isInProgress()) {
+                Log.v(LOG_TAG, "LOAD MORE ITEMS");
 
             } else {
-                Log.d(LOG_TAG, "LOADING IN PROGRESS");
+                Log.v(LOG_TAG, "LOADING IN PROGRESS");
             }
         }
 

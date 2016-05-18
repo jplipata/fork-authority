@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.lipata.whatsforlunch.ApiKeys;
-import com.lipata.whatsforlunch.data.yelppojo.YelpResponse;
+import com.lipata.whatsforlunch.api.yelp.model.YelpResponse;
 
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.model.OAuthRequest;

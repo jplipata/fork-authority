@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.whatsforlunch.ui.BusinessListAdapter;
 import com.lipata.whatsforlunch.R;
-import com.lipata.whatsforlunch.data.yelppojo.Business;
+import com.lipata.whatsforlunch.api.yelp.model.Business;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

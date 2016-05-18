@@ -3,15 +3,14 @@ package com.lipata.whatsforlunch.api.yelp;
 import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.lipata.whatsforlunch.ApiKeys;
+import com.lipata.whatsforlunch.api.yelp.model.Business;
+import com.lipata.whatsforlunch.api.yelp.model.YelpResponse;
+import com.lipata.whatsforlunch.data.AppSettings;
+import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.ui.BusinessListAdapter;
 import com.lipata.whatsforlunch.ui.MainActivity;
-import com.lipata.whatsforlunch.data.BusinessListManager;
-import com.lipata.whatsforlunch.data.AppSettings;
-import com.lipata.whatsforlunch.data.yelppojo.Business;
-import com.lipata.whatsforlunch.data.yelppojo.YelpResponse;
 
 import java.util.List;
 
@@ -29,16 +28,14 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
     BusinessListManager mBusinessListManager;
     BusinessListAdapter mBusinessListAdapter;
     MainActivity mMainActivity;
-    Toast mToast;
 
-    public AsyncYelpCall(String userLocation, String userSearch, BusinessListManager businessListManager,
-                         MainActivity mainActivity, Toast toast) {
+    public AsyncYelpCall(String userLocation, String userSearch,
+                         MainActivity mainActivity) {
         this.mUserLocation = userLocation;
         this.mUserSearch = userSearch;
-        this.mBusinessListManager = businessListManager;
+        this.mBusinessListManager = mainActivity.getBusinessListManager();
         this.mMainActivity = mainActivity;
         this.mBusinessListAdapter = mainActivity.getSuggestionListAdapter();
-        this.mToast = toast;
 
     }
 
@@ -91,7 +88,6 @@ public class AsyncYelpCall extends AsyncTask<String, Void, String> {
 
         // UI stuff -- This probably shouldn't be here
         mMainActivity.stopRefreshAnimation();
-        mToast.cancel();
         mMainActivity.getRecyclerViewLayoutManager().scrollToPosition(0);
     }
 }

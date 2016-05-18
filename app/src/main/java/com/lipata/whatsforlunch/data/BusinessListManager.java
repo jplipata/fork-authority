@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.lipata.whatsforlunch.data.user.BusinessItemRecord;
 import com.lipata.whatsforlunch.data.user.UserRecords;
-import com.lipata.whatsforlunch.data.yelppojo.Business;
+import com.lipata.whatsforlunch.api.yelp.model.Business;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +37,7 @@ public class BusinessListManager {
         // Get user data
         List<BusinessItemRecord> userRecordList = mUserRecords.getList();
 
-        // Iterate through API results, adjust order according to user records
+        // Iterate through API results, adjust order according to user records  TODO: Replace iteration with HashMap
         businessList_Filtered.addAll(businessList_Source);
         for(int i=0; i<businessList_Source.size(); i++){
             Business business = businessList_Source.get(i);

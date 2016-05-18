@@ -1,10 +1,10 @@
 
-package com.lipata.whatsforlunch.data.yelppojo;
+package com.lipata.whatsforlunch.api.yelp.model;
 
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
-public class Coordinate {
+public class Center {
 
     private double latitude;
     private double longitude;

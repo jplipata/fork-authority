@@ -1,10 +1,7 @@
 package com.lipata.whatsforlunch.ui;
 
 import android.animation.ObjectAnimator;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -25,11 +22,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.whatsforlunch.R;
 import com.lipata.whatsforlunch.api.GooglePlayApi;
-import com.lipata.whatsforlunch.api.yelp.AsyncYelpCall;
-import com.lipata.whatsforlunch.data.AppSettings;
+import com.lipata.whatsforlunch.api.yelp.model.Business;
 import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.user.UserRecords;
-import com.lipata.whatsforlunch.data.yelppojo.Business;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -61,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     // App modules
     GooglePlayApi mGooglePlayApi;
     UserRecords mUserRecords;
+
     BusinessListManager mBusinessListManager;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (mGooglePlayApi.isLocationStale()) {
-                    executeSequence();
+                    fetchBusinessList();
                 } else {
                     Toast.makeText(MainActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
                 }
@@ -132,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Check whether there are suggestion items in the RecyclerView.  If not, load some.
         if(mSuggestionListAdapter.getItemCount()==0){
-               mGooglePlayApi.getClient().connect();
+            fetchBusinessList();
         }
     }
 
@@ -154,34 +150,21 @@ public class MainActivity extends AppCompatActivity {
         //Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
     }
 
+    public void startRefreshAnimation(){
+        Log.d(LOG_TAG, "Starting animation");
+        if(!mFAB_refreshAnimation.isRunning()) {
+            mFAB_refreshAnimation.start();
+        }
+    }
+
     public void stopRefreshAnimation(){
         Log.d(LOG_TAG, "Stop animation");
         //mRefreshAnimation.cancel();
         mFAB_refreshAnimation.cancel();
     }
 
-    public void onGoogleApiConnectionFailed(int errorCode){
-
-        // TODO This logic should probably live somewhere else, e.g. Presenter.  Maybe it's better
-        // to just have a `public display(String textToBeDisplayed)` and have the logic handled elsewhere
-
-        switch (errorCode){
-            case 1:
-                Snackbar.make(mCoordinatorLayout,
-                        "ERROR: Google Play services is missing on this device",
-                        Snackbar.LENGTH_INDEFINITE).show();
-                break;
-            case 2:
-                Snackbar.make(mCoordinatorLayout,
-                        "ERROR: The installed version of Google Play services is out of date.",
-                        Snackbar.LENGTH_INDEFINITE).show();
-                break;
-            default:
-                Snackbar.make(mCoordinatorLayout,
-                        "ERROR: Google API Client, error code: " + errorCode,
-                        Snackbar.LENGTH_INDEFINITE).show();
-                break;
-        }
+    public void showSnackBarIndefinite(String text){
+        Snackbar.make(mCoordinatorLayout, text, Snackbar.LENGTH_INDEFINITE).show();
     }
 
     // Callback for Marshmallow requestPermissions() response
@@ -206,6 +189,32 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
+
+    // Trigger location + yelp calls
+    public void fetchBusinessList(){
+
+        // UI
+
+        // Wrote this Toast to have a reference so that it could be cancelled once operation completes.
+        // However, I called cancel() with no noticeable effect.  Keeping this code in case I
+        // figure it out later.
+        final Toast toast = Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT);
+        toast.show();
+
+        startRefreshAnimation();
+
+        // Business Logic
+
+        if(!mGooglePlayApi.getClient().isConnected()){
+            mGooglePlayApi.getClient().connect();
+        } else {
+            mGooglePlayApi.callYelpApi();
+        }
+    }
+
+
 
     // Retain Activity state
     @Override
@@ -241,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     // Getters
 
     //TODO RecyclerView.LayoutManager has been replaced by android.support.v7.widget.LinearLayoutManager.  For some reason this still works, but it could cause problems later.
@@ -256,48 +266,8 @@ public class MainActivity extends AppCompatActivity {
         return mSuggestionListAdapter;
     }
 
-    // Business Logic
-    // TODO This is a hodge podge of UI + business logic.  Needs to be organized.
-    public void executeSequence(){
-
-        // UI
-        final Toast toast = Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT);
-        toast.show();
-
-        Log.d(LOG_TAG, "Starting animation");
-        if(!mFAB_refreshAnimation.isRunning()) {
-            mFAB_refreshAnimation.start();
-        }
-
-        // Business Logic
-
-        mGooglePlayApi.showLocation();
-
-        // If getLastLocation() returned null, start a Location Request to get device location
-        // Else, query yelp with existing location arguments
-        if (mGooglePlayApi.getLastLocation() == null || mGooglePlayApi.isLocationStale()) {
-            mGooglePlayApi.requestLocationData();
-        } else {
-            // Check for network connectivity
-            ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-            boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-
-            // If connected to network make Yelp API call, if no network, notify user
-            if(isConnected) {
-                String ll = mGooglePlayApi.getLastLocation().getLatitude() + ","
-                        + mGooglePlayApi.getLastLocation().getLongitude() + ","
-                        + mGooglePlayApi.getLastLocation().getAccuracy();
-                Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
-                new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mBusinessListManager, this, toast).execute();
-            } else {
-
-                // UI
-                Snackbar.make(mCoordinatorLayout, "No network. Try again when you are connected to the internet.",
-                        Snackbar.LENGTH_INDEFINITE).show();
-                stopRefreshAnimation();
-            }
-        }
+    public BusinessListManager getBusinessListManager() {
+        return mBusinessListManager;
     }
 
 }
