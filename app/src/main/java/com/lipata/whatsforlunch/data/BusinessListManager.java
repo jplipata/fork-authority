@@ -3,9 +3,9 @@ package com.lipata.whatsforlunch.data;
 import android.content.Context;
 import android.util.Log;
 
+import com.lipata.whatsforlunch.api.yelp_api.model.Business;
 import com.lipata.whatsforlunch.data.user.BusinessItemRecord;
 import com.lipata.whatsforlunch.data.user.UserRecords;
-import com.lipata.whatsforlunch.api.yelp.model.Business;
 
 import java.util.ArrayList;
 import java.util.Collections;

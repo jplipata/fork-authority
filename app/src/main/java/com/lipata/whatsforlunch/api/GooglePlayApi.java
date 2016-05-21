@@ -18,12 +18,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.lipata.whatsforlunch.api.yelp.AsyncYelpCall;
-import com.lipata.whatsforlunch.ui.MainActivity;
+import com.lipata.whatsforlunch.api.yelp_api.YelpApi;
 import com.lipata.whatsforlunch.data.AppSettings;
+import com.lipata.whatsforlunch.ui.MainActivity;
+
 
 /**
  * Created by jlipata on 4/2/16.
+ * Class responsible for obtaining device location.
  */
 public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -46,8 +48,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         mGoogleApiClient = new GoogleApiClient.Builder(mMainActivity)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .addApi(LocationServices.API).build();
+                 .addApi(LocationServices.API).build();
 
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -91,7 +92,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
             return false;}
     }
 
-    public void checkPermissionsAndRequestLocation() {
+    public void checkPermissionAndRequestLocation() {
 
         // Check for Location permission
         boolean isPermissionMissing = ContextCompat.checkSelfPermission(mMainActivity, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -142,7 +143,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         // If getLastLocation() returned null, start a Location Request to get device location
         // Else, query yelp with existing location arguments
         if (getLastLocation() == null || isLocationStale()) {
-            checkPermissionsAndRequestLocation();
+            checkPermissionAndRequestLocation();
         } else {
             // Check for network connectivity
             ConnectivityManager cm = (ConnectivityManager)mMainActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -155,7 +156,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
                         + getLastLocation().getLongitude() + ","
                         + getLastLocation().getAccuracy();
                 Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
-                new AsyncYelpCall(ll, AppSettings.SEARCH_TERM, mMainActivity).execute();
+                new YelpApi(mMainActivity).callYelpApi(AppSettings.SEARCH_TERM, ll, Integer.toString(AppSettings.SEARCH_RADIUS));
             } else {
 
                 // UI

@@ -40,7 +40,6 @@ The design similarity to Yelp is intentional.  Since this is basically a custom 
 ###### Code Quality
 - Refactor: Overall architecture needs to be improved, implement e.g. MVP pattern.
 - Replace iterative List approach to UserRecords/BusinessListManager with hashmap
-- Replace AsyncTask with something better (e.g. RxJava/Retrofit)
 - Replace findViewById with Butterknife
 - Refactor: RecyclerView.Adapter onClick handlers should be defined in ViewHolder
 

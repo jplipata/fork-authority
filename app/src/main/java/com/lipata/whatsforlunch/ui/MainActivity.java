@@ -22,7 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.whatsforlunch.R;
 import com.lipata.whatsforlunch.api.GooglePlayApi;
-import com.lipata.whatsforlunch.api.yelp.model.Business;
+import com.lipata.whatsforlunch.api.yelp_api.model.Business;
 import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.user.UserRecords;
 
@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, mGooglePlayApi.getLocationUpdateTimestamp());
 
-        // TODO Should this be done with a Parcelable instead?
+        // TODO There must be a better way to do this
         String suggestionListStr = new Gson().toJson(mSuggestionListAdapter.getBusinessList());
         savedInstanceState.putString(SUGGESTIONLIST_KEY, suggestionListStr);
     }

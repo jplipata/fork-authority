@@ -16,10 +16,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lipata.whatsforlunch.R;
+import com.lipata.whatsforlunch.api.yelp_api.model.Business;
 import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.user.BusinessItemRecord;
 import com.lipata.whatsforlunch.data.user.UserRecords;
-import com.lipata.whatsforlunch.api.yelp.model.Business;
 import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
