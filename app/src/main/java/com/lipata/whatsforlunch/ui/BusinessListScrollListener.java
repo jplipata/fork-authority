@@ -4,8 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 
-import com.lipata.whatsforlunch.api.TestApiCall;
-
 /**
  * Created by jlipata on 4/23/16.
  */
@@ -13,7 +11,6 @@ public class BusinessListScrollListener extends RecyclerView.OnScrollListener {
     private final static String LOG_TAG = BusinessListScrollListener.class.getSimpleName();
 
     LinearLayoutManager mLayoutManager;
-    TestApiCall mApiCall; //TODO This is probably not a good way to do this
     int visibleItemCount;
     int totalItemCount;
     int firstVisibleItemPosition;
@@ -21,7 +18,6 @@ public class BusinessListScrollListener extends RecyclerView.OnScrollListener {
 
     public BusinessListScrollListener(LinearLayoutManager layoutManager) {
         this.mLayoutManager = layoutManager;
-        mApiCall = new TestApiCall();
     }
 
     @Override
@@ -38,14 +34,12 @@ public class BusinessListScrollListener extends RecyclerView.OnScrollListener {
                 +" | firstVisibleItemPosition "+firstVisibleItemPosition+" | lastVisibleItemPosition "+lastVisibleItemPosition);
 
         if(lastVisibleItemPosition+1 == totalItemCount) {
-            if (!mApiCall.isInProgress()) {
-                Log.v(LOG_TAG, "LOAD MORE ITEMS");
 
-            } else {
-                Log.v(LOG_TAG, "LOADING IN PROGRESS");
-            }
+            Log.v(LOG_TAG, "Reached bottom of list");
+
+            // Load more items
+
         }
-
 
     }
 }
