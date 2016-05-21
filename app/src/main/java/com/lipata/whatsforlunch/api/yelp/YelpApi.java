@@ -1,10 +1,10 @@
-package com.lipata.whatsforlunch.api.yelp_api;
+package com.lipata.whatsforlunch.api.yelp;
 
 import android.util.Log;
 
 import com.lipata.whatsforlunch.ApiKeys;
-import com.lipata.whatsforlunch.api.yelp_api.model.Business;
-import com.lipata.whatsforlunch.api.yelp_api.model.YelpResponse;
+import com.lipata.whatsforlunch.api.yelp.model.Business;
+import com.lipata.whatsforlunch.api.yelp.model.YelpResponse;
 import com.lipata.whatsforlunch.ui.BusinessListAdapter;
 import com.lipata.whatsforlunch.ui.MainActivity;
 
@@ -55,7 +55,7 @@ public class YelpApi {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        EndpointInterface apiService = retrofit.create(EndpointInterface.class);
+        Endpoints apiService = retrofit.create(Endpoints.class);
 
         Call<YelpResponse> call = apiService.getBusinesses(term, location, radius);
         call.enqueue(new Callback<YelpResponse>() {

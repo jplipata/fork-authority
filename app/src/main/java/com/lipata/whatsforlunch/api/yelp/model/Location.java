@@ -1,5 +1,5 @@
 
-package com.lipata.whatsforlunch.api.yelp_api.model;
+package com.lipata.whatsforlunch.api.yelp.model;
 
 import com.google.gson.annotations.SerializedName;
 

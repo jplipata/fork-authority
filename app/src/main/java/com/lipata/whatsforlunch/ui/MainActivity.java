@@ -22,7 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.whatsforlunch.R;
 import com.lipata.whatsforlunch.api.GooglePlayApi;
-import com.lipata.whatsforlunch.api.yelp_api.model.Business;
+import com.lipata.whatsforlunch.api.yelp.model.Business;
 import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.user.UserRecords;
 
