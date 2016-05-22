@@ -52,11 +52,11 @@ public class MainActivity extends AppCompatActivity {
     private BusinessListAdapter mSuggestionListAdapter;
     FloatingActionButton mFAB_refresh;
     ObjectAnimator mFAB_refreshAnimation;
+    Snackbar mSnackbar;
 
     // App modules
     GooglePlayApi mGooglePlayApi;
     UserRecords mUserRecords;
-
     BusinessListManager mBusinessListManager;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,7 +164,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showSnackBarIndefinite(String text){
-        Snackbar.make(mCoordinatorLayout, text, Snackbar.LENGTH_INDEFINITE).show();
+        mSnackbar = Snackbar.make(mCoordinatorLayout, text, Snackbar.LENGTH_INDEFINITE);
+        mSnackbar.show();
     }
 
     // Callback for Marshmallow requestPermissions() response
@@ -184,14 +185,12 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 } else {
-                    Snackbar.make(mCoordinatorLayout, "Location Permission Required", Snackbar.LENGTH_LONG).show();                }
+                    showSnackBarIndefinite("Location Permission Required");                }
                 return;
             }
         }
     }
-
-
-
+    
     // Trigger location + yelp calls
     public void fetchBusinessList(){
 
@@ -202,6 +201,11 @@ public class MainActivity extends AppCompatActivity {
         // figure it out later.
         final Toast toast = Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT);
         toast.show();
+
+        // Dismiss any Snackbars
+        if(mSnackbar!=null){
+            mSnackbar.dismiss();
+        }
 
         startRefreshAnimation();
 

@@ -160,8 +160,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
             } else {
 
                 // UI
-                Snackbar.make(mMainActivity.getCoordinatorLayout(), "No network. Try again when you are connected to the internet.",
-                        Snackbar.LENGTH_INDEFINITE).show();
+                mMainActivity.showSnackBarIndefinite("No network. Try again when you are connected to the internet.");
                 mMainActivity.stopRefreshAnimation();
             }
         }
