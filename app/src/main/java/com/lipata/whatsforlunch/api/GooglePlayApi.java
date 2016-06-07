@@ -55,131 +55,11 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
                 .setFastestInterval(LOCATION_REQUEST_FASTEST_INTERVAL);
     }
 
-    // Public methods
-
-    public void callYelpApi(){
-        /*
-        * This method is the entry point to this class from MainActivity
-        *
-        * This code is not placed in the onConnected callback because it can also be called when the
-        * Google API client is already connected.
-        */
-
-        updateLastLocationAndUpdateUI();
-
-        // If getLastLocation() returned null, start a Location Request to get device location
-        // Else, query yelp with existing location arguments
-        if (getLastLocation() == null || isLocationStale()) {
-            checkPermissionAndRequestLocation();
-        } else {
-            // Check for network connectivity
-            ConnectivityManager cm = (ConnectivityManager)mMainActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-            boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-
-            // If connected to network make Yelp API call, if no network, notify user
-            if(isConnected) {
-                String ll = getLastLocation().getLatitude() + ","
-                        + getLastLocation().getLongitude() + ","
-                        + getLastLocation().getAccuracy();
-                Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
-                new YelpApi(mMainActivity).callYelpApi(AppSettings.SEARCH_TERM, ll, Integer.toString(AppSettings.SEARCH_RADIUS));
-            } else {
-
-                // UI
-                mMainActivity.showSnackBarIndefinite("No network. Try again when you are connected to the internet.");
-                mMainActivity.stopRefreshAnimation();
-            }
-        }
-    }
-
-    public boolean isLocationStale(){
-        long currentTime = SystemClock.elapsedRealtime();
-        Log.d(LOG_TAG, "currentTime = " + currentTime);
-        Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
-
-        if ((currentTime - mLocationUpdateTimestamp) > AppSettings.LOCATION_LIFESPAN){
-            return true;
-        } else {
-            return false;}
-    }
-
-    public void requestLocationUpdates(){
-
-        /*
-         * Public method called by onRequestPermissionsResult in MainActivity
-         */
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
-    }
-
-    public void stopLocationUpdates() {
-
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-
-        // For our purposes, once we have the location, we no longer need the client, so disconnect
-        mGoogleApiClient.disconnect();
-
-        Log.d(LOG_TAG, "Location updates stopped and client disconnected");
-    }
-
-    // Helper methods
-
-    private void updateLastLocationAndUpdateUI(){
-        Log.d(LOG_TAG, "updateLastLocationAndUpdateUI()...");
-
-        // Get last location & update timestamp
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        mLocationUpdateTimestamp = SystemClock.elapsedRealtime();
-        Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
-
-        // If LastLocation is not null, pass to MainActivity to be displayed
-        if (mLastLocation != null) {
-            double latitude = mLastLocation.getLatitude();
-            double longitude = mLastLocation.getLongitude();
-            float accuracy = mLastLocation.getAccuracy();
-            Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
-
-            mMainActivity.updateLocationViews(latitude, longitude, accuracy);
-
-            stopLocationUpdates();
-        } else {
-            Log.d(LOG_TAG, "mLastLocation = null");
-        }
-    }
-
-    private void checkPermissionAndRequestLocation() {
-
-        // Check for Location permission
-        boolean isPermissionMissing = ContextCompat.checkSelfPermission(mMainActivity, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED;
-        Log.d(LOG_TAG, "isPermissionMissing = " + isPermissionMissing);
-
-        if(isPermissionMissing) {
-            // If permission is missing, we need to ask for it.  See onRequestPermissionResult() callback
-            ActivityCompat.requestPermissions(mMainActivity,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID);
-        } else {
-
-            // Else, permission has already been granted.  Proceed with requestLocationUpdates...
-            if(mGoogleApiClient.isConnected()) {
-                Log.d(LOG_TAG, "Google API is connected.  Requesting Location Updates...");
-                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-            } else {
-                Log.d(LOG_TAG, "Google API not connected.  Reconnecting...");
-                mGoogleApiClient.connect();
-            }
-        }
-    }
-
-
     // Callbacks for Google Play API
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.d(LOG_TAG, "onConnected()");
-        callYelpApi();
+        executeFetchDataSequence();
     }
 
     @Override
@@ -218,6 +98,126 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     public void onLocationChanged(Location location) {
         Log.d(LOG_TAG, "Location Changed");
         updateLastLocationAndUpdateUI();
+        checkNetworkPermissionAndCallYelpApi();
+    }
+
+    // Public methods
+
+    public void executeFetchDataSequence(){
+        /*
+        * This method is the entry point to this class from MainActivity
+        *
+        * This code is not placed in the onConnected callback because it can also be called when the
+        * Google API client is already connected.
+        */
+
+        checkLocationPermissionAndRequestLocation();
+        // Once location is returned from the API, the onLocationChanged() callback will be called
+        // which will then call the Yelp API
+
+    }
+
+    public boolean isLocationStale(){
+        long currentTime = SystemClock.elapsedRealtime();
+        Log.d(LOG_TAG, "currentTime = " + currentTime);
+        Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
+
+        if ((currentTime - mLocationUpdateTimestamp) > AppSettings.LOCATION_LIFESPAN){
+            return true;
+        } else {
+            return false;}
+    }
+
+    public void requestLocationUpdates(){
+
+        /*
+         * Public method called by onRequestPermissionsResult in MainActivity
+         */
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+    }
+
+    public void stopLocationUpdates() {
+
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+
+        // For our purposes, once we have the location, we no longer need the client, so disconnect
+        mGoogleApiClient.disconnect();
+
+        Log.d(LOG_TAG, "Location updates stopped and client disconnected");
+    }
+
+    // Helper methods
+
+    private void checkLocationPermissionAndRequestLocation() {
+
+        // Check for Location permission
+        boolean isPermissionMissing = ContextCompat.checkSelfPermission(mMainActivity, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED;
+        Log.d(LOG_TAG, "isPermissionMissing = " + isPermissionMissing);
+
+        if(isPermissionMissing) {
+            // If permission is missing, we need to ask for it.  See onRequestPermissionResult() callback
+            ActivityCompat.requestPermissions(mMainActivity,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID);
+        } else {
+
+            // Else, permission has already been granted.  Proceed with requestLocationUpdates...
+            if(mGoogleApiClient.isConnected()) {
+                Log.d(LOG_TAG, "Google API is connected.  Requesting Location Updates...");
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            } else {
+                Log.d(LOG_TAG, "Google API not connected.  Reconnecting...");
+                mGoogleApiClient.connect();
+            }
+        }
+    }
+
+    private void updateLastLocationAndUpdateUI(){
+        Log.d(LOG_TAG, "updateLastLocationAndUpdateUI()...");
+
+        // Get last location & update timestamp
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        mLocationUpdateTimestamp = SystemClock.elapsedRealtime();
+        Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
+
+        // If LastLocation is not null, pass to MainActivity to be displayed
+        if (mLastLocation != null) {
+            double latitude = mLastLocation.getLatitude();
+            double longitude = mLastLocation.getLongitude();
+            float accuracy = mLastLocation.getAccuracy();
+            Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
+
+            mMainActivity.updateLocationViews(latitude, longitude, accuracy);
+
+            stopLocationUpdates();
+        } else {
+            Log.d(LOG_TAG, "mLastLocation = null");
+        }
+    }
+
+    private void checkNetworkPermissionAndCallYelpApi(){
+        // Check for network connectivity
+        ConnectivityManager cm = (ConnectivityManager)mMainActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+        // If connected to network make Yelp API call, if no network, notify user
+        if(isConnected) {
+            String ll = getLastLocation().getLatitude() + ","
+                    + getLastLocation().getLongitude() + ","
+                    + getLastLocation().getAccuracy();
+            Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
+            new YelpApi(mMainActivity).callYelpApi(AppSettings.SEARCH_TERM, ll, Integer.toString(AppSettings.SEARCH_RADIUS));
+        } else {
+
+            // UI
+            mMainActivity.showSnackBarIndefinite("No network. Try again when you are connected to the internet.");
+            mMainActivity.stopRefreshAnimation();
+        }
+
     }
 
     // Getters

@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
         if(!mGooglePlayApi.getClient().isConnected()){
             mGooglePlayApi.getClient().connect();
         } else {
-            mGooglePlayApi.callYelpApi();
+            mGooglePlayApi.executeFetchDataSequence();
         }
     }
 
