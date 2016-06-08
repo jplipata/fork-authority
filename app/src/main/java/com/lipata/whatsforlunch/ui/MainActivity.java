@@ -1,6 +1,8 @@
 package com.lipata.whatsforlunch.ui;
 
 import android.animation.ObjectAnimator;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -42,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
     static final String SUGGESTIONLIST_KEY = "suggestionList"; // TODO: This should go in R.strings
     static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
+    /** Google Play API - Location Setting Request
+     * Constant used in the location settings dialog.
+     */
+    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+
     // Views
     protected CoordinatorLayout mCoordinatorLayout;
     protected TextView mTextView_Latitude;
@@ -58,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
     GooglePlayApi mGooglePlayApi;
     UserRecords mUserRecords;
     BusinessListManager mBusinessListManager;
+
+    // Activity lifecycle
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -190,34 +199,75 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    
+
+    // Callback for GooglePlayApi Settings API
+    // This must live in the Activity class
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        // All required changes were successfully made
+
+                        executeGooglePlayApiLocation();
+
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        // The user was asked to change settings, but chose not to
+
+
+
+                        break;
+                    default:
+                        break;
+                }
+                break;
+        }
+    }
+
+
     // Trigger location + yelp calls
     public void fetchBusinessList(){
 
         // UI
 
-        // Wrote this Toast to have a reference so that it could be cancelled once operation completes.
-        // However, I called cancel() with no noticeable effect.  Keeping this code in case I
-        // figure it out later.
-        final Toast toast = Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT);
-        toast.show();
+            // Wrote this Toast to have a reference so that it could be cancelled once operation completes.
+            // However, I called cancel() with no noticeable effect.  Keeping this code in case I
+            // figure it out later.
+            final Toast toast = Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT);
+            toast.show();
 
-        // Dismiss any Snackbars
-        if(mSnackbar!=null){
-            mSnackbar.dismiss();
-        }
+            // Dismiss any Snackbars
+            if(mSnackbar!=null){
+                mSnackbar.dismiss();
+            }
 
-        startRefreshAnimation();
+            startRefreshAnimation();
 
         // Business Logic
 
+
+            // DEBUGGING
+//            if(mGooglePlayApi.getClient().isConnected()){
+//                Log.d(LOG_TAG, "GooglePlayApi client connected");
+//            } else Log.d(LOG_TAG, "GooglePlayApi client DISCONNECTED");
+
+            // CONNECT TO GOOGLE API
+
+            mGooglePlayApi.getClient().connect();
+    }
+
+
+    // Helper methods
+
+    private void executeGooglePlayApiLocation(){
         if(!mGooglePlayApi.getClient().isConnected()){
             mGooglePlayApi.getClient().connect();
         } else {
             mGooglePlayApi.executeFetchDataSequence();
         }
     }
-
 
 
     // Retain Activity state

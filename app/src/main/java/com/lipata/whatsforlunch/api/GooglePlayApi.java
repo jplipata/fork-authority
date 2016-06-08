@@ -2,21 +2,30 @@ package com.lipata.whatsforlunch.api;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.lipata.whatsforlunch.api.yelp.YelpApi;
 import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.ui.MainActivity;
@@ -27,13 +36,19 @@ import com.lipata.whatsforlunch.ui.MainActivity;
  * Class responsible for obtaining device location.
  */
 public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener {
+        GoogleApiClient.OnConnectionFailedListener, LocationListener, ResultCallback<LocationSettingsResult> {
 
     private static final String LOG_TAG = GooglePlayApi.class.getSimpleName();
 
     final int LOCATION_REQUEST_INTERVAL = 1000; // in milliseconds
     final int LOCATION_REQUEST_FASTEST_INTERVAL = 1000;// in milliseconds
     final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
+
+    /** Google Play API - Location Setting Request
+     * Constant used in the location settings dialog.
+     */
+    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+
 
     private MainActivity mMainActivity;
     protected GoogleApiClient mGoogleApiClient;
@@ -59,7 +74,19 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.d(LOG_TAG, "onConnected()");
-        executeFetchDataSequence();
+
+        Log.d(LOG_TAG, "Checking that Location is enabled on device...");
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
+
+        result.setResultCallback(this);
+
+        // Result is handled on onResult() callback
+
+        //DO NEXT: executeFetchDataSequence();
     }
 
     @Override
@@ -243,14 +270,35 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         mLocationUpdateTimestamp = timestamp;
     }
 
-    // TODO Implement this
-//    void isEnabledOnDevice(){
-//        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-//                .addLocationRequest(mLocationRequest);
-//        PendingResult<LocationSettingsResult> result =
-//                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
-//    }
+    @Override
+    public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
+        final Status status = locationSettingsResult.getStatus();
 
+        Log.d(LOG_TAG, "Location Settings result received. Code = " + status.getStatusCode());
 
+        switch (status.getStatusCode()) {
+            case LocationSettingsStatusCodes.SUCCESS:
+                Log.i(LOG_TAG, "All location settings are satisfied.  Checking Location Permission and requesting location...");
 
+                checkLocationPermissionAndRequestLocation();
+
+                break;
+            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                Log.i(LOG_TAG, "Location settings are not satisfied. Show the user a dialog to" +
+                        "upgrade location settings ");
+
+                try {
+                    // Show the dialog by calling startResolutionForResult(), and check the result
+                    // in onActivityResult().
+                    status.startResolutionForResult(mMainActivity, REQUEST_CHECK_SETTINGS);
+                } catch (IntentSender.SendIntentException e) {
+                    Log.i(LOG_TAG, "PendingIntent unable to execute request.");
+                }
+                break;
+            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                Log.i(LOG_TAG, "Location settings are inadequate, and cannot be fixed here. Dialog " +
+                        "not created.");
+                break;
+        }
+    }
 }
