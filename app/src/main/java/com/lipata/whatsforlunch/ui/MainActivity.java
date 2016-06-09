@@ -131,24 +131,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume(){
-        Log.d(LOG_TAG, "onResume()");
-        super.onResume();
+    @Override protected void onStart(){
+        super.onStart();
 
         // Check whether there are suggestion items in the RecyclerView.  If not, load some.
         if(mSuggestionListAdapter.getItemCount()==0){
             fetchBusinessList();
         }
+
+
+    }
+
+    @Override protected void onResume(){
+        Log.d(LOG_TAG, "onResume()");
+        super.onResume();
+
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         Log.d(LOG_TAG, "onPause");
+
+    }
+
+    @Override protected void onStop(){
+        Log.d(LOG_TAG, "onStop()");
+        super.onStop();
         if (mGooglePlayApi.getClient().isConnected()) {
             mGooglePlayApi.stopLocationUpdates();
         }
+
     }
 
     // UI methods
@@ -176,6 +190,10 @@ public class MainActivity extends AppCompatActivity {
     public void showSnackBarIndefinite(String text){
         mSnackbar = Snackbar.make(mCoordinatorLayout, text, Snackbar.LENGTH_INDEFINITE);
         mSnackbar.show();
+    }
+
+    public void showToast(String text){
+        Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
     }
 
     // Callback for Marshmallow requestPermissions() response
@@ -211,13 +229,17 @@ public class MainActivity extends AppCompatActivity {
                     case Activity.RESULT_OK:
                         // All required changes were successfully made
 
+                        Log.d(LOG_TAG, "onActivityResult() RESULT_OK");
                         executeGooglePlayApiLocation();
 
                         break;
                     case Activity.RESULT_CANCELED:
                         // The user was asked to change settings, but chose not to
 
+                        Log.d(LOG_TAG, "onActivityResult() RESULT_CANCELED");
 
+                        stopRefreshAnimation();
+                        showSnackBarIndefinite("Location settings error");
 
                         break;
                     default:
@@ -249,8 +271,12 @@ public class MainActivity extends AppCompatActivity {
         // Business Logic
 
             // Connect to GooglePlayApi, which will trigger onConnect() callback, i.e. execute sequence of events
-            Log.d(LOG_TAG, "Connection to Google Play API...");
-            mGooglePlayApi.getClient().connect();
+            Log.d(LOG_TAG, "Connecting to Google Play API...");
+
+            if(mGooglePlayApi.getClient().isConnected()){
+                mGooglePlayApi.checkDeviceLocationEnabled();
+            } else mGooglePlayApi.getClient().connect();
+
     }
 
 
