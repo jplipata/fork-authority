@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume(){
+        Log.d(LOG_TAG, "onResume()");
         super.onResume();
 
         // Check whether there are suggestion items in the RecyclerView.  If not, load some.
@@ -247,14 +248,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Business Logic
 
-
-            // DEBUGGING
-//            if(mGooglePlayApi.getClient().isConnected()){
-//                Log.d(LOG_TAG, "GooglePlayApi client connected");
-//            } else Log.d(LOG_TAG, "GooglePlayApi client DISCONNECTED");
-
-            // CONNECT TO GOOGLE API
-
+            // Connect to GooglePlayApi, which will trigger onConnect() callback, i.e. execute sequence of events
+            Log.d(LOG_TAG, "Connection to Google Play API...");
             mGooglePlayApi.getClient().connect();
     }
 
