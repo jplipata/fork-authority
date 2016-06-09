@@ -41,8 +41,8 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     private static final String LOG_TAG = GooglePlayApi.class.getSimpleName();
 
-    final int LOCATION_REQUEST_INTERVAL = 1000; // in milliseconds
-    final int LOCATION_REQUEST_FASTEST_INTERVAL = 1000;// in milliseconds
+    final int LOCATION_REQUEST_INTERVAL = 500; // in milliseconds
+    final int LOCATION_REQUEST_FASTEST_INTERVAL = 500;// in milliseconds
     final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
     /*
@@ -176,26 +176,14 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     }
 
-    public void executeFetchDataSequence(){
-        /*
-        * This method is the entry point to this class from MainActivity
-        *
-        * This code is not placed in the onConnected callback because it can also be called when the
-        * Google API client is already connected.
-        */
-
-        checkLocationPermissionAndRequestLocation();
-        // Once location is returned from the API, the onLocationChanged() callback will be called
-        // which will then call the Yelp API
-
-    }
-
     public boolean isLocationStale(){
         long currentTime = SystemClock.elapsedRealtime();
         Log.d(LOG_TAG, "currentTime = " + currentTime);
         Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
 
-        if ((currentTime - mLocationUpdateTimestamp) > AppSettings.LOCATION_LIFESPAN){
+        if(getLastLocation()==null){
+            return true;
+        } else if ((currentTime - mLocationUpdateTimestamp) > AppSettings.LOCATION_LIFESPAN){
             return true;
         } else {
             return false;}
@@ -271,7 +259,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    private void checkNetworkPermissionAndCallYelpApi(){
+    public void checkNetworkPermissionAndCallYelpApi(){
         // Check for network connectivity
         ConnectivityManager cm = (ConnectivityManager)mMainActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();

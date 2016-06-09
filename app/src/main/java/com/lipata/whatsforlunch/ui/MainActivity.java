@@ -272,12 +272,18 @@ public class MainActivity extends AppCompatActivity {
 
         // Business Logic
 
-            // Connect to GooglePlayApi, which will trigger onConnect() callback, i.e. execute sequence of events
-            Log.d(LOG_TAG, "Connecting to Google Play API...");
 
-            if(mGooglePlayApi.getClient().isConnected()){
-                mGooglePlayApi.checkDeviceLocationEnabled();
-            } else mGooglePlayApi.getClient().connect();
+            // If the location has already been recently updated, no need to update it, go straight to quarying yelp
+
+            if(!mGooglePlayApi.isLocationStale()) {
+
+                mGooglePlayApi.checkNetworkPermissionAndCallYelpApi();
+
+            } else {
+                // Connect to GooglePlayApi, which will trigger onConnect() callback, i.e. execute sequence of events
+
+                executeGooglePlayApiLocation();
+            }
 
     }
 
@@ -288,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
         if(!mGooglePlayApi.getClient().isConnected()){
             mGooglePlayApi.getClient().connect();
         } else {
-            mGooglePlayApi.executeFetchDataSequence();
+            mGooglePlayApi.checkDeviceLocationEnabled();
         }
     }
 

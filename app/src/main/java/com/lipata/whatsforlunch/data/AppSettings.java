@@ -9,9 +9,15 @@ public class AppSettings {
     public static int SEARCH_RADIUS = 1000; // Search radius in meters. If the value is too large, a AREA_TOO_LARGE error may be returned. The max value is 40000 meters (25 miles).
 
     // Timings
-    public static double LOCATION_LIFESPAN = 4 * 1000; // "Age" of location data in milliseconds before it becomes "stale"
+
     public static long TOOSOON_THRESHOLD = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
     public static int DONTLIKE_THRESHOLD_INDAYS = 90; // 90 days
+
+    /* "Age" of location data in milliseconds before it becomes "stale"
+     * TODO For debugging you probably want this to be FAST, but for production you'll want it slower
+     */
+    public static double LOCATION_LIFESPAN = 15 * 1000;
+
 
     /*
      * The DISMISSED_THRESHOLD constant should be based on how long it typically takes a person to
