@@ -153,15 +153,6 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
             case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
                 Log.i(LOG_TAG, "SETTINGS_CHANGE_UNAVAILABLE Location settings are inadequate, and cannot be fixed here. Dialog " +
                         "not created.");
-
-                // TODO Notify the user
-
-//                new AlertDialog.Builder(mMainActivity.getApplicationContext())
-//                        .setTitle("Delete entry")
-//                        .setMessage("Are you sure you want to delete this entry?")
-//                        .setIcon(android.R.drawable.ic_dialog_alert)
-//                        .show();
-
                 break;
         }
     }
@@ -181,7 +172,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
         result.setResultCallback(this);
 
-        // Result is handled on onResult() callback
+        // See onResult() callback for next steps...
 
     }
 
@@ -249,7 +240,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
             // Else, permission has already been granted.  Proceed with requestLocationUpdates...
             if(mGoogleApiClient.isConnected()) {
                 Log.d(LOG_TAG, "Google API is connected.  Requesting Location Updates...");
-                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+                requestLocationUpdates();
             } else {
                 Log.d(LOG_TAG, "Google API not connected.  Reconnecting...");
                 mGoogleApiClient.connect();

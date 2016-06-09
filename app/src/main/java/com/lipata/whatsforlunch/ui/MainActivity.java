@@ -213,7 +213,9 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 } else {
-                    showSnackBarIndefinite("Location Permission Required");                }
+                    stopRefreshAnimation();
+                    showSnackBarIndefinite("Location permission required");
+                }
                 return;
             }
         }
