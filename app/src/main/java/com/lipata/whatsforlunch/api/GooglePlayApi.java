@@ -49,7 +49,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
      * Google Play API - Location Setting Request
      * Constant used in the location settings dialog.
      */
-    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+    public static final int REQUEST_CHECK_SETTINGS = 0x1;
 
     private MainActivity mMainActivity;
     protected GoogleApiClient mGoogleApiClient;
