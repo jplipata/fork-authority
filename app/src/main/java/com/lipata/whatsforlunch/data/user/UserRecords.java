@@ -19,8 +19,11 @@ import java.util.List;
  */
 public class UserRecords {
     private static String LOG_TAG = UserRecords.class.getSimpleName();
-    List<BusinessItemRecord> mList;
+
     Context mContext;
+
+    //TODO Replace this inefficient list implementation with a HashMap
+    List<BusinessItemRecord> mList;
 
     public UserRecords(Context context) {
         this.mContext=context;

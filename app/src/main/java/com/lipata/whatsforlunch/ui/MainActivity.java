@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.whatsforlunch.R;
 import com.lipata.whatsforlunch.api.GooglePlayApi;
+import com.lipata.whatsforlunch.api.MyGeocoder;
 import com.lipata.whatsforlunch.api.yelp.model.Business;
 import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.user.UserRecords;
@@ -46,8 +47,9 @@ public class MainActivity extends AppCompatActivity {
 
     // Views
     protected CoordinatorLayout mCoordinatorLayout;
-    protected TextView mTextView_Latitude;
-    protected TextView mTextView_Longitude;
+    //protected TextView mTextView_Latitude;
+    //protected TextView mTextView_Longitude;
+    protected TextView mTextView_ApproxLocation;
     protected TextView mTextView_Accuracy;
     protected RecyclerView mRecyclerView_suggestionList;
     private LinearLayoutManager mSuggestionListLayoutManager;
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     // App modules
     GooglePlayApi mGooglePlayApi;
+    MyGeocoder mGeocoder;
     UserRecords mUserRecords;
     BusinessListManager mBusinessListManager;
 
@@ -73,8 +76,9 @@ public class MainActivity extends AppCompatActivity {
         mBusinessListManager = new BusinessListManager(this, mUserRecords);
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
-        mTextView_Latitude = (TextView) findViewById((R.id.latitude_text));
-        mTextView_Longitude = (TextView) findViewById((R.id.longitude_text));
+        //mTextView_Latitude = (TextView) findViewById((R.id.latitude_text));
+        //mTextView_Longitude = (TextView) findViewById((R.id.longitude_text));
+        mTextView_ApproxLocation = (TextView) findViewById(R.id.approx_location_text);
         mTextView_Accuracy = (TextView) findViewById(R.id.accuracy_text);
 
         // RecyclerView
@@ -111,7 +115,8 @@ public class MainActivity extends AppCompatActivity {
         mFAB_refreshAnimation.setInterpolator(null);
 
         // Location API
-        mGooglePlayApi = new GooglePlayApi(this);
+        mGeocoder = new MyGeocoder(this);
+        mGooglePlayApi = new GooglePlayApi(this, mGeocoder);
 
         // Restore state
         if (savedInstanceState != null) {
@@ -163,8 +168,8 @@ public class MainActivity extends AppCompatActivity {
     // UI methods
 
     public void updateLocationViews(double latitude, double longitude, float accuracy){
-        mTextView_Latitude.setText(Double.toString(latitude));
-        mTextView_Longitude.setText(Double.toString(longitude));
+        //mTextView_Latitude.setText(Double.toString(latitude));
+        //mTextView_Longitude.setText(Double.toString(longitude));
         mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
         //Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
     }
@@ -189,6 +194,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void showToast(String text){
         Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+    }
+
+    public void setApproxLocation(String text){
+        mTextView_ApproxLocation.setText(text);
     }
 
     // Callback for Marshmallow requestPermissions() response

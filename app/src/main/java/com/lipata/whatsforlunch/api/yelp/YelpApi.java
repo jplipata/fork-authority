@@ -101,10 +101,8 @@ public class YelpApi {
             public void onFailure(Call<YelpResponse> call, Throwable t) {
                 Log.e(LOG_TAG, "Retrofit FAILURE", t);
                 t.printStackTrace();
-                //mMainFragment.setYelpText("Yelp API FAILURE");
                 mMainActivity.stopRefreshAnimation();
                 mMainActivity.showSnackBarIndefinite("ERROR: Yelp API Failure");
-
             }
         });
 

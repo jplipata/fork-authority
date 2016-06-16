@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -31,6 +32,10 @@ import com.lipata.whatsforlunch.api.yelp.YelpApi;
 import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.ui.MainActivity;
 
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 
 /**
  * Created by jlipata on 4/2/16.
@@ -52,13 +57,16 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     public static final int REQUEST_CHECK_SETTINGS = 0x1;
 
     private MainActivity mMainActivity;
+    private MyGeocoder mGeocoder;
+
     protected GoogleApiClient mGoogleApiClient;
     protected Location mLastLocation;
     private LocationRequest mLocationRequest;
     long mLocationUpdateTimestamp; // in milliseconds
 
-    public GooglePlayApi(MainActivity mainActivity) {
+    public GooglePlayApi(MainActivity mainActivity, MyGeocoder geocoder) {
         this.mMainActivity = mainActivity;
+        this.mGeocoder = geocoder;
 
         mGoogleApiClient = new GoogleApiClient.Builder(mMainActivity)
                 .addConnectionCallbacks(this)
@@ -121,6 +129,30 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     @Override
     public void onLocationChanged(Location location) {
         Log.d(LOG_TAG, "Location Changed");
+
+        // Call Geocoder via RxJava
+        mGeocoder.getAddressObservable(location).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Address>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(LOG_TAG, e.getMessage(), e);
+                    }
+
+                    @Override
+                    public void onNext(Address address) {
+
+                        Log.d(LOG_TAG, address.toString());
+                        mMainActivity.setApproxLocation(address.getAddressLine(1));
+
+                    }
+                });
+
         updateLastLocationAndUpdateUI();
         checkNetworkPermissionAndCallYelpApi();
     }

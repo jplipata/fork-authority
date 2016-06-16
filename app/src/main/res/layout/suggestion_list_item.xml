@@ -92,7 +92,7 @@
         style="?android:attr/borderlessButtonStyle"
         android:text="LIKE"
         android:background="@color/cardview_light_background"
-        android:textSize="@dimen/cardview_buttons_text"
+        android:textSize="@dimen/cardview_buttons_textsize"
         android:textColor="@color/material_text_gray"
         />
 
@@ -105,7 +105,7 @@
         style="?android:attr/borderlessButtonStyle"
         android:text="JUST ATE HERE"
         android:background="@color/cardview_light_background"
-        android:textSize="@dimen/cardview_buttons_text"
+        android:textSize="@dimen/cardview_buttons_textsize"
         android:textColor="@color/material_text_gray"
         android:drawableTop="@drawable/ic_schedule_black_24px"/>
 
@@ -118,7 +118,7 @@
         style="?android:attr/borderlessButtonStyle"
         android:text="DON'T LIKE"
         android:background="@color/cardview_light_background"
-        android:textSize="@dimen/cardview_buttons_text"
+        android:textSize="@dimen/cardview_buttons_textsize"
         android:textColor="@color/material_text_gray"
         />
 
@@ -129,7 +129,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:id="@+id/business_justateheredate"
-        android:textSize="@dimen/cardview_buttons_text"
+        android:textSize="@dimen/cardview_buttons_textsize"
         android:textColor="@color/material_text_gray"
         android:paddingBottom="4dp"
         android:textStyle="italic"
@@ -139,7 +139,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:id="@+id/business_likeordontlike"
-        android:textSize="@dimen/cardview_buttons_text"
+        android:textSize="@dimen/cardview_buttons_textsize"
         android:textColor="@color/material_text_gray"
         android:paddingBottom="4dp"
         android:textStyle="italic"
