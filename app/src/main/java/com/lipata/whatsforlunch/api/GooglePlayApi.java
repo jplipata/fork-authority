@@ -2,7 +2,6 @@ package com.lipata.whatsforlunch.api;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -14,7 +13,6 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -57,14 +55,14 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     public static final int REQUEST_CHECK_SETTINGS = 0x1;
 
     private MainActivity mMainActivity;
-    private MyGeocoder mGeocoder;
+    private GeocoderApi mGeocoder;
 
     protected GoogleApiClient mGoogleApiClient;
     protected Location mLastLocation;
     private LocationRequest mLocationRequest;
     long mLocationUpdateTimestamp; // in milliseconds
 
-    public GooglePlayApi(MainActivity mainActivity, MyGeocoder geocoder) {
+    public GooglePlayApi(MainActivity mainActivity, GeocoderApi geocoder) {
         this.mMainActivity = mainActivity;
         this.mGeocoder = geocoder;
 
@@ -130,7 +128,10 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     public void onLocationChanged(Location location) {
         Log.d(LOG_TAG, "Location Changed");
 
+        updateLastLocationAndUpdateUI();
+
         // Call Geocoder via RxJava
+        // TODO Consider moving this Subscriber to the UI, e.g. MainActivity
         mGeocoder.getAddressObservable(location).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Address>() {
@@ -142,18 +143,20 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
                     @Override
                     public void onError(Throwable e) {
                         Log.e(LOG_TAG, e.getMessage(), e);
+                        //mMainActivity.setLocationText("Lookup error");
+
+                        // If there's an error with reverse geo lookup, we'll just show the lat,long coordinates instead
                     }
 
                     @Override
                     public void onNext(Address address) {
 
                         Log.d(LOG_TAG, address.toString());
-                        mMainActivity.setApproxLocation(address.getAddressLine(1));
+                        mMainActivity.setLocationText(address.getAddressLine(0)+", "+address.getAddressLine(1));
 
                     }
                 });
 
-        updateLastLocationAndUpdateUI();
         checkNetworkPermissionAndCallYelpApi();
     }
 

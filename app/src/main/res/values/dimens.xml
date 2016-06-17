@@ -7,7 +7,7 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="cardview_layout_LR_padding">4dp</dimen>
-    <dimen name="approx_location_padding">16dp</dimen>
+    <dimen name="location_padding">16dp</dimen>
 
     <dimen name="cardview_buttons_textsize">10sp</dimen>
     <dimen name="location_labels_textsize">12sp</dimen>

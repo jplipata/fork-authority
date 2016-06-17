@@ -19,14 +19,14 @@
             android:layout_width="0dp"
             android:textSize="@dimen/location_labels_textsize"
             android:layout_height="wrap_content"
-            android:text="APPROXIMATE LOCATION"
-            android:paddingLeft="@dimen/approx_location_padding"
+            android:text="LOCATION"
+            android:paddingLeft="@dimen/location_padding"
             android:layout_weight="2"/>
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingLeft="@dimen/approx_location_padding"
+            android:paddingLeft="@dimen/location_padding"
             android:textSize="@dimen/location_labels_textsize"
             android:text="ACCURACY" />
     </LinearLayout>
@@ -38,11 +38,14 @@
         android:paddingBottom="8dp">
 
         <TextView
-            android:id="@+id/approx_location_text"
+            android:id="@+id/location_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:paddingLeft="@dimen/approx_location_padding"
+            android:singleLine="true"
+            android:scrollHorizontally="true"
+            android:ellipsize="marquee"
+            android:paddingLeft="@dimen/location_padding"
             android:freezesText="true"
             android:text="No data" />
 
@@ -51,7 +54,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingLeft="@dimen/approx_location_padding"
+            android:singleLine="true"
+            android:scrollHorizontally="true"
+            android:ellipsize="marquee"
+            android:paddingLeft="@dimen/location_padding"
             android:freezesText="true"
             android:text="No data" />
 

@@ -1,11 +1,10 @@
 package com.lipata.whatsforlunch.api;
 
+import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.util.Log;
-
-import com.lipata.whatsforlunch.ui.MainActivity;
 
 import java.io.IOException;
 
@@ -15,20 +14,14 @@ import rx.functions.Func0;
 /**
  * Created by jlipata on 6/14/16.
  */
-public class MyGeocoder {
+public class GeocoderApi {
 
-    static private final String LOG_TAG = MyGeocoder.class.getSimpleName();
+    static private final String LOG_TAG = GeocoderApi.class.getSimpleName();
 
-    MainActivity mMainActivity;
+    Context mContext;
 
-    public MyGeocoder(MainActivity mMainActivity) {
-        this.mMainActivity = mMainActivity;
-    }
-
-    Address getAddress(Location location) throws IOException {
-        Log.d(LOG_TAG, "getAddress()");
-        Geocoder geocoder = new Geocoder(mMainActivity);
-        return geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
+    public GeocoderApi(Context context) {
+        this.mContext = context;
     }
 
     public Observable<Address> getAddressObservable(final Location location){
@@ -37,12 +30,19 @@ public class MyGeocoder {
             @Override
             public Observable<Address> call() {
                 try {
-                    return Observable.just(getAddress(location));
+                    return Observable.just(fetchAddress(location));
                 } catch (IOException e) {
                     e.printStackTrace();
-                    return null;
+                    return Observable.error(e);
                 }
             }
         });
     }
+
+    Address fetchAddress(Location location) throws IOException {
+        Log.d(LOG_TAG, "fetchAddress()");
+        Geocoder geocoder = new Geocoder(mContext);
+        return geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
+    }
+
 }

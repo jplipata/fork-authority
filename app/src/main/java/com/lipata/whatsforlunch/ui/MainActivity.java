@@ -24,12 +24,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.whatsforlunch.R;
 import com.lipata.whatsforlunch.api.GooglePlayApi;
-import com.lipata.whatsforlunch.api.MyGeocoder;
+import com.lipata.whatsforlunch.api.GeocoderApi;
 import com.lipata.whatsforlunch.api.yelp.model.Business;
 import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.user.UserRecords;
 
 import java.lang.reflect.Type;
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
     // App modules
     GooglePlayApi mGooglePlayApi;
-    MyGeocoder mGeocoder;
+    GeocoderApi mGeocoder;
     UserRecords mUserRecords;
     BusinessListManager mBusinessListManager;
 
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
         //mTextView_Latitude = (TextView) findViewById((R.id.latitude_text));
         //mTextView_Longitude = (TextView) findViewById((R.id.longitude_text));
-        mTextView_ApproxLocation = (TextView) findViewById(R.id.approx_location_text);
+        mTextView_ApproxLocation = (TextView) findViewById(R.id.location_text);
         mTextView_Accuracy = (TextView) findViewById(R.id.accuracy_text);
 
         // RecyclerView
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         mFAB_refreshAnimation.setInterpolator(null);
 
         // Location API
-        mGeocoder = new MyGeocoder(this);
+        mGeocoder = new GeocoderApi(this);
         mGooglePlayApi = new GooglePlayApi(this, mGeocoder);
 
         // Restore state
@@ -170,6 +171,12 @@ public class MainActivity extends AppCompatActivity {
     public void updateLocationViews(double latitude, double longitude, float accuracy){
         //mTextView_Latitude.setText(Double.toString(latitude));
         //mTextView_Longitude.setText(Double.toString(longitude));
+
+        // Latitude range is 0 to +-90.  Longitude is 0 to +-180.
+        // 6 decimal places is accurate to 43.496-111.32 mm
+        // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
+        mTextView_ApproxLocation.setText(new DecimalFormat("##.######").format(latitude)+", "
+                +new DecimalFormat("###.######").format(longitude));
         mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
         //Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
     }
@@ -196,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
     }
 
-    public void setApproxLocation(String text){
+    public void setLocationText(String text){
         mTextView_ApproxLocation.setText(text);
     }
 
