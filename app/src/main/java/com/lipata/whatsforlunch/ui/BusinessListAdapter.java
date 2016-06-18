@@ -63,11 +63,15 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         public TextView mTextView_BusinessAddress;
         public ImageView mImageView_BusinessRatingUrl;
         public TextView mTextView_BusinessReviewCount;
-        public TextView mTextView_JustAteHereDate;
-        public TextView mTextView_LikeDontLike;
+
         public Button mButton_TooSoon;
         public Button mButton_Like;
         public Button mButton_DontLike;
+
+        public View mView_Separater;
+        public LinearLayout mLayout_DescriptiveText;
+        public TextView mTextView_JustAteHereDate;
+        public TextView mTextView_LikeDontLike;
 
         public ViewHolder(View v) {
             super(v);
@@ -79,11 +83,15 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             mTextView_BusinessAddress = (TextView) v.findViewById(R.id.business_address);
             mImageView_BusinessRatingUrl = (ImageView) v.findViewById(R.id.business_rating);
             mTextView_BusinessReviewCount = (TextView) v.findViewById(R.id.business_review_count);
-            mTextView_JustAteHereDate = (TextView) v.findViewById(R.id.business_justateheredate);
-            mTextView_LikeDontLike = (TextView) v.findViewById(R.id.business_likeordontlike);
+
             mButton_TooSoon = (Button) v.findViewById(R.id.button_toosoon);
             mButton_Like = (Button) v.findViewById(R.id.button_like);
             mButton_DontLike = (Button) v.findViewById(R.id.button_dontlike);
+
+            mView_Separater = v.findViewById(R.id.bottom_separator);
+            mLayout_DescriptiveText = (LinearLayout) v.findViewById(R.id.descriptive_text_layout);
+            mTextView_JustAteHereDate = (TextView) v.findViewById(R.id.business_justateheredate);
+            mTextView_LikeDontLike = (TextView) v.findViewById(R.id.business_likeordontlike);
         }
     }
 
@@ -144,6 +152,16 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         long tooSoonClickDate = business.getTooSoonClickDate();
         long dontlikeClickDate = business.getDontLikeClickDate();
 
+        // Show separator or not
+        if(tooSoonClickDate!=0 || dontlikeClickDate!=0 ){
+            holder.mView_Separater.setVisibility(View.VISIBLE);
+            holder.mLayout_DescriptiveText.setVisibility(View.VISIBLE);
+        } else {
+            holder.mView_Separater.setVisibility(View.GONE);
+            holder.mLayout_DescriptiveText.setVisibility(View.GONE);
+        }
+
+        // Just Ate Here
         if(tooSoonClickDate!=0) {
             //Log.d(LOG_TAG, business.getName()+" has a tooSoonClickDate");
             Calendar calendar = Calendar.getInstance();
@@ -158,6 +176,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             holder.mTextView_JustAteHereDate.setVisibility(View.GONE);
         }
 
+        // Like / Don't Like
         if(dontlikeClickDate==-1){
             holder.mTextView_LikeDontLike.setVisibility(View.VISIBLE);
             holder.mTextView_LikeDontLike.setText("You like this");
