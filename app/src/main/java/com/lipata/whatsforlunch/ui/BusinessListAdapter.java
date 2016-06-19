@@ -70,8 +70,8 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
         public View mView_Separater;
         public LinearLayout mLayout_DescriptiveText;
-        public TextView mTextView_JustAteHereDate;
-        public TextView mTextView_LikeDontLike;
+        public TextView mTextView_DescriptiveText;
+        //public TextView mTextView_LikeDontLike;
 
         public ViewHolder(View v) {
             super(v);
@@ -90,8 +90,8 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
             mView_Separater = v.findViewById(R.id.bottom_separator);
             mLayout_DescriptiveText = (LinearLayout) v.findViewById(R.id.descriptive_text_layout);
-            mTextView_JustAteHereDate = (TextView) v.findViewById(R.id.business_justateheredate);
-            mTextView_LikeDontLike = (TextView) v.findViewById(R.id.business_likeordontlike);
+            mTextView_DescriptiveText = (TextView) v.findViewById(R.id.business_descriptive_text);
+            //mTextView_LikeDontLike = (TextView) v.findViewById(R.id.business_likeordontlike);
         }
     }
 
@@ -104,6 +104,8 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
+
+        holder.mTextView_DescriptiveText.setText("");
 
         // Get business at `position` index. This object's fields will be used to populate UI views
         final Business business = mBusinessList.get(position);
@@ -161,6 +163,17 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             holder.mLayout_DescriptiveText.setVisibility(View.GONE);
         }
 
+        // Like / Don't Like
+        if(dontlikeClickDate==-1){
+            //holder.mTextView_LikeDontLike.setVisibility(View.VISIBLE);
+            holder.mTextView_DescriptiveText.setText("You like this");
+        } else if(dontlikeClickDate!=0){
+            //holder.mTextView_DescriptiveText.setVisibility(View.VISIBLE);
+            holder.mTextView_DescriptiveText.setText("Don't like");
+        } else {
+            //holder.mTextView_LikeDontLike.setVisibility(View.GONE);
+        }
+
         // Just Ate Here
         if(tooSoonClickDate!=0) {
             //Log.d(LOG_TAG, business.getName()+" has a tooSoonClickDate");
@@ -169,23 +182,21 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             int month = calendar.get(Calendar.MONTH)+1;
             int day = calendar.get(Calendar.DATE);
             int year = calendar.get(Calendar.YEAR);
-            holder.mTextView_JustAteHereDate.setVisibility(View.VISIBLE);
-            holder.mTextView_JustAteHereDate.setText("Just ate here on "+month+"/"+day+"/"+year);
+            //holder.mTextView_DescriptiveText.setVisibility(View.VISIBLE);
+
+            CharSequence descriptiveText = holder.mTextView_DescriptiveText.getText();
+            if(descriptiveText.toString().equals("")){
+                holder.mTextView_DescriptiveText.setText("Just ate here on "+month+"/"+day+"/"+year);
+            } else {
+                holder.mTextView_DescriptiveText.append(".  Just ate here on "+month+"/"+day+"/"+year);
+            }
+
         } else {
             //Log.d(LOG_TAG, business.getName()+" does not have a tooSoonClickDate");
-            holder.mTextView_JustAteHereDate.setVisibility(View.GONE);
+            //holder.mTextView_DescriptiveText.setVisibility(View.GONE);
         }
 
-        // Like / Don't Like
-        if(dontlikeClickDate==-1){
-            holder.mTextView_LikeDontLike.setVisibility(View.VISIBLE);
-            holder.mTextView_LikeDontLike.setText("You like this");
-        } else if(dontlikeClickDate!=0){
-            holder.mTextView_LikeDontLike.setVisibility(View.VISIBLE);
-            holder.mTextView_LikeDontLike.setText("Don't like");
-        } else {
-            holder.mTextView_LikeDontLike.setVisibility(View.GONE);
-        }
+
 
         // Like button dynamic icon
         if(business.getDontLikeClickDate()==-1){

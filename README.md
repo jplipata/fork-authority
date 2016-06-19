@@ -32,10 +32,8 @@ The design similarity to Yelp is intentional.  Since this is basically a custom 
 - Need app icon
 - More results, better way to manage de-prioritized categories
 - User definable settings
-- Replace text location coordinates with map view or something more user friendly
-- Get more results
 - "Just ate here" active state icon and dynamic text based on state
-- Bug: if the user denies location permission and selects "never ask again", it will render the app useless (Marshmallow and above)
+- More sophisticated preference logic, such as looking for patterns in categories for recommendations (e.g. if a user tends to like Japanese, businesses with category = Japanese will get sorted to top of list
 
 ###### Code Quality
 - Refactor: Overall architecture needs to be improved, implement e.g. MVP pattern.

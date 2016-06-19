@@ -19,7 +19,11 @@
         android:orientation="horizontal"
         android:id="@+id/business_header_layout"
         android:clickable="true"
-        android:padding="12dp"
+        android:paddingTop="@dimen/layout_topbottom_padding"
+        android:paddingBottom="@dimen/layout_topbottom_padding"
+        android:paddingLeft="@dimen/layout_side_padding"
+        android:paddingRight="@dimen/layout_side_padding"
+
         android:background="?attr/selectableItemBackground">
 
         <ImageView
@@ -142,18 +146,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp"        >
+        android:paddingTop="@dimen/layout_topbottom_padding"
+        android:paddingBottom="@dimen/layout_topbottom_padding"
+        android:paddingLeft="@dimen/layout_side_padding"
+        android:paddingRight="@dimen/layout_side_padding"     >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:id="@+id/business_justateheredate"
-            android:textSize="@dimen/cardview_buttons_textsize"
+            android:id="@+id/business_descriptive_text"
+            android:textSize="12sp"
             android:textColor="@color/material_text_gray"
             android:textStyle="italic"
             android:padding="2dp"
             android:text="debug-justatehere"
             />
+        <!--Combining into 1 textview
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -166,6 +174,7 @@
 
             android:text="debug-like"
             />
+            -->
 
     </LinearLayout>
 
