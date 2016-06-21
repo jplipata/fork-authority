@@ -105,8 +105,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
-        holder.mTextView_DescriptiveText.setText("");
-
         // Get business at `position` index. This object's fields will be used to populate UI views
         final Business business = mBusinessList.get(position);
 
@@ -147,7 +145,8 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             holder.mView_Separater.setVisibility(View.VISIBLE);
             holder.mLayout_DescriptiveText.setVisibility(View.VISIBLE);
             holder.mTextView_DescriptiveText.setText(descriptiveText);
-        } else {
+        } else // If there's no descriptive text, hide the line separator and the layout
+        {
             holder.mView_Separater.setVisibility(View.GONE);
             holder.mLayout_DescriptiveText.setVisibility(View.GONE);
         }
