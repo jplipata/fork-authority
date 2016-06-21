@@ -4,6 +4,7 @@ package com.lipata.whatsforlunch.api.yelp.model;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.annotation.Generated;
@@ -49,6 +50,47 @@ public class Business {
     long dontLikeClickDate;
     long dismissedDate;
 
+
+    public String getDescriptiveText(){
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if(dontLikeClickDate==-1){
+            stringBuilder.append("You like this");
+        } else if(dontLikeClickDate!=0){
+            stringBuilder.append("Don't like");
+        }
+
+        if(tooSoonClickDate!=0) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(tooSoonClickDate);
+            int month = calendar.get(Calendar.MONTH)+1;
+            int day = calendar.get(Calendar.DATE);
+            int year = calendar.get(Calendar.YEAR);
+
+            if(dontLikeClickDate==0){
+                stringBuilder.append("Just ate here on "+month+"/"+day+"/"+year);
+            } else {
+                stringBuilder.append(".  Just ate here on "+month+"/"+day+"/"+year);
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
+    /**
+     * `categories` field from JSON is an ArrayList.  This method formats it into a String for display to UI
+     */
+    public String getFormattedCategories() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i=0; i<categories.size(); i++){
+            String category = categories.get(i).get(0);
+            stringBuilder.append(category);
+            if(i<(categories.size()-1)){
+                stringBuilder.append(", ");
+            }
+        }
+        return stringBuilder.toString();
+    }
 
     public long getTooSoonClickDate() {
         return tooSoonClickDate;

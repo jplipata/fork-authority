@@ -22,11 +22,11 @@ import com.lipata.whatsforlunch.data.user.BusinessItemRecord;
 import com.lipata.whatsforlunch.data.user.UserRecords;
 import com.squareup.picasso.Picasso;
 
-import java.util.Calendar;
 import java.util.List;
 
 /**
  * Created by jlipata on 1/1/16.
+ * TODO There's a lot of stuff in this class that should be in the model or data classes. Clean it up!
  */
 public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapter.ViewHolder> {
     private static final String LOG_TAG = BusinessListAdapter.class.getSimpleName();
@@ -135,26 +135,19 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         // Business review count
         holder.mTextView_BusinessReviewCount.setText(business.getReviewCount() + " Reviews");
 
-        StringBuilder stringBuilder = new StringBuilder();
-        List<List<String>> categoryList = business.getCategories();
-        for(int i=0; i<categoryList.size(); i++){
-            String category = categoryList.get(i).get(0);
-            stringBuilder.append(category);
-            if(i<(categoryList.size()-1)){
-                stringBuilder.append(", ");
-            }
-        }
-        String formattedCategories = stringBuilder.toString();
-
-        holder.mTextView_BusinessCategories.setText(formattedCategories);
+        holder.mTextView_BusinessCategories.setText(business.getFormattedCategories());
 
         holder.mTextView_BusinessAddress.setText(business.getLocation().getFormattedDisplayAddress());
 
         // Dynamically add text based on UserRecords
+        // TODO This logic should live in the model
+
         long tooSoonClickDate = business.getTooSoonClickDate();
         long dontlikeClickDate = business.getDontLikeClickDate();
 
         // Show separator or not
+        // TODO Perhaps this should be replaced with if(getDescriptiveText!=null), then show separater + layout, else make them invisible
+
         if(tooSoonClickDate!=0 || dontlikeClickDate!=0 ){
             holder.mView_Separater.setVisibility(View.VISIBLE);
             holder.mLayout_DescriptiveText.setVisibility(View.VISIBLE);
@@ -163,39 +156,10 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             holder.mLayout_DescriptiveText.setVisibility(View.GONE);
         }
 
-        // Like / Don't Like
-        if(dontlikeClickDate==-1){
-            //holder.mTextView_LikeDontLike.setVisibility(View.VISIBLE);
-            holder.mTextView_DescriptiveText.setText("You like this");
-        } else if(dontlikeClickDate!=0){
-            //holder.mTextView_DescriptiveText.setVisibility(View.VISIBLE);
-            holder.mTextView_DescriptiveText.setText("Don't like");
-        } else {
-            //holder.mTextView_LikeDontLike.setVisibility(View.GONE);
+        String descriptiveText = business.getDescriptiveText();
+        if(descriptiveText!=null){
+            holder.mTextView_DescriptiveText.setText(descriptiveText);
         }
-
-        // Just Ate Here
-        if(tooSoonClickDate!=0) {
-            //Log.d(LOG_TAG, business.getName()+" has a tooSoonClickDate");
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(business.getTooSoonClickDate());
-            int month = calendar.get(Calendar.MONTH)+1;
-            int day = calendar.get(Calendar.DATE);
-            int year = calendar.get(Calendar.YEAR);
-            //holder.mTextView_DescriptiveText.setVisibility(View.VISIBLE);
-
-            CharSequence descriptiveText = holder.mTextView_DescriptiveText.getText();
-            if(descriptiveText.toString().equals("")){
-                holder.mTextView_DescriptiveText.setText("Just ate here on "+month+"/"+day+"/"+year);
-            } else {
-                holder.mTextView_DescriptiveText.append(".  Just ate here on "+month+"/"+day+"/"+year);
-            }
-
-        } else {
-            //Log.d(LOG_TAG, business.getName()+" does not have a tooSoonClickDate");
-            //holder.mTextView_DescriptiveText.setVisibility(View.GONE);
-        }
-
 
 
         // Like button dynamic icon
