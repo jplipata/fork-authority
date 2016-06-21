@@ -140,27 +140,17 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         holder.mTextView_BusinessAddress.setText(business.getLocation().getFormattedDisplayAddress());
 
         // Dynamically add text based on UserRecords
-        // TODO This logic should live in the model
 
-        long tooSoonClickDate = business.getTooSoonClickDate();
-        long dontlikeClickDate = business.getDontLikeClickDate();
-
-        // Show separator or not
-        // TODO Perhaps this should be replaced with if(getDescriptiveText!=null), then show separater + layout, else make them invisible
-
-        if(tooSoonClickDate!=0 || dontlikeClickDate!=0 ){
+        // Show descriptiveText + enclosing layout + line separator, if present
+        String descriptiveText = business.getDescriptiveText();
+        if(descriptiveText!=null){
             holder.mView_Separater.setVisibility(View.VISIBLE);
             holder.mLayout_DescriptiveText.setVisibility(View.VISIBLE);
+            holder.mTextView_DescriptiveText.setText(descriptiveText);
         } else {
             holder.mView_Separater.setVisibility(View.GONE);
             holder.mLayout_DescriptiveText.setVisibility(View.GONE);
         }
-
-        String descriptiveText = business.getDescriptiveText();
-        if(descriptiveText!=null){
-            holder.mTextView_DescriptiveText.setText(descriptiveText);
-        }
-
 
         // Like button dynamic icon
         if(business.getDontLikeClickDate()==-1){

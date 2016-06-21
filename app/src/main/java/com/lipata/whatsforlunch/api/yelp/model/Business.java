@@ -12,6 +12,10 @@ import javax.annotation.Generated;
 @Generated("org.jsonschema2pojo")
 public class Business {
 
+    public static final String YOU_LIKE_THIS = "You like this";
+    public static final String DONT_LIKE_THIS = "Don't like";
+
+
     private boolean isClaimed;
     private double rating;
     private String mobileUrl;
@@ -46,18 +50,39 @@ public class Business {
     private double distance;
 
     // My fields
+
+    /**
+     * Field used to track "just ate here" as a date.
+     * Initializes as 0 when converted by GSON
+     */
     long tooSoonClickDate;
+
+    /**
+     * Field used to track Like or Don't Like state.
+     * Initializes as 0 when converted by GSON
+     * -1 means "Like"
+     * A positive number means "Don't Like", expressed as a date when it was clicked (so that it can expire after a certain amount of time)
+     */
     long dontLikeClickDate;
+
+    /**
+     * Initializes as 0 when converted by GSON
+     * Not in use since dismiss functionality was changed to not expire. Under consideration for removal.
+     */
     long dismissedDate;
 
 
     public String getDescriptiveText(){
         StringBuilder stringBuilder = new StringBuilder();
 
+        if(dontLikeClickDate==0 && tooSoonClickDate==0){
+            return null;
+        }
+
         if(dontLikeClickDate==-1){
-            stringBuilder.append("You like this");
+            stringBuilder.append(YOU_LIKE_THIS);
         } else if(dontLikeClickDate!=0){
-            stringBuilder.append("Don't like");
+            stringBuilder.append(DONT_LIKE_THIS);
         }
 
         if(tooSoonClickDate!=0) {
