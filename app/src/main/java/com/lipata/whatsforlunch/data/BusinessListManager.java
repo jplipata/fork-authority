@@ -66,18 +66,20 @@ public class BusinessListManager {
 
                     // On match found, do:
 
-                        // Handle Like case
+                    // Update the `business` object
+                    business.setDontLikeClickDate(dontLikeClickDate);
+                    business.setTooSoonClickDate(tooSoonClickDate);
+
+                    // Handle Like case
 
                             if(dontLikeClickDate==-1){
                                 Log.d(LOG_TAG, "filter() deemed LIKE");
 
-                                // Update the `business` object
-                                business.setDontLikeClickDate(BusinessItemRecord.LIKE_FLAG);
-
                                 // Move item to top of list, but only if
                                 // a) it is not already at the top of the list
                                 // b) it is not 'too soon' or c) 'dismissed'
-                                if(i!=0 && tooSoonDelta>=AppSettings.TOOSOON_THRESHOLD
+
+                                if(i!=0 && business.isTooSoonClickDateExpired()
                                         && dismissedDelta>=AppSettings.DISMISSED_THRESHOLD) { // Check if item is not already at top of list
                                     topStack.addItemToTopStack(business);
                                     businessList_Filtered.set(i, null);
@@ -89,8 +91,6 @@ public class BusinessListManager {
                         // Handle Dont Like case
 
                             if (dontLikeClickDate > 0) {
-                                // Update the `business` object
-                                business.setDontLikeClickDate(dontLikeClickDate);
 
                                 // Move to bottom of list unless expired
                                 if (dontLikeDelta_days < AppSettings.DONTLIKE_THRESHOLD_INDAYS) {
@@ -106,10 +106,8 @@ public class BusinessListManager {
                         // Handle the "Too Soon" case:
 
                         if(tooSoonClickDate!=0) {
-                            // Update the `business` object to include tooSoonClickDate;
-                            business.setTooSoonClickDate(tooSoonClickDate);
 
-                            if (tooSoonDelta < AppSettings.TOOSOON_THRESHOLD) {
+                            if (!business.isTooSoonClickDateExpired()) {
                                 Log.d(LOG_TAG, "filter() Deemed too soon!");
                                 // Move item down the list
                                 businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
@@ -118,23 +116,6 @@ public class BusinessListManager {
                             }
 
                         }
-
-                        // Handle Dismissed case
-                        // Temporarily ignoring this case
-                        // Dismissed items will not be filtered, i.e. if the user refreshes, any dismissed
-                        // items will 'come back'
-//
-//                            if(businessItemRecord.getDismissedDate()!=0){
-//                                business.setDismissedDate(dismissedDate);
-//                                if (dismissedDelta < AppSettings.DISMISSED_THRESHOLD){
-//                                    Log.d(LOG_TAG, "filter() Deemed dismissed!");
-//                                    businessList_Filtered = moveItemToBottom(businessList_Filtered, i);
-//                                } else {
-//                                    Log.d(LOG_TAG, "filter() Dismissed EXPIRED");
-//
-//                                }
-//                            }
-
 
                     break;  // Once you've found the match, there's no need to keep going. Exit the `for` loop
                 }

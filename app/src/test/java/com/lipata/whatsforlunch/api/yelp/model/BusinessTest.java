@@ -2,9 +2,7 @@ package com.lipata.whatsforlunch.api.yelp.model;
 
 import com.lipata.whatsforlunch.Utility;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -16,22 +14,11 @@ public class BusinessTest {
 
     Business business;
 
-    @Before
-    public void setUp() throws Exception {
-
-
-    }
-
-    @After
-    public void tearDown() throws Exception {
-
-    }
-
     @Test
     public void testGetDescriptiveText_LikeCase() throws Exception {
         business = new Business();
         business.setDontLikeClickDate(-1); // -1 means "Like"
-        business.setTooSoonClickDate(0); // 0 is uninitialized
+        business.setTooSoonClickDate(0); // 0 is unassigned
 
         Assert.assertEquals(Business.YOU_LIKE_THIS, business.getDescriptiveText());
     }
@@ -40,7 +27,7 @@ public class BusinessTest {
     public void testGetDescriptiveText_DontLikeCase() throws Exception {
         business = new Business();
         business.setDontLikeClickDate(System.currentTimeMillis()-ONE_DAY); // Sets to "Don't Like" as of yesterday
-        business.setTooSoonClickDate(0); // Sets Just Ate Here
+        business.setTooSoonClickDate(0); // Unassigned
 
         Assert.assertEquals(Business.DONT_LIKE_THIS, business.getDescriptiveText());
     }
@@ -49,7 +36,7 @@ public class BusinessTest {
     public void testGetDescriptiveText_NullCase() throws Exception {
         business = new Business();
         business.setDontLikeClickDate(0); // Sets to unassigned
-        business.setTooSoonClickDate(0); // Sets Just Ate Here to unassigned
+        business.setTooSoonClickDate(0); // Sets to unassigned
 
         Assert.assertNull(business.getDescriptiveText());
     }
@@ -58,7 +45,7 @@ public class BusinessTest {
     public void testGetDescriptiveText_JustAteHereSolo_ExpiredCase() throws Exception {
         business = new Business();
         business.setDontLikeClickDate(0); // Sets to unassigned
-        business.setTooSoonClickDate(1465446266588L); // Sets Just Ate Here to 6/9/2016 *I THINK*.  I.e. this is from my device's system time, not sure if it will be universal for other devices
+        business.setTooSoonClickDate(1465446266588L); // Sets Just Ate Here to 6/9/2016 *I THINK*, i.e. this is from my device's system time, not sure if it will be universal for other devices
 
         Assert.assertEquals(Business.ATE_HERE_SOLO+"6/9/2016" ,business.getDescriptiveText());
     }

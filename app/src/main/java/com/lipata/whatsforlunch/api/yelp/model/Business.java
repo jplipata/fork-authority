@@ -143,7 +143,7 @@ public class Business {
     public long getTooSoonClickDate() {
         return tooSoonClickDate;
     }
-    
+
     public long getDontLikeClickDate() {
         return dontLikeClickDate;
     }
