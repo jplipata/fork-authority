@@ -94,7 +94,6 @@ public class YelpApi {
                 // UI stuff
                 mMainActivity.stopRefreshAnimation();
                 mMainActivity.getRecyclerViewLayoutManager().scrollToPosition(0);
-
             }
 
             @Override
@@ -102,9 +101,8 @@ public class YelpApi {
                 Log.e(LOG_TAG, "Retrofit FAILURE", t);
                 t.printStackTrace();
                 mMainActivity.stopRefreshAnimation();
-                mMainActivity.showSnackBarIndefinite("ERROR: Yelp API Failure.  Check your internet connection or perhaps there's a problem with Yelp at the moment.");
+                mMainActivity.showSnackBarIndefinite("Yelp API error.  Check your internet connection or perhaps there's a problem with Yelp at the moment.");
             }
         });
-
     }
 }

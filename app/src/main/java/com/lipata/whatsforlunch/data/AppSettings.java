@@ -16,7 +16,7 @@ public class AppSettings {
     /* "Age" of location data in milliseconds before it becomes "stale"
      * TODO For debugging you probably want this to be FAST, but for production you'll want it slower
      */
-    public static double LOCATION_LIFESPAN = 15 * 1000;
+    public static double LOCATION_LIFESPAN = 10 * 1000;
 
 
     /*

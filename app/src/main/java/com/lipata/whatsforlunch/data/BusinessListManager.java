@@ -29,7 +29,7 @@ public class BusinessListManager {
     /**
      * Takes a list of `Business`s and sorts them according to user preferences stored in `UserRecords`
      * @param businessList_Source List to be sorted.
-     * @return Returns sorted list.
+     * @return Returns sorted list in order of "Preferred", "Neutral", "Too Soon", then "Don't Like"
      */
     public List<Business> filter(List<Business> businessList_Source){
 

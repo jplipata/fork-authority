@@ -68,8 +68,8 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         public Button mButton_Like;
         public Button mButton_DontLike;
 
-        public View mView_Separater;
-        public LinearLayout mLayout_DescriptiveText;
+        //public View mView_Separater;
+        //public LinearLayout mLayout_DescriptiveText;
         public TextView mTextView_DescriptiveText;
         //public TextView mTextView_LikeDontLike;
 
@@ -88,8 +88,8 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             mButton_Like = (Button) v.findViewById(R.id.button_like);
             mButton_DontLike = (Button) v.findViewById(R.id.button_dontlike);
 
-            mView_Separater = v.findViewById(R.id.bottom_separator);
-            mLayout_DescriptiveText = (LinearLayout) v.findViewById(R.id.descriptive_text_layout);
+            //mView_Separater = v.findViewById(R.id.bottom_separator);
+            //mLayout_DescriptiveText = (LinearLayout) v.findViewById(R.id.descriptive_text_layout);
             mTextView_DescriptiveText = (TextView) v.findViewById(R.id.business_descriptive_text);
             //mTextView_LikeDontLike = (TextView) v.findViewById(R.id.business_likeordontlike);
         }
@@ -139,16 +139,14 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
         // Dynamically add text based on UserRecords
 
-        // Show descriptiveText + enclosing layout + line separator, if present
+        // Show descriptiveText , if present
         String descriptiveText = business.getDescriptiveText();
         if(descriptiveText!=null){
-            holder.mView_Separater.setVisibility(View.VISIBLE);
-            holder.mLayout_DescriptiveText.setVisibility(View.VISIBLE);
+            holder.mTextView_DescriptiveText.setVisibility(View.VISIBLE);
             holder.mTextView_DescriptiveText.setText(descriptiveText);
         } else // If there's no descriptive text, hide the line separator and the layout
         {
-            holder.mView_Separater.setVisibility(View.GONE);
-            holder.mLayout_DescriptiveText.setVisibility(View.GONE);
+            holder.mTextView_DescriptiveText.setVisibility(View.GONE);
         }
 
         // Like button dynamic icon

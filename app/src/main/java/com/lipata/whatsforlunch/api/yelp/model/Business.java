@@ -18,8 +18,8 @@ public class Business {
     public static final String DONT_LIKE_THIS = "Don't like";
     public static final String JUST_ATE_HERE_SOLO = "Just ate here on ";
     public static final String JUST_ATE_HERE_APPENDED = ".  Just ate here on ";
-    public static final String ATE_HERE_SOLO = "You ate here on ";
-    public static final String ATE_HERE_APPENDED = ".  You ate here on ";
+    public static final String ATE_HERE_SOLO = "You ate here around ";
+    public static final String ATE_HERE_APPENDED = ".  You ate here around ";
 
     private boolean isClaimed;
     private double rating;

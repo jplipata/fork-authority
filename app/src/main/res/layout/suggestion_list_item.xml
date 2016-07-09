@@ -78,7 +78,34 @@
                     android:text="Categories"/>
 
             </LinearLayout>
+
     </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/business_descriptive_text"
+        android:textSize="11sp"
+        android:textColor="@color/material_text_gray"
+        android:textStyle="italic"
+        android:paddingLeft="@dimen/layout_side_padding"
+        android:paddingBottom="@dimen/layout_topbottom_padding"
+        android:text="debug-justatehere"
+        />
+
+    <!--
+    <LinearLayout
+        android:id="@+id/descriptive_text_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/layout_topbottom_padding"
+        android:paddingBottom="@dimen/layout_topbottom_padding"
+        android:paddingLeft="@dimen/layout_side_padding"
+        android:paddingRight="@dimen/layout_side_padding"     >
+
+    </LinearLayout>
+    -->
 
     <View
         android:layout_width="match_parent"
@@ -135,48 +162,8 @@
 
     </LinearLayout>
 
-    <View
-        android:id="@+id/bottom_separator"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#EEEEEE"/>
 
-    <LinearLayout
-        android:id="@+id/descriptive_text_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="@dimen/layout_topbottom_padding"
-        android:paddingBottom="@dimen/layout_topbottom_padding"
-        android:paddingLeft="@dimen/layout_side_padding"
-        android:paddingRight="@dimen/layout_side_padding"     >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:id="@+id/business_descriptive_text"
-            android:textSize="12sp"
-            android:textColor="@color/material_text_gray"
-            android:textStyle="italic"
-            android:padding="2dp"
-            android:text="debug-justatehere"
-            />
-        <!--Combining into 1 textview
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:id="@+id/business_likeordontlike"
-            android:textSize="@dimen/cardview_buttons_textsize"
-            android:textColor="@color/material_text_gray"
-            android:textStyle="italic"
-            android:padding="2dp"
 
-            android:text="debug-like"
-            />
-            -->
-
-    </LinearLayout>
 
     <!-- 1/18/16 We could provide a summary of net likes to the user.
 
