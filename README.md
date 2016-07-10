@@ -4,7 +4,7 @@ A tool to help you answer the toughest question of the day: What's for lunch?!
 #### Background
 <img src="https://cloud.githubusercontent.com/assets/11450465/14229888/806b9cd6-f910-11e5-9f5f-982ea09fe3a1.gif" width="325" align="right">
 
-No matter how many stars a restaurant has on Yelp, you'll get sick of it if you eat there everyday.  #whatsforlunch let's you specify things like "just ate here", "like", or "don't like".  The app will store your preferences and provide you with a customized list of search results.  You can also "swipe to dismiss" to help narrow down your options.
+No matter how many stars a restaurant has on Yelp, you'll get sick of it if you eat there everyday.  #whatsforlunch let's you specify things like "just ate here", "like", or "don't like".  The app will store your preferences and provide you with a personalized list of search results.  You can also "swipe to dismiss" to help narrow down your options.
 
 #### How It Works
 
