@@ -23,17 +23,15 @@ Click the Refresh button to start over
 whatsforlunch will remember your preferences for next time
 
 #### Developer Notes
-This is my first Android app.  There are many areas that can be improved upon.  See development roadmap below.
-
 The design similarity to Yelp is intentional.  Since this is basically a custom front-end for Yelp data, I wanted it to have a seemless UI feel. I also thought it would be a good exercise to try to replicate the Yelp UI from scratch ("great artists steal").
 
 ##### Enhancement Backlog
 ###### UI/Functionality
 - Need app icon
-- More results, better way to manage de-prioritized categories
-- User definable settings
+- More results, better way to manage filtered categories
+- User definable settings/search query
 - "Just ate here" active state icon and dynamic text based on state
-- More sophisticated preference logic, such as looking for patterns in categories for recommendations (e.g. if a user tends to like Japanese, businesses with category = Japanese will get sorted to top of list
+- More sophisticated suggestion logic, such as looking for patterns in categories for recommendations (e.g. if a user tends to like Japanese, businesses with category = Japanese will get sorted to top of list
 
 ###### Code Quality
 - Refactor: Overall architecture needs to be improved, implement e.g. MVP pattern.
