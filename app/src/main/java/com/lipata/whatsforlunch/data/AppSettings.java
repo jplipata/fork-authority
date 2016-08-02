@@ -14,9 +14,8 @@ public class AppSettings {
     public static int DONTLIKE_THRESHOLD_INDAYS = 90; // 90 days
 
     /* "Age" of location data in milliseconds before it becomes "stale"
-     * TODO For debugging you probably want this to be FAST, but for production you'll want it slower
      */
-    public static double LOCATION_LIFESPAN = 10 * 1000;
+    public static double LOCATION_LIFESPAN = 5 * 1000;
 
 
     /*

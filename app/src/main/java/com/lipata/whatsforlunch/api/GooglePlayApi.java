@@ -188,6 +188,8 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
             case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
                 Log.i(LOG_TAG, "SETTINGS_CHANGE_UNAVAILABLE Location settings are inadequate, and cannot be fixed here. Dialog " +
                         "not created.");
+                mMainActivity.stopRefreshAnimation();
+                mMainActivity.showSnackBarIndefinite("There was an error.  Please check your settings.");
                 break;
         }
     }

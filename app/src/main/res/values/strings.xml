@@ -1,6 +1,6 @@
 <resources>
     <!-- UI - App -->
-    <string name="app_name">What\'s For Lunch?</string>
+    <string name="app_name">whatsforlunch</string>
     <string name="action_settings">Settings</string>
 
     <!-- UI - Location Strings -->
