@@ -27,7 +27,6 @@ The design similarity to Yelp is intentional.  Since this is basically a custom 
 
 ##### Enhancement Backlog
 ###### UI/Functionality
-- Need app icon
 - More results, better way to manage filtered categories
 - User definable settings/search query
 - "Just ate here" active state icon and dynamic text based on state
