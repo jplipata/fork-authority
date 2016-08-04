@@ -29,48 +29,47 @@ public class YelpApi {
 
     public static final String LOG_TAG = "YelpApi-Retrofit";
     public static final String BASE_URL = "https://api.yelp.com/";
+    public static final int RESULTS_PER_PAGE = 20; // However many results the Yelp API returns per page
 
-    OkHttpOAuthConsumer consumer;
-    HttpLoggingInterceptor httpLoggingInterceptor;
-    OkHttpClient okHttpClient;
-    Retrofit retrofit;
-    final Endpoints apiService;
+    OkHttpOAuthConsumer mConsumer;
+    HttpLoggingInterceptor mHttpLoggingInterceptor;
+    OkHttpClient mOkHttpClient;
+    Retrofit mRetrofit;
+    final Endpoints mApiService;
 
     MainActivity mMainActivity;
 
-    List<Business> mBusinessList = new ArrayList<>(); // This is our main data
-    int mTotal;
+    List<Business> mMasterList = new ArrayList<>(); // This is our main data
+    int mTotalNumberOfResults;
 
     public YelpApi(MainActivity mainActivity) {
         this.mMainActivity = mainActivity;
 
         // OAuth
-        consumer = new OkHttpOAuthConsumer(ApiKeys.CONSUMER_KEY, ApiKeys.CONSUMER_SECRET);
-        consumer.setTokenWithSecret(ApiKeys.TOKEN, ApiKeys.TOKEN_SECRET);
+        mConsumer = new OkHttpOAuthConsumer(ApiKeys.CONSUMER_KEY, ApiKeys.CONSUMER_SECRET);
+        mConsumer.setTokenWithSecret(ApiKeys.TOKEN, ApiKeys.TOKEN_SECRET);
 
         // Logger
-        httpLoggingInterceptor = new HttpLoggingInterceptor();
-        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+        mHttpLoggingInterceptor = new HttpLoggingInterceptor();
+        mHttpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
 
-        okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new SigningInterceptor(consumer))
-                .addInterceptor(httpLoggingInterceptor) // As per tutorial: We recommend to add logging as the last interceptor, because this will also log the information which you added with previous interceptors to your request.
+        mOkHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new SigningInterceptor(mConsumer))
+                .addInterceptor(mHttpLoggingInterceptor) // As per tutorial: We recommend to add logging as the last interceptor, because this will also log the information which you added with previous interceptors to your request.
                 .build();
 
-        retrofit = new Retrofit.Builder()
+        mRetrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
-                .client(okHttpClient)
+                .client(mOkHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        apiService = retrofit.create(Endpoints.class);
-
+        mApiService = mRetrofit.create(Endpoints.class);
     }
 
     public void callYelpApi(final String term, final String location, final String radius){
 
-
-        Call<YelpResponse> call = apiService.getBusinesses(term, location, radius);
+        Call<YelpResponse> call = mApiService.getBusinesses(term, location, radius);
         call.enqueue(new Callback<YelpResponse>() {
             @Override
             public void onResponse(Call<YelpResponse> call, Response<YelpResponse> response) {
@@ -83,7 +82,6 @@ public class YelpApi {
                             + " ID: " + yelpResponse.getError().getId());
                     mMainActivity.stopRefreshAnimation();
                     mMainActivity.showSnackBarIndefinite("Yelp API Error: " + yelpResponse.getError().getText());
-
                 }
 
                 // Handle case where there's no error but no results are returned
@@ -95,8 +93,8 @@ public class YelpApi {
 
                 // Handle case where there are 20 or less results
                 else if (yelpResponse.getTotal()<=20){
-                    mBusinessList.addAll(yelpResponse.getBusinesses());
-                    mTotal = yelpResponse.getTotal();
+                    mMasterList.addAll(yelpResponse.getBusinesses());
+                    mTotalNumberOfResults = yelpResponse.getTotal();
                     filterListAndUpdateUi();
                 }
 
@@ -114,11 +112,12 @@ public class YelpApi {
     }
 
     private void getMoreThan20Results(final YelpResponse yelpResponse, String term, String location, String radius) {
+
         // Using an array so that we can use the indexes to keep the results in order since
         // they will be received asynchronously
 
-        mTotal = yelpResponse.getTotal();
-        final Business[] businessArray = new Business[mTotal];
+        mTotalNumberOfResults = yelpResponse.getTotal();
+        final Business[] businessArray = new Business[mTotalNumberOfResults];
 
         // Load the first 20
         for (int i = 0; i<yelpResponse.getBusinesses().size() ; i++){
@@ -128,11 +127,11 @@ public class YelpApi {
         // Load the rest
         final int start = yelpResponse.getBusinesses().size();
 
-        for(int i = start; i<mTotal; ){
+        for(int i = start; i< mTotalNumberOfResults; /* i is updated below */ ){
             String offset = Integer.toString(i);
             final int offsetPointer = i;
 
-            Call<YelpResponse> call2 = apiService.getMoreBusinesses(term, location, radius, offset);
+            Call<YelpResponse> call2 = mApiService.getMoreBusinesses(term, location, radius, offset);
             call2.enqueue(new Callback<YelpResponse>() {
                 @Override
                 public void onResponse(Call<YelpResponse> call, Response<YelpResponse> response) {
@@ -146,20 +145,21 @@ public class YelpApi {
                 }
             });
 
-            // must update i
-            i=i+20;
+            // Update `i`
+            i=i+RESULTS_PER_PAGE;
         }
     }
 
     private void addBusinesses(int offset, List<Business> businessList, Business[] businessArray){
+        // Add new batch of businesses to the master array
         for(int i=0; i<businessList.size(); i++){
             businessArray[offset+i] = businessList.get(i);
         }
 
-        // Check to see if array is full
+        // Check to see if array is full.  If yes, proceed to filter list and update UI
         if(isArrayFull(businessArray)){
-            mBusinessList.clear();
-            mBusinessList.addAll(Arrays.asList(businessArray));
+            mMasterList.clear();
+            mMasterList.addAll(Arrays.asList(businessArray));
             filterListAndUpdateUi();
         }
     }
@@ -175,7 +175,7 @@ public class YelpApi {
 
     private void filterListAndUpdateUi() {
         BusinessListAdapter businessListAdapter = mMainActivity.getSuggestionListAdapter();
-        List<Business> filteredBusinesses = mMainActivity.getBusinessListManager().filter(mBusinessList);
+        List<Business> filteredBusinesses = mMainActivity.getBusinessListManager().filter(mMasterList);
         businessListAdapter.setBusinessList(filteredBusinesses);
         businessListAdapter.notifyDataSetChanged();
         mMainActivity.stopRefreshAnimation();
