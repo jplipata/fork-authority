@@ -13,6 +13,12 @@ import retrofit2.http.Query;
 public interface Endpoints {
 
     @GET("v2/search")
-    Call<YelpResponse> getBusinesses(@Query("term") String term, @Query("ll") String location, @Query("radius_filter") String radius);
+    Call<YelpResponse> getBusinesses(@Query("term") String term, @Query("ll") String location,
+                                     @Query("radius_filter") String radius);
+
+    @GET("v2/search")
+    Call<YelpResponse> getMoreBusinesses(@Query("term") String term, @Query("ll") String location,
+                                         @Query("radius_filter") String radius, @Query("offset") String offset);
+
 
 }
