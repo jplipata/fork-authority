@@ -117,6 +117,7 @@ public class YelpApi {
         // they will be received asynchronously
 
         mTotalNumberOfResults = yelpResponse.getTotal();
+        mMainActivity.showToast(String.format("Retrieving %d businesses...", mTotalNumberOfResults));
         final Business[] businessArray = new Business[mTotalNumberOfResults];
 
         // Load the first 20
@@ -129,7 +130,7 @@ public class YelpApi {
 
         for(int i = start; i< mTotalNumberOfResults; /* i is updated below */ ){
             String offset = Integer.toString(i);
-            final int offsetPointer = i;
+            final int offsetPointer = i; // Need a `final` variable to use in the anonymous class below, otherwise I would just use `i`
 
             Call<YelpResponse> call2 = mApiService.getMoreBusinesses(term, location, radius, offset);
             call2.enqueue(new Callback<YelpResponse>() {
@@ -151,12 +152,13 @@ public class YelpApi {
     }
 
     private void addBusinesses(int offset, List<Business> businessList, Business[] businessArray){
-        // Add new batch of businesses to the master array
+        // Add new batch of businesses to the master array in the correct order
         for(int i=0; i<businessList.size(); i++){
             businessArray[offset+i] = businessList.get(i);
         }
 
         // Check to see if array is full.  If yes, proceed to filter list and update UI
+        // DANGER! If one of the calls never receives a response, this method might not ever get called.
         if(isArrayFull(businessArray)){
             mMasterList.clear();
             mMasterList.addAll(Arrays.asList(businessArray));
