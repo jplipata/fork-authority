@@ -268,12 +268,6 @@ public class MainActivity extends AppCompatActivity {
 
         // UI
 
-            // Wrote this Toast to have a reference so that it could be cancelled once operation completes.
-            // However, I called cancel() with no noticeable effect.  Keeping this code in case I
-            // figure it out later.
-            final Toast toast = Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT);
-            toast.show();
-
             // Dismiss any Snackbars
             if(mSnackbar!=null){
                 mSnackbar.dismiss();
@@ -283,8 +277,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Business Logic
 
-
-            // If the location has already been recently updated, no need to update it, go straight to quarying yelp
+            // If the location has already been recently updated, no need to update it, go straight to querying yelp
 
             if(!mGooglePlayApi.isLocationStale()) {
 

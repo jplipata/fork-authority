@@ -2,7 +2,7 @@ package com.lipata.whatsforlunch.api.yelp;
 
 import android.util.Log;
 
-import com.lipata.whatsforlunch.ApiKeys;
+import com.lipata.whatsforlunch.BuildConfig;
 import com.lipata.whatsforlunch.api.yelp.model.Business;
 import com.lipata.whatsforlunch.api.yelp.model.YelpResponse;
 import com.lipata.whatsforlunch.ui.BusinessListAdapter;
@@ -46,8 +46,8 @@ public class YelpApi {
         this.mMainActivity = mainActivity;
 
         // OAuth
-        mConsumer = new OkHttpOAuthConsumer(ApiKeys.CONSUMER_KEY, ApiKeys.CONSUMER_SECRET);
-        mConsumer.setTokenWithSecret(ApiKeys.TOKEN, ApiKeys.TOKEN_SECRET);
+        mConsumer = new OkHttpOAuthConsumer(BuildConfig.CONSUMER_KEY, BuildConfig.CONSUMER_SECRET);
+        mConsumer.setTokenWithSecret(BuildConfig.TOKEN, BuildConfig.TOKEN_SECRET);
 
         // Logger
         mHttpLoggingInterceptor = new HttpLoggingInterceptor();

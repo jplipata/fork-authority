@@ -232,6 +232,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
          * Public method called by onRequestPermissionsResult in MainActivity
          */
 
+        mMainActivity.showToast("Getting your location...");
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, mLocationRequest, this);
     }
