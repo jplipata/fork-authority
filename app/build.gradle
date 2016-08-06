@@ -13,14 +13,10 @@ android {
 
         Properties properties = new Properties()
         properties.load(project.rootProject.file('apikeys').newDataInputStream())
-        def CONSUMER_KEY = properties.getProperty('apikey.CONSUMER_KEY')
-        def CONSUMER_SECRET = properties.getProperty('apikey.CONSUMER_SECRET')
-        def TOKEN = properties.getProperty('apikey.TOKEN')
-        def TOKEN_SECRET = properties.getProperty('apikey.TOKEN_SECRET')
-        buildConfigField "String", "CONSUMER_KEY", CONSUMER_KEY
-        buildConfigField "String", "CONSUMER_SECRET", CONSUMER_SECRET
-        buildConfigField "String", "TOKEN", TOKEN
-        buildConfigField "String", "TOKEN_SECRET", TOKEN_SECRET
+        buildConfigField "String", "CONSUMER_KEY", properties.getProperty('apikey.CONSUMER_KEY')
+        buildConfigField "String", "CONSUMER_SECRET", properties.getProperty('apikey.CONSUMER_SECRET')
+        buildConfigField "String", "TOKEN", properties.getProperty('apikey.TOKEN')
+        buildConfigField "String", "TOKEN_SECRET", properties.getProperty('apikey.TOKEN_SECRET')
     }
     buildTypes {
         release {

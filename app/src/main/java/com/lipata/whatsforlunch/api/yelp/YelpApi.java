@@ -132,7 +132,7 @@ public class YelpApi {
             String offset = Integer.toString(i);
             final int offsetPointer = i; // Need a `final` variable to use in the anonymous class below, otherwise I would just use `i`
 
-            Call<YelpResponse> call2 = mApiService.getMoreBusinesses(term, location, radius, offset);
+            Call<YelpResponse> call2 = mApiService.getBusinesses(term, location, radius, offset);
             call2.enqueue(new Callback<YelpResponse>() {
                 @Override
                 public void onResponse(Call<YelpResponse> call, Response<YelpResponse> response) {

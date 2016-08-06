@@ -17,8 +17,8 @@ public interface Endpoints {
                                      @Query("radius_filter") String radius);
 
     @GET("v2/search")
-    Call<YelpResponse> getMoreBusinesses(@Query("term") String term, @Query("ll") String location,
-                                         @Query("radius_filter") String radius, @Query("offset") String offset);
+    Call<YelpResponse> getBusinesses(@Query("term") String term, @Query("ll") String location,
+                                     @Query("radius_filter") String radius, @Query("offset") String offset);
 
 
 }

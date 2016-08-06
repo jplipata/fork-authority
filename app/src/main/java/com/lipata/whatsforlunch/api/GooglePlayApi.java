@@ -30,6 +30,9 @@ import com.lipata.whatsforlunch.api.yelp.YelpApi;
 import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.ui.MainActivity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -44,9 +47,10 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     private static final String LOG_TAG = GooglePlayApi.class.getSimpleName();
 
-    final int LOCATION_REQUEST_INTERVAL = 500; // in milliseconds
-    final int LOCATION_REQUEST_FASTEST_INTERVAL = 500;// in milliseconds
+    final int LOCATION_REQUEST_INTERVAL = 100; // in milliseconds
+    final int LOCATION_REQUEST_FASTEST_INTERVAL = 100;// in milliseconds
     final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
+    final int LOCATION_REQUEST_RETRIES = 3; // Number of Location objects to receive before evaluating and returning the best one
 
     /*
      * Google Play API - Location Setting Request
@@ -61,6 +65,8 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     protected Location mLastLocation;
     private LocationRequest mLocationRequest;
     long mLocationUpdateTimestamp; // in milliseconds
+
+    private List<Location> mLocationArray;
 
     public GooglePlayApi(MainActivity mainActivity, GeocoderApi geocoder) {
         this.mMainActivity = mainActivity;
@@ -128,36 +134,9 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     public void onLocationChanged(Location location) {
         Log.d(LOG_TAG, "Location Changed");
 
-        updateLastLocationAndUpdateUI();
+        mLocationArray.add(location);
 
-        // Call Geocoder via RxJava
-        // TODO Consider moving this Subscriber to the UI, e.g. MainActivity
-        mGeocoder.getAddressObservable(location).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Address>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(LOG_TAG, e.getMessage(), e);
-                        //mMainActivity.setLocationText("Lookup error");
-
-                        // If there's an error with reverse geo lookup, we'll just show the lat,long coordinates instead
-                    }
-
-                    @Override
-                    public void onNext(Address address) {
-
-                        Log.d(LOG_TAG, address.toString());
-                        mMainActivity.setLocationText(address.getAddressLine(0)+", "+address.getAddressLine(1));
-
-                    }
-                });
-
-        checkNetworkPermissionAndCallYelpApi();
+        isBestLocation();
     }
 
     // Callback for LocationSettingsRequest
@@ -193,7 +172,6 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
                 break;
         }
     }
-
 
     // Public methods
 
@@ -233,21 +211,92 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
          */
 
         mMainActivity.showToast("Getting your location...");
+
+        // We want to get a few locations from the API and pick the best one
+        // We'll store them in an array
+        mLocationArray = new ArrayList<>();
+
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, mLocationRequest, this);
     }
 
     public void stopLocationUpdates() {
 
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        if(mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
 
-        // For our purposes, once we have the location, we no longer need the client, so disconnect
-        mGoogleApiClient.disconnect();
+            // For our purposes, once we have the location, we no longer need the client, so disconnect
+            mGoogleApiClient.disconnect();
 
-        Log.d(LOG_TAG, "Location updates stopped and client disconnected");
+            Log.d(LOG_TAG, "Location updates stopped and client disconnected");
+        } else {
+            Log.d(LOG_TAG, "stopLocationUpdates() Google Api Client already disconnected");
+        }
     }
 
     // Helper methods
+
+    /***
+     * This method is called every time the Google Play Api returns a new Location to the `onLocationChanged` callback
+     * It determines whether the number of retries have been met.  If yes, it stops further location requests
+     * and triggers to proceed with the best location.  If no, it does nothing and waits for the next location
+     */
+    private void isBestLocation() {
+        Log.d(LOG_TAG, String.format("Location request #%d", mLocationArray.size()));
+        if(mLocationArray.size()>=LOCATION_REQUEST_RETRIES){
+            stopLocationUpdates();
+            onBestLocationDetermined(identifyBestLocation());
+        }
+    }
+
+    private Location identifyBestLocation() {
+
+        Location bestLocation = mLocationArray.get(0); // Get the first one, we'll compare next
+        Log.d(LOG_TAG, String.format("Location #0: Accuracy %f", mLocationArray.get(0).getAccuracy()));
+
+        for(int i=1 /* Start with the second one */ ; i<mLocationArray.size(); i++){
+            float accuracy = mLocationArray.get(i).getAccuracy();
+            Log.d(LOG_TAG, String.format("Location #%d: Accuracy %f", i, accuracy));
+            if(accuracy<bestLocation.getAccuracy()){
+                bestLocation = mLocationArray.get(i);
+            }
+        }
+        Log.d(LOG_TAG, String.format("Best location: Accuracy %f", bestLocation.getAccuracy()));
+        return bestLocation;
+    }
+
+    private void onBestLocationDetermined(Location location) {
+        updateLastLocationAndUpdateUI(location);
+
+        // Call Geocoder via RxJava
+        // TODO Consider moving this Subscriber to the UI, e.g. MainActivity
+        mGeocoder.getAddressObservable(location).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Address>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(LOG_TAG, e.getMessage(), e);
+                        //mMainActivity.setLocationText("Lookup error");
+
+                        // If there's an error with reverse geo lookup, we'll just show the lat,long coordinates instead
+                    }
+
+                    @Override
+                    public void onNext(Address address) {
+
+                        Log.d(LOG_TAG, address.toString());
+                        mMainActivity.setLocationText(address.getAddressLine(0)+", "+address.getAddressLine(1));
+
+                    }
+                });
+
+        checkNetworkPermissionAndCallYelpApi();
+    }
 
     private void checkLocationPermissionAndRequestLocation() {
 
@@ -274,11 +323,11 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    private void updateLastLocationAndUpdateUI(){
+    private void updateLastLocationAndUpdateUI(Location location){
         Log.d(LOG_TAG, "updateLastLocationAndUpdateUI()...");
 
         // Get last location & update timestamp
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        mLastLocation = location;
         mLocationUpdateTimestamp = SystemClock.elapsedRealtime();
         Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
 
@@ -290,8 +339,6 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
             Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
 
             mMainActivity.updateLocationViews(latitude, longitude, accuracy);
-
-            stopLocationUpdates();
         } else {
             Log.d(LOG_TAG, "mLastLocation = null");
         }
