@@ -26,6 +26,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.lipata.whatsforlunch.Utility;
 import com.lipata.whatsforlunch.api.yelp.YelpApi;
 import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.ui.MainActivity;
@@ -67,6 +68,8 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     long mLocationUpdateTimestamp; // in milliseconds
 
     private List<Location> mLocationArray;
+
+    private long mRequestLocationStartTime;
 
     public GooglePlayApi(MainActivity mainActivity, GeocoderApi geocoder) {
         this.mMainActivity = mainActivity;
@@ -212,6 +215,8 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
         mMainActivity.showToast("Getting your location...");
 
+        mRequestLocationStartTime = System.nanoTime();
+
         // We want to get a few locations from the API and pick the best one
         // We'll store them in an array
         mLocationArray = new ArrayList<>();
@@ -296,6 +301,8 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
                 });
 
         checkNetworkPermissionAndCallYelpApi();
+
+        Utility.reportExecutionAnalytics(this, "Google Play Api get location", mRequestLocationStartTime);
     }
 
     private void checkLocationPermissionAndRequestLocation() {

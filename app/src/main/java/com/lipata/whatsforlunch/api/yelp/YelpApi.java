@@ -3,6 +3,7 @@ package com.lipata.whatsforlunch.api.yelp;
 import android.util.Log;
 
 import com.lipata.whatsforlunch.BuildConfig;
+import com.lipata.whatsforlunch.Utility;
 import com.lipata.whatsforlunch.api.yelp.model.Business;
 import com.lipata.whatsforlunch.api.yelp.model.YelpResponse;
 import com.lipata.whatsforlunch.ui.BusinessListAdapter;
@@ -42,6 +43,8 @@ public class YelpApi {
     List<Business> mMasterList = new ArrayList<>(); // This is our main data
     int mTotalNumberOfResults;
 
+    long mCallStartTime;
+
     public YelpApi(MainActivity mainActivity) {
         this.mMainActivity = mainActivity;
 
@@ -68,7 +71,7 @@ public class YelpApi {
     }
 
     public void callYelpApi(final String term, final String location, final String radius){
-
+        mCallStartTime = System.nanoTime();
         Call<YelpResponse> call = mApiService.getBusinesses(term, location, radius);
         call.enqueue(new Callback<YelpResponse>() {
             @Override
@@ -166,12 +169,17 @@ public class YelpApi {
         }
     }
 
+    // I was concerned about the execution time of this iterative O(n) function, but in practice
+    // it is not significantly slow
     private boolean isArrayFull(Business[] businessArray){
+        long startTime = System.nanoTime();
         for(int i=0; i<businessArray.length; i++){
             if(businessArray[i]==null) {
+                Utility.reportExecutionAnalytics(this, "isArrayFull()",startTime);
                 return false;
             }
         }
+        Utility.reportExecutionAnalytics(this, "isArrayFull()", startTime);
         return true;
     }
 
@@ -182,6 +190,7 @@ public class YelpApi {
         businessListAdapter.notifyDataSetChanged();
         mMainActivity.stopRefreshAnimation();
         mMainActivity.getRecyclerViewLayoutManager().scrollToPosition(0);
+        Utility.reportExecutionAnalytics(this, "callYelpApi sequence", mCallStartTime);
     }
 
     private void handleFailure(Throwable t) {
