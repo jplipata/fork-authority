@@ -38,12 +38,13 @@ public class YelpApi {
     Retrofit mRetrofit;
     final Endpoints mApiService;
 
+    // TODO Need to abstract this
     MainActivity mMainActivity;
 
     List<Business> mMasterList = new ArrayList<>(); // This is our main data
     int mTotalNumberOfResults;
 
-    long mCallStartTime;
+    long mCallYelpApiStartTime;
 
     public YelpApi(MainActivity mainActivity) {
         this.mMainActivity = mainActivity;
@@ -71,7 +72,7 @@ public class YelpApi {
     }
 
     public void callYelpApi(final String term, final String location, final String radius){
-        mCallStartTime = System.nanoTime();
+        mCallYelpApiStartTime = System.nanoTime();
         Call<YelpResponse> call = mApiService.getBusinesses(term, location, radius);
         call.enqueue(new Callback<YelpResponse>() {
             @Override
@@ -190,7 +191,7 @@ public class YelpApi {
         businessListAdapter.notifyDataSetChanged();
         mMainActivity.stopRefreshAnimation();
         mMainActivity.getRecyclerViewLayoutManager().scrollToPosition(0);
-        Utility.reportExecutionAnalytics(this, "callYelpApi sequence", mCallStartTime);
+        Utility.reportExecutionAnalytics(this, "callYelpApi sequence", mCallYelpApiStartTime);
     }
 
     private void handleFailure(Throwable t) {

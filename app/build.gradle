@@ -12,7 +12,7 @@ android {
         versionName "0.1"
 
         Properties properties = new Properties()
-        properties.load(project.rootProject.file('apikeys').newDataInputStream())
+        properties.load(project.rootProject.file('yelpapikeys').newDataInputStream())
         buildConfigField "String", "CONSUMER_KEY", properties.getProperty('apikey.CONSUMER_KEY')
         buildConfigField "String", "CONSUMER_SECRET", properties.getProperty('apikey.CONSUMER_SECRET')
         buildConfigField "String", "TOKEN", properties.getProperty('apikey.TOKEN')

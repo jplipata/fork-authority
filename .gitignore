@@ -6,5 +6,4 @@
 .DS_Store
 /build
 /captures
-app/src/main/java/com/lipata/whatsforlunch/ApiKeys.java
-/apikeys
+/yelpapikeys

@@ -48,18 +48,18 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     private static final String LOG_TAG = GooglePlayApi.class.getSimpleName();
 
-    final int LOCATION_REQUEST_INTERVAL = 100; // in milliseconds
-    final int LOCATION_REQUEST_FASTEST_INTERVAL = 100;// in milliseconds
-    final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
-    final int LOCATION_REQUEST_RETRIES = 3; // Number of Location objects to receive before evaluating and returning the best one
+    final int LOCATION_REQUEST_INTERVAL = 20; // in milliseconds
+    final int LOCATION_REQUEST_FASTEST_INTERVAL = 20;// in milliseconds
 
-    /*
-     * Google Play API - Location Setting Request
-     * Constant used in the location settings dialog.
-     */
+    final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
+    final int LOCATION_REQUEST_SAMPLE_SIZE = 3; // Number of Location objects to receive before evaluating and returning the best one
+
+    // Google Play API - Location Setting Request.  Constant used in the location settings dialog.
     public static final int REQUEST_CHECK_SETTINGS = 0x1;
 
+    // TODO Need to abstract this
     private MainActivity mMainActivity;
+
     private GeocoderApi mGeocoder;
 
     protected GoogleApiClient mGoogleApiClient;
@@ -70,6 +70,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     private List<Location> mLocationArray;
 
     private long mRequestLocationStartTime;
+    private long mLastLocationChangeTime;
 
     public GooglePlayApi(MainActivity mainActivity, GeocoderApi geocoder) {
         this.mMainActivity = mainActivity;
@@ -83,7 +84,9 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(LOCATION_REQUEST_INTERVAL)
-                .setFastestInterval(LOCATION_REQUEST_FASTEST_INTERVAL);
+                .setFastestInterval(LOCATION_REQUEST_FASTEST_INTERVAL)
+                //.setMaxWaitTime(LOCATION_REQUEST_MAX_WAIT_TIME)
+            ;
     }
 
     // Callbacks for Google Play API
@@ -135,7 +138,10 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     // Callback method for LocationRequest
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(LOG_TAG, "Location Changed");
+
+        Log.d(LOG_TAG,"onLocationChanged() Execution analytics: Time since last update "+ ((System.nanoTime()- mLastLocationChangeTime)/1000000)+" ms");
+
+        mLastLocationChangeTime = System.nanoTime();
 
         mLocationArray.add(location);
 
@@ -215,12 +221,15 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
         mMainActivity.showToast("Getting your location...");
 
+        // Timestamp to measure entire location request process
         mRequestLocationStartTime = System.nanoTime();
 
         // We want to get a few locations from the API and pick the best one
         // We'll store them in an array
         mLocationArray = new ArrayList<>();
 
+        // Timestamp for individual location updates { onLocationChanged() }
+        mLastLocationChangeTime = System.nanoTime();
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, mLocationRequest, this);
     }
@@ -248,7 +257,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
      */
     private void isBestLocation() {
         Log.d(LOG_TAG, String.format("Location request #%d", mLocationArray.size()));
-        if(mLocationArray.size()>=LOCATION_REQUEST_RETRIES){
+        if(mLocationArray.size()>= LOCATION_REQUEST_SAMPLE_SIZE){
             stopLocationUpdates();
             onBestLocationDetermined(identifyBestLocation());
         }
@@ -381,10 +390,6 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     public Location getLastLocation(){
         return mLastLocation;
-    }
-
-    public LocationRequest getLocationRequest(){
-        return mLocationRequest;
     }
 
     public long getLocationUpdateTimestamp(){
