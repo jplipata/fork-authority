@@ -28,10 +28,10 @@ public class Utility {
         return stringBuilder.toString();
     }
 
-    public static void reportExecutionAnalytics(Object object, String methodName, long startTime) {
+    public static void reportExecutionTime(Object object, String methodName, long startTime) {
         String LOG_TAG = object.getClass().getSimpleName();
         long executionTime = System.nanoTime()-startTime;
-        Log.d(LOG_TAG, "Execution analytics: "+methodName+" execution time = " + executionTime+
+        Log.v(LOG_TAG, "Execution time: "+methodName+" = " + executionTime+
                 " nanoseconds or " + (executionTime/1000000000) + " seconds");
     }
 }

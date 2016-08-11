@@ -5,7 +5,7 @@ package com.lipata.whatsforlunch.data;
  */
 public class AppSettings {
     // Yelp query
-    public static String SEARCH_TERM = "lunch";
+    public static String SEARCH_TERM = "restaurants";
     public static int SEARCH_RADIUS = 1000; // Search radius in meters. If the value is too large, a AREA_TOO_LARGE error may be returned. The max value is 40000 meters (25 miles).
 
     // Timings

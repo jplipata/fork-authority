@@ -80,31 +80,36 @@ public class YelpApi {
 
                 final YelpResponse yelpResponse = response.body();
 
-                // Handle Yelp API "error"
-                if(yelpResponse.getError()!=null){
-                    Log.e(LOG_TAG, "YELP API ERROR RETURNED: " + yelpResponse.getError().getText()
-                            + " ID: " + yelpResponse.getError().getId());
+                if (yelpResponse != null) {
+                    // Handle Yelp API "error"
+                    if (yelpResponse.getError() != null) {
+                        Log.e(LOG_TAG, "YELP API ERROR RETURNED: " + yelpResponse.getError().getText()
+                                + " ID: " + yelpResponse.getError().getId());
+                        mMainActivity.stopRefreshAnimation();
+                        mMainActivity.showSnackBarIndefinite("Yelp API Error: " + yelpResponse.getError().getText());
+                    }
+
+                    // Handle case where there's no error but no results are returned
+                    else if (yelpResponse.getBusinesses().size() == 0) {
+                        Log.d(LOG_TAG, "Yelp API returned no results");
+                        mMainActivity.stopRefreshAnimation();
+                        mMainActivity.showSnackBarIndefinite("No businesses found.");
+                    }
+
+                    // Handle case where there are 20 or less results
+                    else if (yelpResponse.getTotal() <= 20) {
+                        mMasterList.addAll(yelpResponse.getBusinesses());
+                        mTotalNumberOfResults = yelpResponse.getTotal();
+                        filterListAndUpdateUi();
+                    }
+
+                    // Handle more than 20 results
+                    else {
+                        getMoreThan20Results(yelpResponse, term, location, radius);
+                    }
+                } else {
+                    mMainActivity.showSnackBarIndefinite("Yelp API Error: Null response.");
                     mMainActivity.stopRefreshAnimation();
-                    mMainActivity.showSnackBarIndefinite("Yelp API Error: " + yelpResponse.getError().getText());
-                }
-
-                // Handle case where there's no error but no results are returned
-                else if (yelpResponse.getBusinesses().size()==0) {
-                    Log.d(LOG_TAG, "Yelp API returned no results");
-                    mMainActivity.stopRefreshAnimation();
-                    mMainActivity.showSnackBarIndefinite("No businesses found.");
-                }
-
-                // Handle case where there are 20 or less results
-                else if (yelpResponse.getTotal()<=20){
-                    mMasterList.addAll(yelpResponse.getBusinesses());
-                    mTotalNumberOfResults = yelpResponse.getTotal();
-                    filterListAndUpdateUi();
-                }
-
-                // Handle more than 20 results
-                else {
-                    getMoreThan20Results(yelpResponse, term, location, radius);
                 }
             }
 
@@ -167,6 +172,8 @@ public class YelpApi {
             mMasterList.clear();
             mMasterList.addAll(Arrays.asList(businessArray));
             filterListAndUpdateUi();
+        } else {
+            Log.d(LOG_TAG, "isArrayFull = false");
         }
     }
 
@@ -174,13 +181,13 @@ public class YelpApi {
     // it is not significantly slow
     private boolean isArrayFull(Business[] businessArray){
         long startTime = System.nanoTime();
-        for(int i=0; i<businessArray.length; i++){
+        for(int i=0; i<(businessArray.length); i++){
             if(businessArray[i]==null) {
-                Utility.reportExecutionAnalytics(this, "isArrayFull()",startTime);
+                Utility.reportExecutionTime(this, "isArrayFull()",startTime);
                 return false;
             }
         }
-        Utility.reportExecutionAnalytics(this, "isArrayFull()", startTime);
+        Utility.reportExecutionTime(this, "isArrayFull()", startTime);
         return true;
     }
 
@@ -191,7 +198,7 @@ public class YelpApi {
         businessListAdapter.notifyDataSetChanged();
         mMainActivity.stopRefreshAnimation();
         mMainActivity.getRecyclerViewLayoutManager().scrollToPosition(0);
-        Utility.reportExecutionAnalytics(this, "callYelpApi sequence", mCallYelpApiStartTime);
+        Utility.reportExecutionTime(this, "callYelpApi sequence", mCallYelpApiStartTime);
     }
 
     private void handleFailure(Throwable t) {

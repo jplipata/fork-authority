@@ -50,9 +50,15 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     final int LOCATION_REQUEST_INTERVAL = 20; // in milliseconds
     final int LOCATION_REQUEST_FASTEST_INTERVAL = 20;// in milliseconds
+    final int ACCURACY_TOLERANCE = 200; // meters
 
     final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
-    final int LOCATION_REQUEST_SAMPLE_SIZE = 3; // Number of Location objects to receive before evaluating and returning the best one
+
+    /**
+     * Number of Location objects to receive before evaluating and returning the best one
+     * Originally set this at 3 but it would take up to 15 seconds to execute on S3 Kitkat
+     */
+    final int LOCATION_REQUEST_SAMPLE_SIZE = 2;
 
     // Google Play API - Location Setting Request.  Constant used in the location settings dialog.
     public static final int REQUEST_CHECK_SETTINGS = 0x1;
@@ -90,21 +96,20 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     }
 
     // Callbacks for Google Play API
-    @Override
-    public void onConnected(Bundle connectionHint) {
 
-        /*
-         * This is the first step/entry point in the sequence of execution steps
-         */
-
+    // This is the first step/entry point in the sequence of execution steps
+    @Override public void onConnected(Bundle connectionHint) {
         Log.d(LOG_TAG, "onConnected()");
-
-        checkDeviceLocationEnabled();
-
+        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if(location!=null && location.getAccuracy()<ACCURACY_TOLERANCE) {
+            Log.d(LOG_TAG, "LastLocation not null and within ACCURACY_TOLERANCE");
+            onBestLocationDetermined(location);
+        } else {
+            checkDeviceLocationEnabled();
+        }
     }
 
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
+    @Override public void onConnectionFailed(ConnectionResult result) {
         // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
         // onConnectionFailed.
         // https://developers.google.com/android/reference/com/google/android/gms/common/ConnectionResult
@@ -126,8 +131,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    @Override
-    public void onConnectionSuspended(int cause) {
+    @Override public void onConnectionSuspended(int cause) {
         // The connection to Google Play services was lost for some reason. We call connect() to
         // attempt to re-establish the connection.
         Log.i(LOG_TAG, "Connection suspended");
@@ -136,8 +140,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     }
 
     // Callback method for LocationRequest
-    @Override
-    public void onLocationChanged(Location location) {
+    @Override public void onLocationChanged(Location location) {
 
         Log.d(LOG_TAG,"onLocationChanged() Execution analytics: Time since last update "+ ((System.nanoTime()- mLastLocationChangeTime)/1000000)+" ms");
 
@@ -311,7 +314,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
         checkNetworkPermissionAndCallYelpApi();
 
-        Utility.reportExecutionAnalytics(this, "Google Play Api get location", mRequestLocationStartTime);
+        Utility.reportExecutionTime(this, "Google Play Api get location", mRequestLocationStartTime);
     }
 
     private void checkLocationPermissionAndRequestLocation() {
