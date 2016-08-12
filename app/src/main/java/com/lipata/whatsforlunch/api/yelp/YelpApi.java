@@ -11,7 +11,10 @@ import com.lipata.whatsforlunch.ui.MainActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -43,6 +46,14 @@ public class YelpApi {
 
     List<Business> mMasterList = new ArrayList<>(); // This is our main data
     int mTotalNumberOfResults;
+
+    /**
+     * CallLog
+     * Uses the `offset` as the key and the boolean to track whether the call has been received.
+     * When we add an entry to the log, we set it to false, meaning the response has not been received yet.
+     * The call2 callback will set the value to `true` when the response callback has been called.
+     */
+    HashMap<Integer, Boolean> mCallLog;
 
     long mCallYelpApiStartTime;
 
@@ -122,11 +133,12 @@ public class YelpApi {
 
     private void getMoreThan20Results(final YelpResponse yelpResponse, String term, String location, String radius) {
 
-        // Using an array so that we can use the indexes to keep the results in order since
-        // they will be received asynchronously
-
-        mTotalNumberOfResults = yelpResponse.getTotal();
+        mCallLog = new HashMap<>();
         mMainActivity.showToast(String.format("Retrieving %d businesses...", mTotalNumberOfResults));
+
+        // Using an array `businessArray` so that we can use the indexes to keep the results in order since
+        // they will be received asynchronously.  Created according to the size returned by the initial Yelp response
+        mTotalNumberOfResults = yelpResponse.getTotal();
         final Business[] businessArray = new Business[mTotalNumberOfResults];
 
         // Load the first 20
@@ -137,15 +149,19 @@ public class YelpApi {
         // Load the rest
         final int start = yelpResponse.getBusinesses().size();
 
-        for(int i = start; i< mTotalNumberOfResults; /* i is updated below */ ){
-            String offset = Integer.toString(i);
-            final int offsetPointer = i; // Need a `final` variable to use in the anonymous class below, otherwise I would just use `i`
+        for(int offsetInt = start; offsetInt< mTotalNumberOfResults; /* i is updated below */ ){
+            String offsetStr = Integer.toString(offsetInt);
+            final int offsetPointer = offsetInt; // Need a `final` variable to use in the anonymous class below, otherwise I would just use `i`
 
-            Call<YelpResponse> call2 = mApiService.getBusinesses(term, location, radius, offset);
+            // Add the call, identified by the offset, to the CallLog.  `false` means the response hasn't been received
+            // This will be updated to `true` by the callback below when a reponse is received
+            mCallLog.put(offsetInt, false);
+            Call<YelpResponse> call2 = mApiService.getBusinesses(term, location, radius, offsetStr);
             call2.enqueue(new Callback<YelpResponse>() {
                 @Override
                 public void onResponse(Call<YelpResponse> call, Response<YelpResponse> response) {
                     YelpResponse yelpResponse2 = response.body();
+                    mCallLog.put(offsetPointer, true);
                     addBusinesses(offsetPointer, yelpResponse2.getBusinesses(), businessArray);
                 }
 
@@ -156,9 +172,12 @@ public class YelpApi {
             });
 
             // Update `i`
-            i=i+RESULTS_PER_PAGE;
+            // We cannot increment `i` by the actual number of responses received because the response
+            // is received asynchronously, i.e. we don't have the data at this time
+            offsetInt=offsetInt+RESULTS_PER_PAGE;
         }
     }
+
 
     private void addBusinesses(int offset, List<Business> businessList, Business[] businessArray){
         // Add new batch of businesses to the master array in the correct order
@@ -166,32 +185,42 @@ public class YelpApi {
             businessArray[offset+i] = businessList.get(i);
         }
 
-        // Check to see if array is full.  If yes, proceed to filter list and update UI
-        // DANGER! If one of the calls never receives a response, this method might not ever get called.
-        if(isArrayFull(businessArray)){
+        // Check to see if all calls have been received.  If yes, proceed to filter list and update UI
+        // TODO DANGER! If one of the calls never receives a response, this method might not ever get called and the program will not proceed
+        if(areAllCallsReceived()){
             mMasterList.clear();
             mMasterList.addAll(Arrays.asList(businessArray));
             filterListAndUpdateUi();
         } else {
-            Log.d(LOG_TAG, "isArrayFull = false");
+            Log.d(LOG_TAG, "areAllCallsReceived = false");
         }
     }
 
-    // I was concerned about the execution time of this iterative O(n) function, but in practice
-    // it is not significantly slow
-    private boolean isArrayFull(Business[] businessArray){
+    /**
+     * This method iterates through mCallLog, looking for all `true` values.  If all values are true,
+     * then all `call2` responses have been received
+     *
+     * @return  True if all call2 responses have been received.  False if not
+     */
+    private boolean areAllCallsReceived(){
         long startTime = System.nanoTime();
-        for(int i=0; i<(businessArray.length); i++){
-            if(businessArray[i]==null) {
-                Utility.reportExecutionTime(this, "isArrayFull()",startTime);
+
+        for(Map.Entry<Integer, Boolean> entry : mCallLog.entrySet()){
+            if(entry.getValue()==false){
+                Utility.reportExecutionTime(this, "areAllCallsReceived() FALSE",startTime);
                 return false;
             }
         }
-        Utility.reportExecutionTime(this, "isArrayFull()", startTime);
+        Utility.reportExecutionTime(this, "areAllCallsReceived() TRUE", startTime);
         return true;
     }
 
     private void filterListAndUpdateUi() {
+        // There might be null values if the Yelp Api returns fewer actual results than specified in the response
+        // `total` field.  Therefore we should remove any possible null values before passing to the UI
+        mMasterList.removeAll(Collections.singleton(null));
+
+        // Pass list to BusinessListManager to be processed and update UI
         BusinessListAdapter businessListAdapter = mMainActivity.getSuggestionListAdapter();
         List<Business> filteredBusinesses = mMainActivity.getBusinessListManager().filter(mMasterList);
         businessListAdapter.setBusinessList(filteredBusinesses);
