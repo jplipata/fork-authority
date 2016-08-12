@@ -10,7 +10,6 @@ import java.util.Calendar;
 public class Utility {
 
     public static String formatDate(long date){
-
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(date);
         int month = calendar.get(Calendar.MONTH)+1;
@@ -28,10 +27,18 @@ public class Utility {
         return stringBuilder.toString();
     }
 
+    /**
+     * This is a convenience method you can call at the end of a method to compute execution time.
+     * It displays in both nanoseconds and seconds.
+     *
+     * @param object Use `this` from calling class to generate the typical LOG_TAG
+     * @param methodName Your method name for identification
+     * @param startTime The start time to compare from
+     */
     public static void reportExecutionTime(Object object, String methodName, long startTime) {
         String LOG_TAG = object.getClass().getSimpleName();
         long executionTime = System.nanoTime()-startTime;
-        Log.v(LOG_TAG, "Execution time: "+methodName+" = " + executionTime+
+        Log.d(LOG_TAG, "Execution time: "+methodName+" = " + executionTime+
                 " nanoseconds or " + (executionTime/1000000000) + " seconds");
     }
 }

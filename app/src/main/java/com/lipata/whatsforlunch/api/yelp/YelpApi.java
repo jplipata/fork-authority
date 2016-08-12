@@ -134,12 +134,13 @@ public class YelpApi {
     private void getMoreThan20Results(final YelpResponse yelpResponse, String term, String location, String radius) {
 
         mCallLog = new HashMap<>();
-        mMainActivity.showToast(String.format("Retrieving %d businesses...", mTotalNumberOfResults));
 
         // Using an array `businessArray` so that we can use the indexes to keep the results in order since
         // they will be received asynchronously.  Created according to the size returned by the initial Yelp response
         mTotalNumberOfResults = yelpResponse.getTotal();
         final Business[] businessArray = new Business[mTotalNumberOfResults];
+
+        mMainActivity.showToast(String.format("Retrieving %d businesses...", mTotalNumberOfResults));
 
         // Load the first 20
         for (int i = 0; i<yelpResponse.getBusinesses().size() ; i++){
