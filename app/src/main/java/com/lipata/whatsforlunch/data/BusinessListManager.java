@@ -118,8 +118,8 @@ public class BusinessListManager {
         // Combine the lists for display (for now).  TODO Implement a better way of displaying the categories
         List<Business> newList = new ArrayList<>();
         newList.addAll(preferredList);
-        newList.addAll(businessList_temp);
         newList.addAll(tooSoonList);
+        newList.addAll(businessList_temp);
         newList.addAll(dontLikeList);
 
         // That's it! Return the filtered list.

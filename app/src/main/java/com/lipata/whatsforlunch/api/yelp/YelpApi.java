@@ -31,7 +31,7 @@ import se.akerfeldt.okhttp.signpost.SigningInterceptor;
  */
 public class YelpApi {
 
-    public static final String LOG_TAG = "YelpApi-Retrofit";
+    public static final String LOG_TAG = "YelpApi";
     public static final String BASE_URL = "https://api.yelp.com/";
     public static final int RESULTS_PER_PAGE = 20; // However many results the Yelp API returns per page
 
@@ -128,7 +128,10 @@ public class YelpApi {
 
             @Override
             public void onFailure(Call<YelpResponse> call, Throwable t) {
-                handleFailure(t);
+                Log.e(LOG_TAG, "Retrofit FAILURE", t);
+                t.printStackTrace();
+                mMainActivity.stopRefreshAnimation();
+                mMainActivity.showSnackBarIndefinite("Yelp API error.  Check your internet connection or perhaps there's a problem with Yelp at the moment.");
             }
         });
     }
@@ -141,6 +144,7 @@ public class YelpApi {
 
         // Using an array `businessArray` so that we can use the indexes to keep the results in order since
         // they will be received asynchronously.  Created according to the size returned by the initial Yelp response
+        // TODO There will be a problem in any cases where Yelp returns results in excess of the `total` defined in the first call. Replace with List?
         mTotalNumberOfResults = yelpResponse.getTotal();
         final Business[] businessArray = new Business[mTotalNumberOfResults];
 
@@ -166,12 +170,11 @@ public class YelpApi {
                 @Override
                 public void onResponse(Call<YelpResponse> call, Response<YelpResponse> response) {
                     mCallLog.put(offsetPointer, true);
+                    YelpResponse yelpResponse2 = response.body();
 
                     // For every possible outcome of this `if else` tree, we need to call `tryUpdateMasterListandUpdateUI()`
                     // Otherwise, the program will never proceed.
-                    if (response!=null) {
-                        YelpResponse yelpResponse2 = response.body();
-
+                    if (yelpResponse2!=null) {
                         // Handle Yelp API "error"
                         if (yelpResponse2.getError() != null) {
                             Log.e(LOG_TAG, "YELP API ERROR RETURNED: " + yelpResponse.getError().getText()
@@ -189,7 +192,13 @@ public class YelpApi {
                             List<Business> businesses = yelpResponse2.getBusinesses();
                             addBusinesses(offsetPointer, businesses, businessArray);
                         }
-                    } else {
+                    } else if (response.errorBody()!=null){
+                        try{
+                            String error = response.errorBody().string();
+                            Log.d(LOG_TAG, error);
+                        } catch(Exception e){
+                            e.printStackTrace();
+                        }
                         tryUpdateMasterListandUpdateUI(businessArray);
                     }
 
@@ -209,7 +218,8 @@ public class YelpApi {
 
                 @Override
                 public void onFailure(Call<YelpResponse> call, Throwable t) {
-                    handleFailure(t);
+                    t.printStackTrace();
+                    tryUpdateMasterListandUpdateUI(businessArray);
                 }
             });
 
@@ -219,7 +229,6 @@ public class YelpApi {
             offsetInt=offsetInt+RESULTS_PER_PAGE;
         }
     }
-
 
     private void addBusinesses(int offset, List<Business> businessList, Business[] businessArray){
         // Add new batch of businesses to the master array in the correct order
@@ -232,11 +241,10 @@ public class YelpApi {
     }
 
     private void tryUpdateMasterListandUpdateUI(Business[] businessArray) {
-        // TODO DANGER! If one of the calls never receives a response, this method might not ever get called and the program will not proceed
+        // TODO DANGER! If one of the callbacks never gets called, this method might not ever get called and the program will not proceed
         if(areAllCallsReceived()){
             mMasterList.clear();
             mMasterList.addAll(Arrays.asList(businessArray));
-            Log.d(LOG_TAG, "Total results received " + mMasterList.size());
             filterListAndUpdateUi();
         } else {
             Log.d(LOG_TAG, "areAllCallsReceived = false");
@@ -265,6 +273,7 @@ public class YelpApi {
         // There might be null values if the Yelp Api returns fewer actual results than specified in the response
         // `total` field.  Therefore we should remove any possible null values before passing to the UI
         mMasterList.removeAll(Collections.singleton(null));
+        Log.d(LOG_TAG, "Total results received " + mMasterList.size());
 
         // Pass list to BusinessListManager to be processed and update UI
         BusinessListAdapter businessListAdapter = mMainActivity.getSuggestionListAdapter();
@@ -274,13 +283,6 @@ public class YelpApi {
         mMainActivity.stopRefreshAnimation();
         mMainActivity.getRecyclerViewLayoutManager().scrollToPosition(0);
         Utility.reportExecutionTime(this, "callYelpApi sequence", mCallYelpApiStartTime);
-    }
-
-    private void handleFailure(Throwable t) {
-        Log.e(LOG_TAG, "Retrofit FAILURE", t);
-        t.printStackTrace();
-        mMainActivity.stopRefreshAnimation();
-        mMainActivity.showSnackBarIndefinite("Yelp API error.  Check your internet connection or perhaps there's a problem with Yelp at the moment.");
     }
 
 }
