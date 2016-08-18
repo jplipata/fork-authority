@@ -1,4 +1,19 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 
 android {
     compileSdkVersion 23
@@ -12,7 +27,7 @@ android {
         versionName "0.1"
 
         Properties properties = new Properties()
-        properties.load(project.rootProject.file('yelpapikeys').newDataInputStream())
+        properties.load(project.rootProject.file('apikeys').newDataInputStream())
         buildConfigField "String", "CONSUMER_KEY", properties.getProperty('apikey.CONSUMER_KEY')
         buildConfigField "String", "CONSUMER_SECRET", properties.getProperty('apikey.CONSUMER_SECRET')
         buildConfigField "String", "TOKEN", properties.getProperty('apikey.TOKEN')
@@ -54,4 +69,7 @@ dependencies {
 
     compile 'io.reactivex:rxandroid:1.2.0'
     compile 'io.reactivex:rxjava:1.1.5'
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
+        transitive = true;
+    }
 }

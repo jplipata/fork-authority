@@ -44,7 +44,7 @@ public class YelpApi {
     // TODO Need to abstract this
     MainActivity mMainActivity;
 
-    List<Business> mMasterList = new ArrayList<>(); // This is our main data
+    List<Business> mMasterList; // This is our main data
     int mTotalNumberOfResults;
 
     /**
@@ -84,6 +84,8 @@ public class YelpApi {
 
     public void callYelpApi(final String term, final String location, final String radius){
         mCallYelpApiStartTime = System.nanoTime();
+
+        // Call Yelp
         Call<YelpResponse> call = mApiService.getBusinesses(term, location, radius);
         call.enqueue(new Callback<YelpResponse>() {
             @Override
@@ -133,6 +135,8 @@ public class YelpApi {
 
     private void getMoreThan20Results(final YelpResponse yelpResponse, String term, String location, String radius) {
 
+        // Reset mMasterList & mCallLog
+        mMasterList = new ArrayList<>();
         mCallLog = new HashMap<>();
 
         // Using an array `businessArray` so that we can use the indexes to keep the results in order since

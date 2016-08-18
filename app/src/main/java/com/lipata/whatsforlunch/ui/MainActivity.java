@@ -20,11 +20,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.whatsforlunch.R;
-import com.lipata.whatsforlunch.api.GooglePlayApi;
 import com.lipata.whatsforlunch.api.GeocoderApi;
+import com.lipata.whatsforlunch.api.GooglePlayApi;
 import com.lipata.whatsforlunch.api.yelp.model.Business;
 import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.user.UserRecords;
@@ -32,6 +33,8 @@ import com.lipata.whatsforlunch.data.user.UserRecords;
 import java.lang.reflect.Type;
 import java.text.DecimalFormat;
 import java.util.List;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  *  This Android app gets device location, queries the Yelp API for restaurant recommendations,
@@ -48,8 +51,6 @@ public class MainActivity extends AppCompatActivity {
 
     // Views
     protected CoordinatorLayout mCoordinatorLayout;
-    //protected TextView mTextView_Latitude;
-    //protected TextView mTextView_Longitude;
     protected TextView mTextView_ApproxLocation;
     protected TextView mTextView_Accuracy;
     protected RecyclerView mRecyclerView_suggestionList;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -77,8 +79,6 @@ public class MainActivity extends AppCompatActivity {
         mBusinessListManager = new BusinessListManager(this, mUserRecords);
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
-        //mTextView_Latitude = (TextView) findViewById((R.id.latitude_text));
-        //mTextView_Longitude = (TextView) findViewById((R.id.longitude_text));
         mTextView_ApproxLocation = (TextView) findViewById(R.id.location_text);
         mTextView_Accuracy = (TextView) findViewById(R.id.accuracy_text);
 
@@ -272,6 +272,10 @@ public class MainActivity extends AppCompatActivity {
             if(mSnackbar!=null){
                 mSnackbar.dismiss();
             }
+
+            // Clear recyclerview
+            mSuggestionListAdapter.setBusinessList(null);
+            mSuggestionListAdapter.notifyDataSetChanged();
 
             startRefreshAnimation();
 
