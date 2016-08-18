@@ -66,7 +66,7 @@ public class YelpApi {
 
         // Logger
         mHttpLoggingInterceptor = new HttpLoggingInterceptor();
-        mHttpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+        mHttpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         mOkHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new SigningInterceptor(mConsumer))
@@ -159,15 +159,52 @@ public class YelpApi {
             final int offsetPointer = offsetInt; // Need a `final` variable to use in the anonymous class below, otherwise I would just use `i`
 
             // Add the call, identified by the offset, to the CallLog.  `false` means the response hasn't been received
-            // This will be updated to `true` by the callback below when a reponse is received
+            // This will be updated to `true` by the callback below when a response is received
             mCallLog.put(offsetInt, false);
             Call<YelpResponse> call2 = mApiService.getBusinesses(term, location, radius, offsetStr);
             call2.enqueue(new Callback<YelpResponse>() {
                 @Override
                 public void onResponse(Call<YelpResponse> call, Response<YelpResponse> response) {
-                    YelpResponse yelpResponse2 = response.body();
                     mCallLog.put(offsetPointer, true);
-                    addBusinesses(offsetPointer, yelpResponse2.getBusinesses(), businessArray);
+
+                    // For every possible outcome of this `if else` tree, we need to call `tryUpdateMasterListandUpdateUI()`
+                    // Otherwise, the program will never proceed.
+                    if (response!=null) {
+                        YelpResponse yelpResponse2 = response.body();
+
+                        // Handle Yelp API "error"
+                        if (yelpResponse2.getError() != null) {
+                            Log.e(LOG_TAG, "YELP API ERROR RETURNED: " + yelpResponse.getError().getText()
+                                    + " ID: " + yelpResponse.getError().getId());
+                            tryUpdateMasterListandUpdateUI(businessArray);
+                        }
+
+                        // Handle case where 0 businesses are returned
+                        else if (yelpResponse2.getBusinesses().size()==0){
+                            Log.d(LOG_TAG, String.format("Offset %d , Yelp API returned no results", offsetPointer));
+                            tryUpdateMasterListandUpdateUI(businessArray);
+                        }
+                        // If there's no error, proceed to add businesses
+                        else {
+                            List<Business> businesses = yelpResponse2.getBusinesses();
+                            addBusinesses(offsetPointer, businesses, businessArray);
+                        }
+                    } else {
+                        tryUpdateMasterListandUpdateUI(businessArray);
+                    }
+
+
+                    // This is one possible solution
+                    /*
+                    try {
+                        List<Business> businesses = yelpResponse2.getBusinesses();
+                        addBusinesses(offsetPointer, businesses, businessArray);
+                    }
+                    catch (Exception e){
+                        Log.e(LOG_TAG, "call2 onResponse() ERROR");
+                        e.printStackTrace();
+                    }
+                    */
                 }
 
                 @Override
@@ -191,10 +228,15 @@ public class YelpApi {
         }
 
         // Check to see if all calls have been received.  If yes, proceed to filter list and update UI
+        tryUpdateMasterListandUpdateUI(businessArray);
+    }
+
+    private void tryUpdateMasterListandUpdateUI(Business[] businessArray) {
         // TODO DANGER! If one of the calls never receives a response, this method might not ever get called and the program will not proceed
         if(areAllCallsReceived()){
             mMasterList.clear();
             mMasterList.addAll(Arrays.asList(businessArray));
+            Log.d(LOG_TAG, "Total results received " + mMasterList.size());
             filterListAndUpdateUi();
         } else {
             Log.d(LOG_TAG, "areAllCallsReceived = false");
@@ -209,7 +251,6 @@ public class YelpApi {
      */
     private boolean areAllCallsReceived(){
         long startTime = System.nanoTime();
-
         for(Map.Entry<Integer, Boolean> entry : mCallLog.entrySet()){
             if(entry.getValue()==false){
                 Utility.reportExecutionTime(this, "areAllCallsReceived() FALSE",startTime);
