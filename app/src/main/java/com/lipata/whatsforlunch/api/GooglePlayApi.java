@@ -311,7 +311,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
                     public void onNext(Address address) {
 
                         Log.d(LOG_TAG, address.toString());
-                        mMainActivity.setLocationText(address.getAddressLine(0)+", "+address.getAddressLine(1));
+                        mMainActivity.setLocationText(address.getAddressLine(1));
 
                     }
                 });

@@ -282,7 +282,7 @@ public class YelpApi {
         businessListAdapter.notifyDataSetChanged();
         mMainActivity.stopRefreshAnimation();
         mMainActivity.getRecyclerViewLayoutManager().scrollToPosition(0);
-        Utility.reportExecutionTime(this, "callYelpApi sequence", mCallYelpApiStartTime);
+        Utility.reportExecutionTime(this, "callYelpApi sequence, time to get "+mMasterList.size()+" businesses", mCallYelpApiStartTime);
     }
 
 }

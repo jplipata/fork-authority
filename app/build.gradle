@@ -32,6 +32,8 @@ android {
         buildConfigField "String", "CONSUMER_SECRET", properties.getProperty('apikey.CONSUMER_SECRET')
         buildConfigField "String", "TOKEN", properties.getProperty('apikey.TOKEN')
         buildConfigField "String", "TOKEN_SECRET", properties.getProperty('apikey.TOKEN_SECRET')
+
+        manifestPlaceholders = [ crashlytics:properties.getProperty('apikey.crashlytics') ]
     }
     buildTypes {
         release {
