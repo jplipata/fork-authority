@@ -8,7 +8,13 @@ public class BusinessItemRecord {
     public static final int LIKE_FLAG = -1; // I'm using the dontLikeClickDate field for "Like" status.  "-1" means "Like"
 
     String Id;
+
+    /**
+     * tooSoonClickDate
+     * Unit: milliseconds
+     */
     long tooSoonClickDate;
+
     long dontLikeClickDate; // A value of "-1" means "Like"
     long dismissedClickDate;
 

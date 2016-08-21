@@ -1,25 +1,10 @@
 package com.lipata.whatsforlunch.data;
 
-import android.content.Context;
-
-import com.lipata.whatsforlunch.api.yelp.model.Business;
-import com.lipata.whatsforlunch.data.user.UserRecords;
-
-import org.junit.Assert;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * Created by jlipata on 6/21/16.
  */
 public class BusinessListManagerTest {
-
+/*
     @RunWith(MockitoJUnitRunner.class)
     public void testFilter() throws Exception {
 
@@ -68,4 +53,5 @@ public class BusinessListManagerTest {
         Assert.assertTrue(Arrays.equals(expectedArray, filter(listSource)));
 
     }
+    */
 }

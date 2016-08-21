@@ -1,7 +1,5 @@
 package com.lipata.whatsforlunch.api.yelp.model;
 
-import com.lipata.whatsforlunch.Utility;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,6 +39,7 @@ public class BusinessTest {
         Assert.assertNull(business.getDescriptiveText());
     }
 
+    /* OLD TESTS
     @Test
     public void testGetDescriptiveText_JustAteHereSolo_ExpiredCase() throws Exception {
         business = new Business();
@@ -59,6 +58,27 @@ public class BusinessTest {
         business.setTooSoonClickDate(now); // Sets Just Ate Here to today
 
         Assert.assertEquals(Business.JUST_ATE_HERE_SOLO+ Utility.formatDate(now),business.getDescriptiveText());
+    }
+    */
+
+    @Test
+    public void testGetDescriptiveText_JustAteHere_Solo() throws Exception {
+        final long DAY = 86400000L; // 1 day in ms
+        business = new Business();
+        business.setDontLikeClickDate(0); // Sets to unassigned
+
+        // Set tooSoonClickDate to 1 day ago
+        business.setTooSoonClickDate(System.currentTimeMillis() - (DAY*1)); //
+        Assert.assertEquals("You ate here very recently", business.getDescriptiveText());
+
+        // Set tooSoonClickDate to 3 days ago
+        business.setTooSoonClickDate(System.currentTimeMillis() - (DAY*3)); //
+        Assert.assertEquals("You ate here roughly 3 days ago", business.getDescriptiveText());
+
+        // Set tooSoonClickDate to 30 days ago
+        business.setTooSoonClickDate(System.currentTimeMillis() - (DAY*30)); //
+        Assert.assertEquals("You ate here roughly 30 days ago", business.getDescriptiveText());
+
     }
 
 }

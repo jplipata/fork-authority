@@ -16,10 +16,11 @@ public class Business {
     // Defining these display strings here because using res/values/strings.xml requires a `Context`
     public static final String YOU_LIKE_THIS = "You like this";
     public static final String DONT_LIKE_THIS = "Don't like";
-    public static final String JUST_ATE_HERE_SOLO = "Just ate here on ";
-    public static final String JUST_ATE_HERE_APPENDED = ".  Just ate here on ";
-    public static final String ATE_HERE_SOLO = "You ate here around ";
-    public static final String ATE_HERE_APPENDED = ".  You ate here around ";
+    public static final String ATE_HERE_PLURAL_SOLO = "You ate here roughly %d days ago";
+    public static final String ATE_HERE_PLURAL_APPENDED_ = ".  You ate here roughly %d days ago";
+    public static final String ATE_HERE_SINGULAR_SOLO_ = "You ate here very recently";
+    public static final String ATE_HERE_SINGULAR_APPENDED = ".  You ate here very recently";
+
 
     private boolean isClaimed;
     private double rating;
@@ -97,22 +98,25 @@ public class Business {
             stringBuilder.append(DONT_LIKE_THIS);
         }
 
-        // Case for Just Ate Here-Not Expired
-        String monthDayYear = Utility.formatDate(tooSoonClickDate);
-        if(tooSoonClickDate!=0 && !isTooSoonClickDateExpired()) {
-            if(dontLikeClickDate==0){
-                stringBuilder.append(JUST_ATE_HERE_SOLO+monthDayYear);
-            } else {
-                stringBuilder.append(JUST_ATE_HERE_APPENDED+monthDayYear);
-            }
-        }
 
-        // Case for Just Ate Here-Expired
-        else if(tooSoonClickDate!=0 && isTooSoonClickDateExpired()){
-            if(dontLikeClickDate==0){
-                stringBuilder.append(ATE_HERE_SOLO+monthDayYear);
+        // Case for Just Ate Here (Expired and Not Expired)
+        String monthDayYear = Utility.formatDate(tooSoonClickDate);
+        int days = (int) ((System.currentTimeMillis()-tooSoonClickDate) / 86400000); // Number of milliseconds in a day
+        if(tooSoonClickDate!=0) {
+            if(days>1) {
+                if (dontLikeClickDate == 0) {
+                    String string = String.format(ATE_HERE_PLURAL_SOLO, days);
+                    stringBuilder.append(string);
+                } else {
+                    String string = String.format(ATE_HERE_PLURAL_APPENDED_, days);
+                    stringBuilder.append(string);
+                }
             } else {
-                stringBuilder.append(ATE_HERE_APPENDED+monthDayYear);
+                if (dontLikeClickDate == 0) {
+                    stringBuilder.append(ATE_HERE_SINGULAR_SOLO_);
+                } else {
+                    stringBuilder.append(ATE_HERE_SINGULAR_APPENDED);
+                }
             }
         }
 
