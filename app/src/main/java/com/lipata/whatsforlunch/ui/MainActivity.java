@@ -160,8 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onPause() {
+    @Override protected void onPause() {
         super.onPause();
         Log.d(LOG_TAG, "onPause");
 

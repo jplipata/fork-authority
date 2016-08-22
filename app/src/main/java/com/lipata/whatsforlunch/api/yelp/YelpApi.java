@@ -161,7 +161,7 @@ public class YelpApi {
         final int start = yelpResponse.getBusinesses().size();
 
         // Let's set the max to MAX_NO_OF_RESULTS and see how it performs
-        for(int offsetInt = start; offsetInt< mTotalNumberOfResults || offsetInt<MAX_NO_OF_RESULTS ; /* i is updated below */ ){
+        for(int offsetInt = start; offsetInt< mTotalNumberOfResults && offsetInt<MAX_NO_OF_RESULTS ; /* i is updated below */ ){
             String offsetStr = Integer.toString(offsetInt);
             final int offsetPointer = offsetInt; // Need a `final` variable to use in the anonymous class below, otherwise I would just use `i`
 
