@@ -100,12 +100,13 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     // This is the first step/entry point in the sequence of execution steps
     @Override public void onConnected(Bundle connectionHint) {
         Log.d(LOG_TAG, "onConnected()");
+
+        // Timestamp to measure entire location request process
+        mRequestLocationStartTime = System.nanoTime();
+
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if(location!=null && location.getAccuracy()<ACCURACY_TOLERANCE) {
             Log.d(LOG_TAG, "LastLocation not null and within ACCURACY_TOLERANCE");
-
-            // Timestamp to measure entire location request process
-            mRequestLocationStartTime = System.nanoTime();
 
             onBestLocationDetermined(location);
         } else {
@@ -229,7 +230,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         mMainActivity.showToast("Getting your location...");
 
         // Timestamp to measure entire location request process
-        mRequestLocationStartTime = System.nanoTime();
+        //mRequestLocationStartTime = System.nanoTime();
 
         // We want to get a few locations from the API and pick the best one
         // We'll store them in an array
@@ -318,7 +319,10 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
         checkNetworkPermissionAndCallYelpApi();
 
-        Utility.reportExecutionTime(this, "Google Play Api get location", mRequestLocationStartTime);
+        String metricName = "GooglePlayApi get location";
+        Utility.reportExecutionTime(this, metricName, mRequestLocationStartTime);
+        mMainActivity.onKeyMetric(metricName, mRequestLocationStartTime);
+
     }
 
     private void checkLocationPermissionAndRequestLocation() {

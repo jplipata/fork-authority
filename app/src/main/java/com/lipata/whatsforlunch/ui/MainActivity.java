@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.whatsforlunch.R;
@@ -70,7 +72,15 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Fabric.with(this, new Crashlytics());
+
+        final Fabric fabric = new Fabric.Builder(this)
+                .kits(new Answers())
+                .debuggable(true)
+                .build();
+        Fabric.with(fabric);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -296,6 +306,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Fabric Answers Custom Event
+     * @param metricName
+     * @param startTime In nanoseconds, will be converted to milliseconds
+     */
+    public void onKeyMetric(String metricName, long startTime) {
+        long executionTime = System.nanoTime()-startTime;
+        long executionTime_ms = executionTime / 1000000;
+        Answers.getInstance().logCustom(new CustomEvent(metricName)
+                .putCustomAttribute("Execution time (ms)", executionTime_ms));
+    }
+
+
     // Helper methods
 
     private void executeGooglePlayApiLocation(){
@@ -305,7 +328,6 @@ public class MainActivity extends AppCompatActivity {
             mGooglePlayApi.checkDeviceLocationEnabled();
         }
     }
-
 
     // Retain Activity state
     @Override

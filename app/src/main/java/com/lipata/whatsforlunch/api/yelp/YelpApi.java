@@ -34,6 +34,7 @@ public class YelpApi {
     public static final String LOG_TAG = "YelpApi";
     public static final String BASE_URL = "https://api.yelp.com/";
     public static final int RESULTS_PER_PAGE = 20; // However many results the Yelp API returns per page
+    public static final int MAX_NO_OF_RESULTS = 200; // Max number of businesses that will be fetched from Yelp
 
     OkHttpOAuthConsumer mConsumer;
     HttpLoggingInterceptor mHttpLoggingInterceptor;
@@ -136,6 +137,7 @@ public class YelpApi {
         });
     }
 
+    //TODO We really don't need 1000 results, perhaps limit to say 500
     private void getMoreThan20Results(final YelpResponse yelpResponse, String term, String location, String radius) {
 
         // Reset mMasterList & mCallLog
@@ -158,7 +160,8 @@ public class YelpApi {
         // Load the rest
         final int start = yelpResponse.getBusinesses().size();
 
-        for(int offsetInt = start; offsetInt< mTotalNumberOfResults; /* i is updated below */ ){
+        // Let's set the max to MAX_NO_OF_RESULTS and see how it performs
+        for(int offsetInt = start; offsetInt< mTotalNumberOfResults || offsetInt<MAX_NO_OF_RESULTS ; /* i is updated below */ ){
             String offsetStr = Integer.toString(offsetInt);
             final int offsetPointer = offsetInt; // Need a `final` variable to use in the anonymous class below, otherwise I would just use `i`
 
@@ -261,11 +264,11 @@ public class YelpApi {
         long startTime = System.nanoTime();
         for(Map.Entry<Integer, Boolean> entry : mCallLog.entrySet()){
             if(entry.getValue()==false){
-                Utility.reportExecutionTime(this, "areAllCallsReceived() FALSE",startTime);
+                //Utility.reportExecutionTime(this, "areAllCallsReceived() FALSE",startTime);
                 return false;
             }
         }
-        Utility.reportExecutionTime(this, "areAllCallsReceived() TRUE", startTime);
+        //Utility.reportExecutionTime(this, "areAllCallsReceived() TRUE", startTime);
         return true;
     }
 
@@ -283,6 +286,7 @@ public class YelpApi {
         mMainActivity.stopRefreshAnimation();
         mMainActivity.getRecyclerViewLayoutManager().scrollToPosition(0);
         Utility.reportExecutionTime(this, "callYelpApi sequence, time to get "+mMasterList.size()+" businesses", mCallYelpApiStartTime);
+        mMainActivity.onKeyMetric("YelpApi call", mCallYelpApiStartTime);
     }
 
 }

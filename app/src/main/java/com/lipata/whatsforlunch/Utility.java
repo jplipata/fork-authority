@@ -32,13 +32,14 @@ public class Utility {
      * It displays in both nanoseconds and seconds.
      *
      * @param object Use `this` from calling class to generate the typical LOG_TAG
-     * @param methodName Your method name for identification
+     * @param metricName Your method name for identification
      * @param startTime The start time to compare from
      */
-    public static void reportExecutionTime(Object object, String methodName, long startTime) {
+    public static void reportExecutionTime(Object object, String metricName, long startTime) {
         String LOG_TAG = object.getClass().getSimpleName();
         long executionTime = System.nanoTime()-startTime;
-        Log.d(LOG_TAG, "Execution time: "+methodName+" = " + executionTime+
-                " nanoseconds or " + (executionTime/1000000000) + " seconds");
+        long executionTime_ms = executionTime / 1000000;
+        Log.d(LOG_TAG, "Execution time: "+metricName+" = " + executionTime+
+                " nanoseconds or " + executionTime_ms + " ms");
     }
 }
