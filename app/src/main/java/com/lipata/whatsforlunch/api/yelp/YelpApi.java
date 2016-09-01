@@ -34,8 +34,14 @@ public class YelpApi {
     public static final String LOG_TAG = "YelpApi";
     public static final String BASE_URL = "https://api.yelp.com/";
     public static final int RESULTS_PER_PAGE = 20; // However many results the Yelp API returns per page
-    public static final int MAX_NO_OF_RESULTS = 200; // Max number of businesses that will be fetched from Yelp
 
+    /**
+     * Max number of businesses that will be fetched from Yelp.  We were previously fetching all available
+     * results, however load times were taking up to 1 minute on devices with slower connections
+     */
+    public static final int MAX_NO_OF_RESULTS = 240; //
+
+    // Retrofit stuff
     OkHttpOAuthConsumer mConsumer;
     HttpLoggingInterceptor mHttpLoggingInterceptor;
     OkHttpClient mOkHttpClient;
@@ -137,7 +143,6 @@ public class YelpApi {
         });
     }
 
-    //TODO We really don't need 1000 results, perhaps limit to say 500
     private void getMoreThan20Results(final YelpResponse yelpResponse, String term, String location, String radius) {
 
         // Reset mMasterList & mCallLog
@@ -204,19 +209,6 @@ public class YelpApi {
                         }
                         tryUpdateMasterListandUpdateUI(businessArray);
                     }
-
-
-                    // This is one possible solution
-                    /*
-                    try {
-                        List<Business> businesses = yelpResponse2.getBusinesses();
-                        addBusinesses(offsetPointer, businesses, businessArray);
-                    }
-                    catch (Exception e){
-                        Log.e(LOG_TAG, "call2 onResponse() ERROR");
-                        e.printStackTrace();
-                    }
-                    */
                 }
 
                 @Override

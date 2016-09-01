@@ -3,6 +3,7 @@ package com.lipata.whatsforlunch.data;
 import android.content.Context;
 import android.util.Log;
 
+import com.lipata.whatsforlunch.Utility;
 import com.lipata.whatsforlunch.api.yelp.model.Business;
 import com.lipata.whatsforlunch.data.user.BusinessItemRecord;
 import com.lipata.whatsforlunch.data.user.UserRecords;
@@ -32,6 +33,7 @@ public class BusinessListManager {
      * @return Returns sorted list in order of "Preferred", "Neutral", "Too Soon", then "Don't Like"
      */
     public List<Business> filter(List<Business> businessList_Source){
+        long startTime = System.nanoTime();
 
         // 3 categories that each business can be filtered to
         List<Business> preferredList = new ArrayList<>();
@@ -123,6 +125,7 @@ public class BusinessListManager {
         newList.addAll(dontLikeList);
 
         // That's it! Return the filtered list.
+        Utility.reportExecutionTime(this, "BusinessList filter()",startTime);
         return newList;
     }
 }
