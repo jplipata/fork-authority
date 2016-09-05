@@ -370,6 +370,10 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                 .setActionTextColor(mMainActivity.getResources().getColor(R.color.text_white))
                 .show();
 
+        // Update user records
+        mUserRecords.incrementDismissedCount(business);
+        mUserRecords.commit();
+
 //        Temporarily disabling this
 //        // Backend stuff:
 //        // Get current date/time

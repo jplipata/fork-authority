@@ -59,6 +59,7 @@ public class BusinessListManager {
                     long tooSoonClickDate = businessItemRecord.getTooSoonClickDate();
                     long dontLikeClickDate = businessItemRecord.getDontLikeClickDate();
                     long dismissedDate = businessItemRecord.getDismissedDate();
+                    int dismissedCount = businessItemRecord.getDismissedCount();
 
                     // Calculate difference between current time
                     // TODO If we're going to keep this functionality, this logic should move to the `Business` class
@@ -67,13 +68,15 @@ public class BusinessListManager {
 
                     Log.d(LOG_TAG, "Match found! Id = " + businessId + " tooSoonClickDate = "
                             + tooSoonClickDate + " dontLikeClickDate = "+ dontLikeClickDate +
-                            " dismissedDate = "+dismissedDate);
+                            " dismissedDate = "+dismissedDate
+                        + " dismissedCount = "+dismissedCount);
 
                     // On match found, do:
 
                         // Update the `business` object in memory
                         business.setDontLikeClickDate(dontLikeClickDate);
                         business.setTooSoonClickDate(tooSoonClickDate);
+                        business.setDismissedCount(dismissedCount);
 
                         // Handle Like case
 
@@ -82,6 +85,7 @@ public class BusinessListManager {
                                 // Assign it to the "Preferred" list, but only if it's not "too soon"
 
                                 if(business.getTooSoonClickDate()==0 || business.isTooSoonClickDateExpired()){
+
                                     preferredList.add(business);
                                     businessList_temp.set(i, null); // Remove business from original list
                                     Log.v(LOG_TAG, "filter() deemed PREFERRED");
@@ -109,6 +113,8 @@ public class BusinessListManager {
                                     businessList_temp.set(i, null); // Remove business from original list
                                 } else Log.v(LOG_TAG, "filter() TooSoon EXPIRED");
                             }
+
+
                         break;  // Once you've found the match, there's no need to keep going. Exit the `for` loop
                 }
             }

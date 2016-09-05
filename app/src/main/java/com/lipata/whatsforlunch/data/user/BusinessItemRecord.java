@@ -18,6 +18,8 @@ public class BusinessItemRecord {
     long dontLikeClickDate; // A value of "-1" means "Like"
     long dismissedClickDate;
 
+    int dismissedCount;
+
     public String getId() {
         return Id;
     }
@@ -48,6 +50,14 @@ public class BusinessItemRecord {
 
     public void setDismissedDate(long dismissedClickDate) {
         this.dismissedClickDate = dismissedClickDate;
+    }
+
+    public int getDismissedCount() {
+        return dismissedCount;
+    }
+
+    public void incrementDismissedCount() {
+        dismissedCount++;
     }
 
 }

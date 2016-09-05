@@ -54,6 +54,48 @@ public class UserRecords {
         Log.d(LOG_TAG, "BusinessItemRecord added");
     }
 
+    public void incrementDismissedCount(Business business){
+        Log.d(LOG_TAG, "incrementDismissedCount()");
+
+        // Check for item
+        int itemIndex = getItemIndex(business.getId());
+        Log.d(LOG_TAG, "getItemIndex() "+itemIndex);
+
+        // -1 means item does not exist
+        if(itemIndex==-1){
+            Log.d(LOG_TAG, "Item does not exist");
+            // if the item doesn't exist:
+            BusinessItemRecord businessItemRecord = new BusinessItemRecord();
+            businessItemRecord.setId(business.getId());
+
+            // Increment
+            businessItemRecord.incrementDismissedCount();
+
+            // Check
+            Log.d(LOG_TAG, "businessItemRecord.  Id = " + businessItemRecord.getId() +
+                    " tooSoonClickDate = " + businessItemRecord.getTooSoonClickDate()
+                    + " dontlikeClickDate = " + businessItemRecord.getDontLikeClickDate()
+                    + " dismissedDate = " + businessItemRecord.getDismissedDate()
+                    + " dismissedCount = "+businessItemRecord.getDismissedCount());
+            // Store data
+            addRecord(businessItemRecord);
+
+        } else {
+            Log.d(LOG_TAG, "Item does exist.  Index = "+itemIndex);
+
+            // Update dismissedCount
+            BusinessItemRecord record = mList.get(itemIndex);
+            record.incrementDismissedCount();
+
+            Log.d(LOG_TAG, "Item at index "+itemIndex+" updated");
+
+            // Check
+            Log.d(LOG_TAG, record.getId()+" tooSoonClickDate = "+record.getTooSoonClickDate()
+                    + "dontlikeClickDate = " + record.getDontLikeClickDate()
+                    + "dismissedCount = "+record.getDismissedCount());
+        }
+
+    }
 
     public void updateClickDate(Business business, long time, int buttonId){
         Log.d(LOG_TAG, "updateClickDate()");
@@ -120,6 +162,8 @@ public class UserRecords {
     // Returns -1 if item does not exist, otherwise returns index of item
     int getItemIndex(String id){
         int result = -1;
+
+        //TODO Terrible O(n) implementation!  This could be O(1) with HashMap
         for (int i=0 ; i<mList.size(); i++){
             if(mList.get(i).getId().equals(id)){
                 result = i;
