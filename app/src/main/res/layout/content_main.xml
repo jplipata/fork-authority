@@ -100,6 +100,43 @@
         </LinearLayout>
     </FrameLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/progressbar_layout"
+        android:padding="@dimen/location_padding">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/getting_your_location"
+            android:id="@+id/textview_progress_location"/>
+
+        <ProgressBar
+            android:id="@+id/progress_bar_location"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/loading_businesses"
+            android:id="@+id/textview_progress_loadbusinesses"/>
+
+        <ProgressBar
+            android:id="@+id/progress_bar_businesses"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="false"
+            android:max="100"/>
+
+
+    </LinearLayout>
+
         <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

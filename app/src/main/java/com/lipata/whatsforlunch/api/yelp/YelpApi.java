@@ -52,7 +52,10 @@ public class YelpApi {
     MainActivity mMainActivity;
 
     List<Business> mMasterList; // This is our main data
-    int mTotalNumberOfResults;
+
+    // TODO This will need to be cleaned up -- too many variables
+    int mTotalResultsAsPerFirstYelpCall;
+    int mActionableResults;
 
     /**
      * CallLog
@@ -92,6 +95,9 @@ public class YelpApi {
     public void callYelpApi(final String term, final String location, final String radius){
         mCallYelpApiStartTime = System.nanoTime();
 
+        // Update UI
+        mMainActivity.onNewBusinessListRequested();
+
         // Call Yelp
         Call<YelpResponse> call = mApiService.getBusinesses(term, location, radius);
         call.enqueue(new Callback<YelpResponse>() {
@@ -119,7 +125,7 @@ public class YelpApi {
                     // Handle case where there are 20 or less results
                     else if (yelpResponse.getTotal() <= 20) {
                         mMasterList.addAll(yelpResponse.getBusinesses());
-                        mTotalNumberOfResults = yelpResponse.getTotal();
+                        mTotalResultsAsPerFirstYelpCall = yelpResponse.getTotal();
                         filterListAndUpdateUi();
                     }
 
@@ -152,21 +158,29 @@ public class YelpApi {
         // Using an array `businessArray` so that we can use the indexes to keep the results in order since
         // they will be received asynchronously.  Created according to the size returned by the initial Yelp response
         // TODO There will be a problem in any cases where Yelp returns results in excess of the `total` defined in the first call. Replace with List?
-        mTotalNumberOfResults = yelpResponse.getTotal();
-        final Business[] businessArray = new Business[mTotalNumberOfResults];
+        mTotalResultsAsPerFirstYelpCall = yelpResponse.getTotal();
+        final Business[] businessArray = new Business[mTotalResultsAsPerFirstYelpCall];
 
-        mMainActivity.showToast(String.format("Retrieving %d businesses...", mTotalNumberOfResults));
+        // Figure out actual number of results to get
+        // TODO This is a mess.  mTotalResultsAsPerFirstYelpCall, mActionableResults, etc.  Too many variables
+        if(mTotalResultsAsPerFirstYelpCall > MAX_NO_OF_RESULTS){
+            mActionableResults = MAX_NO_OF_RESULTS;
+        } else {
+            mActionableResults = mTotalResultsAsPerFirstYelpCall;
+        }
+
+        // We've already received 20, update secondaryProgress on UI
+        mMainActivity.incrementSecondaryProgress_BusinessProgressBar(getProgressValue(20));
 
         // Load the first 20
         for (int i = 0; i<yelpResponse.getBusinesses().size() ; i++){
             businessArray[i] = yelpResponse.getBusinesses().get(i);
         }
+        mMainActivity.incrementProgress_BusinessProgressBar(getProgressValue(20));
 
         // Load the rest
         final int start = yelpResponse.getBusinesses().size();
-
-        // Let's set the max to MAX_NO_OF_RESULTS and see how it performs
-        for(int offsetInt = start; offsetInt< mTotalNumberOfResults && offsetInt<MAX_NO_OF_RESULTS ; /* i is updated below */ ){
+        for(int offsetInt = start; offsetInt< mTotalResultsAsPerFirstYelpCall && offsetInt<MAX_NO_OF_RESULTS ; /* i is updated below */ ){
             String offsetStr = Integer.toString(offsetInt);
             final int offsetPointer = offsetInt; // Need a `final` variable to use in the anonymous class below, otherwise I would just use `i`
 
@@ -218,6 +232,9 @@ public class YelpApi {
                 }
             });
 
+            // Update UI
+            mMainActivity.incrementSecondaryProgress_BusinessProgressBar(getProgressValue(RESULTS_PER_PAGE));
+
             // Update `i`
             // We cannot increment `i` by the actual number of responses received because the response
             // is received asynchronously, i.e. we don't have the data at this time
@@ -225,11 +242,18 @@ public class YelpApi {
         }
     }
 
+    private int getProgressValue(int numberOfResults) {
+        float temp = ((float)numberOfResults/ mActionableResults) * 100 ;
+        return (int) temp;
+    }
+
     private void addBusinesses(int offset, List<Business> businessList, Business[] businessArray){
         // Add new batch of businesses to the master array in the correct order
         for(int i=0; i<businessList.size(); i++){
             businessArray[offset+i] = businessList.get(i);
         }
+
+        mMainActivity.incrementProgress_BusinessProgressBar(getProgressValue(businessList.size()));
 
         // Check to see if all calls have been received.  If yes, proceed to filter list and update UI
         tryUpdateMasterListandUpdateUI(businessArray);
@@ -275,6 +299,10 @@ public class YelpApi {
         List<Business> filteredBusinesses = mMainActivity.getBusinessListManager().filter(mMasterList);
         businessListAdapter.setBusinessList(filteredBusinesses);
         businessListAdapter.notifyDataSetChanged();
+
+        // UI
+        mMainActivity.onNewBusinessListReceived();
+        mMainActivity.hideProgressLayout(); // This is the final step of the exectuion sequence so hide progress bar layout
         mMainActivity.stopRefreshAnimation();
         mMainActivity.getRecyclerViewLayoutManager().scrollToPosition(0);
         Utility.reportExecutionTime(this, "callYelpApi sequence, time to get "+mMasterList.size()+" businesses", mCallYelpApiStartTime);

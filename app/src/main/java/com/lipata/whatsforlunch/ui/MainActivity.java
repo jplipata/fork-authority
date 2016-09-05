@@ -17,6 +17,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,6 +63,11 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton mFAB_refresh;
     ObjectAnimator mFAB_refreshAnimation;
     Snackbar mSnackbar;
+    LinearLayout mProgressBarLayout;
+    TextView mTextView_Progress_Location;
+    ProgressBar mProgressBar_Location;
+    TextView mTextView_Progress_Businesses;
+    ProgressBar mProgressBar_Businesses;
 
     // App modules
     GooglePlayApi mGooglePlayApi;
@@ -91,6 +98,14 @@ public class MainActivity extends AppCompatActivity {
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
         mTextView_ApproxLocation = (TextView) findViewById(R.id.location_text);
         mTextView_Accuracy = (TextView) findViewById(R.id.accuracy_text);
+
+        // Progress bar views
+        mProgressBarLayout = (LinearLayout) findViewById(R.id.progressbar_layout);
+        mProgressBarLayout.setVisibility(View.GONE);
+        mTextView_Progress_Location = (TextView) findViewById(R.id.textview_progress_location);
+        mProgressBar_Location = (ProgressBar) findViewById(R.id.progress_bar_location);
+        mTextView_Progress_Businesses = (TextView) findViewById(R.id.textview_progress_loadbusinesses);
+        mProgressBar_Businesses = (ProgressBar) findViewById(R.id.progress_bar_businesses);
 
         // RecyclerView
         mRecyclerView_suggestionList = (RecyclerView) findViewById(R.id.suggestion_list);
@@ -149,21 +164,16 @@ public class MainActivity extends AppCompatActivity {
         if(mSuggestionListAdapter.getItemCount()==0){
             fetchBusinessList();
         }
-
-
     }
 
     @Override protected void onResume(){
         Log.d(LOG_TAG, "onResume()");
         super.onResume();
-
-
     }
 
     @Override protected void onPause() {
         super.onPause();
         Log.d(LOG_TAG, "onPause");
-
     }
 
     @Override protected void onStop(){
@@ -172,22 +182,17 @@ public class MainActivity extends AppCompatActivity {
         if (mGooglePlayApi.getClient().isConnected()) {
             mGooglePlayApi.stopLocationUpdates();
         }
-
     }
 
     // UI methods
 
     public void updateLocationViews(double latitude, double longitude, float accuracy){
-        //mTextView_Latitude.setText(Double.toString(latitude));
-        //mTextView_Longitude.setText(Double.toString(longitude));
-
         // Latitude range is 0 to +-90.  Longitude is 0 to +-180.
         // 6 decimal places is accurate to 43.496-111.32 mm
         // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
         mTextView_ApproxLocation.setText(new DecimalFormat("##.######").format(latitude)+", "
                 +new DecimalFormat("###.######").format(longitude));
         mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
-        //Toast.makeText(this, "Location Data Updated", Toast.LENGTH_SHORT).show();
     }
 
     public void startRefreshAnimation(){
@@ -199,7 +204,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void stopRefreshAnimation(){
         Log.d(LOG_TAG, "Stop animation");
-        //mRefreshAnimation.cancel();
         mFAB_refreshAnimation.cancel();
     }
 
@@ -214,6 +218,64 @@ public class MainActivity extends AppCompatActivity {
 
     public void setLocationText(String text){
         mTextView_ApproxLocation.setText(text);
+    }
+
+    public void onDeviceLocationRequested(){
+        if(mProgressBarLayout.getVisibility() != View.VISIBLE ){
+            mProgressBarLayout.setVisibility(View.VISIBLE);
+        }
+        mTextView_Progress_Location.setText(getResources().getText(R.string.getting_your_location));
+        mProgressBar_Location.setVisibility(View.VISIBLE);
+    }
+
+    public void onDeviceLocationRetrieved(){
+        mTextView_Progress_Location.setText(getResources().getText(R.string.getting_your_location)+"OK");
+        mProgressBar_Location.setVisibility(View.GONE);
+    }
+
+    public void onNewBusinessListRequested(){
+        if(mProgressBarLayout.getVisibility() != View.VISIBLE ){
+            mProgressBarLayout.setVisibility(View.VISIBLE);
+        }
+        mProgressBar_Businesses.setSecondaryProgress(0);
+        mProgressBar_Businesses.setProgress(0);
+        mTextView_Progress_Businesses.setText(getResources().getText(R.string.loading_businesses));
+        mProgressBar_Businesses.setVisibility(View.VISIBLE);
+    }
+
+    public void onNewBusinessListReceived(){
+        mTextView_Progress_Businesses.setText(getResources().getText(R.string.loading_businesses)+"OK");
+        mProgressBar_Businesses.setVisibility(View.GONE);
+    }
+
+    public void incrementProgress_BusinessProgressBar(int value){
+        int currentValue = mProgressBar_Businesses.getProgress();
+        int maxValue = mProgressBar_Businesses.getMax();
+
+        int newProgress = currentValue + value;
+
+        if(newProgress<=maxValue){
+            mProgressBar_Businesses.setProgress(newProgress);
+        } else {
+            Log.d(LOG_TAG, "Business Progress Bar setProgress() ALREADY MAXED");
+        }
+    }
+
+    public void incrementSecondaryProgress_BusinessProgressBar(int value){
+        int currentValue = mProgressBar_Businesses.getSecondaryProgress();
+        int maxValue = mProgressBar_Businesses.getMax();
+
+        int newProgress = currentValue + value;
+
+        if(newProgress<=maxValue){
+            mProgressBar_Businesses.setSecondaryProgress(newProgress);
+        } else {
+            Log.d(LOG_TAG, "Business Progress Bar setSecondaryProgress() ALREADY MAXED");
+        }
+    }
+
+    public void hideProgressLayout(){
+        mProgressBarLayout.setVisibility(View.GONE);
     }
 
     // Callback for Marshmallow requestPermissions() response
@@ -298,7 +360,6 @@ public class MainActivity extends AppCompatActivity {
 
             } else {
                 // Connect to GooglePlayApi, which will trigger onConnect() callback, i.e. execute sequence of events
-
                 executeGooglePlayApiLocation();
             }
 
@@ -321,6 +382,11 @@ public class MainActivity extends AppCompatActivity {
     // Helper methods
 
     private void executeGooglePlayApiLocation(){
+
+        // Trigger UI progress bar
+        onDeviceLocationRequested();
+
+        // Request location from Google Play API
         if(!mGooglePlayApi.getClient().isConnected()){
             mGooglePlayApi.getClient().connect();
         } else {

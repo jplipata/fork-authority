@@ -227,8 +227,6 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
          * Public method called by onRequestPermissionsResult in MainActivity
          */
 
-        mMainActivity.showToast("Getting your location...");
-
         // Timestamp to measure entire location request process
         //mRequestLocationStartTime = System.nanoTime();
 
@@ -366,6 +364,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
             Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
 
             mMainActivity.updateLocationViews(latitude, longitude, accuracy);
+            mMainActivity.onDeviceLocationRetrieved();
         } else {
             Log.d(LOG_TAG, "mLastLocation = null");
         }
