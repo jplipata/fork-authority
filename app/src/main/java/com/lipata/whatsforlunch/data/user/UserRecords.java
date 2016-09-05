@@ -6,9 +6,9 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.lipata.whatsforlunch.R;
 import com.lipata.whatsforlunch.api.yelp.model.Business;
 import com.lipata.whatsforlunch.ui.BusinessListAdapter;
-import com.lipata.whatsforlunch.R;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -54,6 +54,10 @@ public class UserRecords {
         Log.d(LOG_TAG, "BusinessItemRecord added");
     }
 
+    /**
+     * `commit()` must be called afterwards to save changes
+     * @param business Business Object to update
+     */
     public void incrementDismissedCount(Business business){
         Log.d(LOG_TAG, "incrementDismissedCount()");
 
@@ -97,6 +101,12 @@ public class UserRecords {
 
     }
 
+    /**
+     * `commit()` must be called afterwards to save changes
+     * @param business
+     * @param time
+     * @param buttonId
+     */
     public void updateClickDate(Business business, long time, int buttonId){
         Log.d(LOG_TAG, "updateClickDate()");
 
@@ -159,7 +169,11 @@ public class UserRecords {
         }
     }
 
-    // Returns -1 if item does not exist, otherwise returns index of item
+    /**
+     *
+     * @param id Business ID to search for
+     * @return Returns -1 if item does not exist, otherwise returns index of item
+     */
     int getItemIndex(String id){
         int result = -1;
 
