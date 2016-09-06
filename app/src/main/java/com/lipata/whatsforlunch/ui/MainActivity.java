@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
         mProgressBar_Location.setVisibility(View.GONE);
 
         Utility.reportExecutionTime(this, AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mStartTime_Location);
-        onKeyMetric(AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mStartTime_Location);
+        logFabricAnswersMetric(AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mStartTime_Location);
     }
 
     public void onNewBusinessListRequested(){
@@ -259,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Analytics
         Utility.reportExecutionTime(this, "Fetch businesses until displayed", mStartTime_Fetch);
-        onKeyMetric(AppSettings.FABRIC_METRIC_FETCH_BIZ_SEQUENCE, mStartTime_Fetch);
+        logFabricAnswersMetric(AppSettings.FABRIC_METRIC_FETCH_BIZ_SEQUENCE, mStartTime_Fetch);
     }
 
     public void incrementProgress_BusinessProgressBar(int value){
@@ -385,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
      * @param metricName
      * @param startTime In nanoseconds, will be converted to milliseconds
      */
-    public void onKeyMetric(String metricName, long startTime) {
+    public void logFabricAnswersMetric(String metricName, long startTime) {
         long executionTime = System.nanoTime()-startTime;
         long executionTime_ms = executionTime / 1000000;
         Answers.getInstance().logCustom(new CustomEvent(metricName)

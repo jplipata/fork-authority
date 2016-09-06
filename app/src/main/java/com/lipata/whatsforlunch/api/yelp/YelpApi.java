@@ -310,7 +310,7 @@ public class YelpApi {
 
         // Analytics
         Utility.reportExecutionTime(this, "callYelpApi sequence, time to get "+mMasterList.size()+" businesses", mCallYelpApiStartTime);
-        mMainActivity.onKeyMetric(AppSettings.FABRIC_METRIC_YELPAPI, mCallYelpApiStartTime);
+        mMainActivity.logFabricAnswersMetric(AppSettings.FABRIC_METRIC_YELPAPI, mCallYelpApiStartTime);
 
         // UI
         mMainActivity.onNewBusinessListReceived();

@@ -26,7 +26,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.lipata.whatsforlunch.Utility;
 import com.lipata.whatsforlunch.api.yelp.YelpApi;
 import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.ui.MainActivity;
@@ -87,6 +86,12 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
                 .addOnConnectionFailedListener(this)
                  .addApi(LocationServices.API).build();
 
+        /**
+         * Regarding these settings see:
+         * https://docs.google.com/spreadsheets/d/1_4iC9dEOrl-cU8FEk7F7xt_BzUfaCebd6lrSfJe2BUE/edit?usp=sharing
+         * https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#setMaxWaitTime(long)
+         * http://stackoverflow.com/questions/16713659/locationrequest-in-google-play-services-isnt-updating-for-interval-set-as-less
+         */
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(LOCATION_REQUEST_INTERVAL)
@@ -97,7 +102,11 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     // Callbacks for Google Play API
 
-    // This is the first step/entry point in the sequence of execution steps
+    /**
+     * This is the first step/entry point in the sequence of execution steps, unless the client is already connected
+     * See MainActivity.executeGooglePlayApiLocation()
+     * @param connectionHint
+     */
     @Override public void onConnected(Bundle connectionHint) {
         Log.d(LOG_TAG, "onConnected()");
 
@@ -153,7 +162,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
         mLocationArray.add(location);
 
-        isBestLocation();
+        areAllLocationsReceived();
     }
 
     // Callback for LocationSettingsRequest
@@ -261,7 +270,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
      * It determines whether the number of retries have been met.  If yes, it stops further location requests
      * and triggers to proceed with the best location.  If no, it does nothing and waits for the next location
      */
-    private void isBestLocation() {
+    private void areAllLocationsReceived() {
         Log.d(LOG_TAG, String.format("Location request #%d", mLocationArray.size()));
         if(mLocationArray.size()>= LOCATION_REQUEST_SAMPLE_SIZE){
             stopLocationUpdates();
@@ -315,7 +324,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         checkNetworkPermissionAndCallYelpApi();
 
         //Utility.reportExecutionTime(this, AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mRequestLocationStartTime);
-        //mMainActivity.onKeyMetric(AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mRequestLocationStartTime);
+        //mMainActivity.logFabricAnswersMetric(AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mRequestLocationStartTime);
 
     }
 

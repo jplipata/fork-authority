@@ -28,11 +28,11 @@ public class Utility {
     }
 
     /**
-     * This is a convenience method you can call at the end of a method to compute execution time.
+     * This is a convenience method you can call to compute execution time.
      * It displays in both nanoseconds and seconds.
      *
      * @param object Use `this` from calling class to generate the typical LOG_TAG
-     * @param metricName Your method name for identification
+     * @param metricName Your metric name for identification
      * @param startTime The start time to compare from
      */
     public static void reportExecutionTime(Object object, String metricName, long startTime) {
