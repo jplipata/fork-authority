@@ -18,6 +18,7 @@ import java.util.List;
  */
 public class BusinessListManager {
     private static String LOG_TAG = BusinessListManager.class.getSimpleName();
+    final static int RESULTS_FOR_DISPLAY_MAX = 100;
 
     UserRecords mUserRecords;
     Context mContext;
@@ -120,6 +121,15 @@ public class BusinessListManager {
             }
         }
 
+
+        // Pare down results
+        // Let's try only displaying roughly 100 results, I don't think we need more than that
+        if(businessList_temp.size() > RESULTS_FOR_DISPLAY_MAX){
+            Log.d(LOG_TAG, "Paring down businessList_temp. Original size "+businessList_temp.size()+
+                    ". "+(businessList_temp.size()-RESULTS_FOR_DISPLAY_MAX)+" items removed");
+            businessList_temp = businessList_temp.subList(0, RESULTS_FOR_DISPLAY_MAX);
+        }
+
         // Remove null elements
         businessList_temp.removeAll(Collections.singleton(null));
 
@@ -129,6 +139,7 @@ public class BusinessListManager {
         newList.addAll(tooSoonList);
         newList.addAll(businessList_temp);
         newList.addAll(dontLikeList);
+        Log.d(LOG_TAG, "Final list size "+newList.size());
 
         // That's it! Return the filtered list.
         Utility.reportExecutionTime(this, "BusinessList filter()",startTime);

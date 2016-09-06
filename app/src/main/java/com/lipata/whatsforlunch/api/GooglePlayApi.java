@@ -301,9 +301,6 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
                     @Override
                     public void onError(Throwable e) {
                         Log.e(LOG_TAG, e.getMessage(), e);
-                        //mMainActivity.setLocationText("Lookup error");
-
-                        // If there's an error with reverse geo lookup, we'll just show the lat,long coordinates instead
                     }
 
                     @Override
@@ -317,9 +314,8 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
         checkNetworkPermissionAndCallYelpApi();
 
-        String metricName = "GooglePlayApi get location";
-        Utility.reportExecutionTime(this, metricName, mRequestLocationStartTime);
-        mMainActivity.onKeyMetric(metricName, mRequestLocationStartTime);
+        //Utility.reportExecutionTime(this, AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mRequestLocationStartTime);
+        //mMainActivity.onKeyMetric(AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mRequestLocationStartTime);
 
     }
 

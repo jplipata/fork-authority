@@ -25,4 +25,11 @@ public class AppSettings {
      * decide what to eat
      */
     public static long DISMISSED_THRESHOLD = 1000 * 60 * 30;
+
+    // Fabric metrics
+    public static final String FABRIC_METRIC_GOOGLEPLAYAPI = "GooglePlayApi get location";
+    public static final String FABRIC_METRIC_YELPAPI = "YelpApi call";
+    public static final String FABRIC_METRIC_FETCH_BIZ_SEQUENCE = "Fetch Businesses";
+
+
 }

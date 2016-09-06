@@ -28,9 +28,11 @@ import com.crashlytics.android.answers.CustomEvent;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.whatsforlunch.R;
+import com.lipata.whatsforlunch.Utility;
 import com.lipata.whatsforlunch.api.GeocoderApi;
 import com.lipata.whatsforlunch.api.GooglePlayApi;
 import com.lipata.whatsforlunch.api.yelp.model.Business;
+import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.data.BusinessListManager;
 import com.lipata.whatsforlunch.data.user.UserRecords;
 
@@ -74,6 +76,10 @@ public class MainActivity extends AppCompatActivity {
     GeocoderApi mGeocoder;
     UserRecords mUserRecords;
     BusinessListManager mBusinessListManager;
+
+    // Analytics
+    long mStartTime_Fetch;
+    long mStartTime_Location;
 
     // Activity lifecycle
 
@@ -231,6 +237,9 @@ public class MainActivity extends AppCompatActivity {
     public void onDeviceLocationRetrieved(){
         mTextView_Progress_Location.setText(getResources().getText(R.string.getting_your_location)+"OK");
         mProgressBar_Location.setVisibility(View.GONE);
+
+        Utility.reportExecutionTime(this, AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mStartTime_Location);
+        onKeyMetric(AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mStartTime_Location);
     }
 
     public void onNewBusinessListRequested(){
@@ -244,8 +253,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onNewBusinessListReceived(){
+        // UI
         mTextView_Progress_Businesses.setText(getResources().getText(R.string.loading_businesses)+"OK");
         mProgressBar_Businesses.setVisibility(View.GONE);
+
+        // Analytics
+        Utility.reportExecutionTime(this, "Fetch businesses until displayed", mStartTime_Fetch);
+        onKeyMetric(AppSettings.FABRIC_METRIC_FETCH_BIZ_SEQUENCE, mStartTime_Fetch);
     }
 
     public void incrementProgress_BusinessProgressBar(int value){
@@ -336,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Trigger location + yelp calls
     public void fetchBusinessList(){
-
+        mStartTime_Fetch = System.nanoTime();
         // UI
 
             // Dismiss any Snackbars
@@ -382,6 +396,7 @@ public class MainActivity extends AppCompatActivity {
     // Helper methods
 
     private void executeGooglePlayApiLocation(){
+        mStartTime_Location = System.nanoTime();
 
         // Trigger UI progress bar
         onDeviceLocationRequested();
@@ -447,5 +462,4 @@ public class MainActivity extends AppCompatActivity {
     public BusinessListManager getBusinessListManager() {
         return mBusinessListManager;
     }
-
 }

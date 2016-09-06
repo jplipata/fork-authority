@@ -6,6 +6,7 @@ import com.lipata.whatsforlunch.BuildConfig;
 import com.lipata.whatsforlunch.Utility;
 import com.lipata.whatsforlunch.api.yelp.model.Business;
 import com.lipata.whatsforlunch.api.yelp.model.YelpResponse;
+import com.lipata.whatsforlunch.data.AppSettings;
 import com.lipata.whatsforlunch.ui.BusinessListAdapter;
 import com.lipata.whatsforlunch.ui.MainActivity;
 
@@ -30,7 +31,6 @@ import se.akerfeldt.okhttp.signpost.SigningInterceptor;
  * Created by jlipata on 5/15/16.
  */
 public class YelpApi {
-
     public static final String LOG_TAG = "YelpApi";
     public static final String BASE_URL = "https://api.yelp.com/";
     public static final int RESULTS_PER_PAGE = 20; // However many results the Yelp API returns per page
@@ -38,8 +38,18 @@ public class YelpApi {
     /**
      * Max number of businesses that will be fetched from Yelp.  We were previously fetching all available
      * results, however load times were taking up to 1 minute on devices with slower connections
+     *
+     * 9/5/2016 Analyzing execution times of the entire fetch businesses sequence, fetching data from Yelp API is
+     * the most time consuming part. With `MAX_NO_OF_RESULTS = 240` we are averaging 4-6 seconds execution
+     * time over wifi (I assume mobile data would be even slower).
+     * `MAX_NO_OF_RESULTS = 120` averages 2-3 seconds
      */
-    public static final int MAX_NO_OF_RESULTS = 240; //
+    public static final int MAX_NO_OF_RESULTS = 120;
+
+    /**
+     * Amount by which to update the progress bar when making initial Yelp Api call
+     */
+    public static final int INITIAL_YELPAPICALL_PROGRESS_VALUE = 10;
 
     // Retrofit stuff
     OkHttpOAuthConsumer mConsumer;
@@ -58,7 +68,7 @@ public class YelpApi {
     int mActionableResults;
 
     /**
-     * CallLog
+     * mCallLog
      * Uses the `offset` as the key and the boolean to track whether the call has been received.
      * When we add an entry to the log, we set it to false, meaning the response has not been received yet.
      * The call2 callback will set the value to `true` when the response callback has been called.
@@ -97,6 +107,8 @@ public class YelpApi {
 
         // Update UI
         mMainActivity.onNewBusinessListRequested();
+        mMainActivity.incrementSecondaryProgress_BusinessProgressBar(INITIAL_YELPAPICALL_PROGRESS_VALUE);
+
 
         // Call Yelp
         Call<YelpResponse> call = mApiService.getBusinesses(term, location, radius);
@@ -105,6 +117,8 @@ public class YelpApi {
             public void onResponse(Call<YelpResponse> call, Response<YelpResponse> response) {
 
                 final YelpResponse yelpResponse = response.body();
+
+                mMainActivity.incrementProgress_BusinessProgressBar(INITIAL_YELPAPICALL_PROGRESS_VALUE);
 
                 if (yelpResponse != null) {
                     // Handle Yelp API "error"
@@ -169,18 +183,14 @@ public class YelpApi {
             mActionableResults = mTotalResultsAsPerFirstYelpCall;
         }
 
-        // We've already received 20, update secondaryProgress on UI
-        mMainActivity.incrementSecondaryProgress_BusinessProgressBar(getProgressValue(20));
-
         // Load the first 20
         for (int i = 0; i<yelpResponse.getBusinesses().size() ; i++){
             businessArray[i] = yelpResponse.getBusinesses().get(i);
         }
-        mMainActivity.incrementProgress_BusinessProgressBar(getProgressValue(20));
 
         // Load the rest
         final int start = yelpResponse.getBusinesses().size();
-        for(int offsetInt = start; offsetInt< mTotalResultsAsPerFirstYelpCall && offsetInt<MAX_NO_OF_RESULTS ; /* i is updated below */ ){
+        for(int offsetInt = start; offsetInt < mActionableResults ; /* i is updated below */ ){
             String offsetStr = Integer.toString(offsetInt);
             final int offsetPointer = offsetInt; // Need a `final` variable to use in the anonymous class below, otherwise I would just use `i`
 
@@ -212,7 +222,7 @@ public class YelpApi {
                         // If there's no error, proceed to add businesses
                         else {
                             List<Business> businesses = yelpResponse2.getBusinesses();
-                            addBusinesses(offsetPointer, businesses, businessArray);
+                            addBusinessesAndUpdateUiProgress(offsetPointer, businesses, businessArray);
                         }
                     } else if (response.errorBody()!=null){
                         try{
@@ -247,7 +257,7 @@ public class YelpApi {
         return (int) temp;
     }
 
-    private void addBusinesses(int offset, List<Business> businessList, Business[] businessArray){
+    private void addBusinessesAndUpdateUiProgress(int offset, List<Business> businessList, Business[] businessArray){
         // Add new batch of businesses to the master array in the correct order
         for(int i=0; i<businessList.size(); i++){
             businessArray[offset+i] = businessList.get(i);
@@ -277,14 +287,12 @@ public class YelpApi {
      * @return  True if all call2 responses have been received.  False if not
      */
     private boolean areAllCallsReceived(){
-        long startTime = System.nanoTime();
         for(Map.Entry<Integer, Boolean> entry : mCallLog.entrySet()){
             if(entry.getValue()==false){
                 //Utility.reportExecutionTime(this, "areAllCallsReceived() FALSE",startTime);
                 return false;
             }
         }
-        //Utility.reportExecutionTime(this, "areAllCallsReceived() TRUE", startTime);
         return true;
     }
 
@@ -300,13 +308,15 @@ public class YelpApi {
         businessListAdapter.setBusinessList(filteredBusinesses);
         businessListAdapter.notifyDataSetChanged();
 
+        // Analytics
+        Utility.reportExecutionTime(this, "callYelpApi sequence, time to get "+mMasterList.size()+" businesses", mCallYelpApiStartTime);
+        mMainActivity.onKeyMetric(AppSettings.FABRIC_METRIC_YELPAPI, mCallYelpApiStartTime);
+
         // UI
         mMainActivity.onNewBusinessListReceived();
         mMainActivity.hideProgressLayout(); // This is the final step of the exectuion sequence so hide progress bar layout
         mMainActivity.stopRefreshAnimation();
         mMainActivity.getRecyclerViewLayoutManager().scrollToPosition(0);
-        Utility.reportExecutionTime(this, "callYelpApi sequence, time to get "+mMasterList.size()+" businesses", mCallYelpApiStartTime);
-        mMainActivity.onKeyMetric("YelpApi call", mCallYelpApiStartTime);
     }
 
 }
