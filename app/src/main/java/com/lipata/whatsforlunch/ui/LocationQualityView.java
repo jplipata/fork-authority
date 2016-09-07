@@ -17,6 +17,7 @@ public class LocationQualityView {
 
     ImageView mImageView;
     Context context;
+    int mStatus;
 
     public LocationQualityView(Context context, ImageView imageView) {
         this.mImageView = imageView;
@@ -24,7 +25,8 @@ public class LocationQualityView {
     }
 
     public void setAccuracyCircleStatus(int statusCode){
-        switch (statusCode){
+        mStatus = statusCode;
+        switch (mStatus){
             case HIDE:
                 mImageView.setColorFilter(context.getResources().getColor(R.color.material_gray_100));
                 break;
@@ -38,6 +40,10 @@ public class LocationQualityView {
                 mImageView.setColorFilter(context.getResources().getColor(R.color.accuracy_BAD));
                 break;
         }
+    }
+
+    public int getStatus(){
+        return mStatus;
     }
 }
 

@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     // Constants
     static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp"; // TODO: This should go in R.strings
     static final String SUGGESTIONLIST_KEY = "suggestionList"; // TODO: This should go in R.strings
+    static final String LOCATION_QUALITY_KEY = "locationQuality";
     static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
     // Views
@@ -161,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
         // Restore state
         if (savedInstanceState != null) {
             mGooglePlayApi.setLocationUpdateTimestamp(savedInstanceState.getLong(LOCATION_UPDATE_TIMESTAMP_KEY));
+            mLocationQualityView.setAccuracyCircleStatus(savedInstanceState.getInt(LOCATION_QUALITY_KEY));
 
             String storedSuggestionList = savedInstanceState.getString(SUGGESTIONLIST_KEY, null);
             if (storedSuggestionList != null) {
@@ -439,6 +441,7 @@ public class MainActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle savedInstanceState){
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, mGooglePlayApi.getLocationUpdateTimestamp());
+        savedInstanceState.putInt(LOCATION_QUALITY_KEY, mLocationQualityView.getStatus());
 
         // TODO There must be a better way to do this
         String suggestionListStr = new Gson().toJson(mSuggestionListAdapter.getBusinessList());
