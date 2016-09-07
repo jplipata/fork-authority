@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -70,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar mProgressBar_Location;
     TextView mTextView_Progress_Businesses;
     ProgressBar mProgressBar_Businesses;
+    //ImageView mImageView_AccuracyCircle_left;
+    //ImageView mImageView_AccuracyCircle_right;
+  //  Drawable mDrawable_AccuracyCircle;
+    LocationQualityView mLocationQualityView;
 
     // App modules
     GooglePlayApi mGooglePlayApi;
@@ -103,7 +108,10 @@ public class MainActivity extends AppCompatActivity {
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
         mTextView_ApproxLocation = (TextView) findViewById(R.id.location_text);
-        mTextView_Accuracy = (TextView) findViewById(R.id.accuracy_text);
+        //mTextView_Accuracy = (TextView) findViewById(R.id.accuracy_text);
+        mLocationQualityView = new LocationQualityView (this, (ImageView) findViewById(R.id.accuracy_circle_left));
+        //mImageView_AccuracyCircle_right = (ImageView) findViewById(R.id.accuracy_circle_right);
+
 
         // Progress bar views
         mProgressBarLayout = (LinearLayout) findViewById(R.id.progressbar_layout);
@@ -170,6 +178,9 @@ public class MainActivity extends AppCompatActivity {
         if(mSuggestionListAdapter.getItemCount()==0){
             fetchBusinessList();
         }
+
+        //TESTING
+        //setAccuracyCircleStatus(10);
     }
 
     @Override protected void onResume(){
@@ -192,13 +203,14 @@ public class MainActivity extends AppCompatActivity {
 
     // UI methods
 
-    public void updateLocationViews(double latitude, double longitude, float accuracy){
+    public void updateLocationViews(double latitude, double longitude, int accuracyQuality){
         // Latitude range is 0 to +-90.  Longitude is 0 to +-180.
         // 6 decimal places is accurate to 43.496-111.32 mm
         // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
         mTextView_ApproxLocation.setText(new DecimalFormat("##.######").format(latitude)+", "
                 +new DecimalFormat("###.######").format(longitude));
-        mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
+        //mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
+        mLocationQualityView.setAccuracyCircleStatus(accuracyQuality);
     }
 
     public void startRefreshAnimation(){
@@ -226,11 +238,22 @@ public class MainActivity extends AppCompatActivity {
         mTextView_ApproxLocation.setText(text);
     }
 
+
+    /**
+     * This gets called first, newBusinessList next
+     */
     public void onDeviceLocationRequested(){
         if(mProgressBarLayout.getVisibility() != View.VISIBLE ){
             mProgressBarLayout.setVisibility(View.VISIBLE);
         }
+        // Reset progress text for both business list and location
+        mTextView_Progress_Businesses.setText(getResources().getText(R.string.loading_businesses));
         mTextView_Progress_Location.setText(getResources().getText(R.string.getting_your_location));
+
+        // Clear location header
+        mTextView_ApproxLocation.setText("");
+        mLocationQualityView.setAccuracyCircleStatus(LocationQualityView.HIDE);
+
         mProgressBar_Location.setVisibility(View.VISIBLE);
     }
 
@@ -291,6 +314,8 @@ public class MainActivity extends AppCompatActivity {
     public void hideProgressLayout(){
         mProgressBarLayout.setVisibility(View.GONE);
     }
+
+
 
     // Callback for Marshmallow requestPermissions() response
     // This must live in the Activity class

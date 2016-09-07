@@ -28,6 +28,7 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.lipata.whatsforlunch.api.yelp.YelpApi;
 import com.lipata.whatsforlunch.data.AppSettings;
+import com.lipata.whatsforlunch.ui.LocationQualityView;
 import com.lipata.whatsforlunch.ui.MainActivity;
 
 import java.util.ArrayList;
@@ -46,6 +47,8 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, ResultCallback<LocationSettingsResult> {
 
     private static final String LOG_TAG = GooglePlayApi.class.getSimpleName();
+    public static final float LOCATION_QUALITY_THRESHOLD_BEST = 100f;
+    public static final float LOCATION_QUALITY_THRESHOLD_BAD = 499f;
 
     final int LOCATION_REQUEST_INTERVAL = 20; // in milliseconds
     final int LOCATION_REQUEST_FASTEST_INTERVAL = 20;// in milliseconds
@@ -368,7 +371,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
             float accuracy = mLastLocation.getAccuracy();
             Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
 
-            mMainActivity.updateLocationViews(latitude, longitude, accuracy);
+            mMainActivity.updateLocationViews(latitude, longitude, getLocationQuality(accuracy));
             mMainActivity.onDeviceLocationRetrieved();
         } else {
             Log.d(LOG_TAG, "mLastLocation = null");
@@ -395,6 +398,15 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
             mMainActivity.stopRefreshAnimation();
         }
 
+    }
+
+    private int getLocationQuality(float accuracy){
+        Log.d(LOG_TAG, "getLocationQuality() accuracy "+accuracy);
+        if(accuracy< LOCATION_QUALITY_THRESHOLD_BEST){
+            return LocationQualityView.BEST;
+        } else if(accuracy> LOCATION_QUALITY_THRESHOLD_BAD){
+            return LocationQualityView.BAD;
+        } else return LocationQualityView.OK;
     }
 
     // Getters
