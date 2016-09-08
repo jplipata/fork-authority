@@ -1,6 +1,7 @@
 package com.lipata.whatsforlunch.ui;
 
 import android.content.Context;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.lipata.whatsforlunch.R;
@@ -22,6 +23,7 @@ public class LocationQualityView {
     public LocationQualityView(Context context, ImageView imageView) {
         this.mImageView = imageView;
         this.context = context;
+        mStatus = HIDE;
     }
 
     public void setAccuracyCircleStatus(int statusCode){
@@ -40,6 +42,13 @@ public class LocationQualityView {
                 mImageView.setColorFilter(context.getResources().getColor(R.color.accuracy_BAD));
                 break;
         }
+    }
+
+    public void show() {
+        mImageView.setVisibility(View.VISIBLE);
+    }
+    public void hide(){
+        mImageView.setVisibility(View.GONE);
     }
 
     public int getStatus(){

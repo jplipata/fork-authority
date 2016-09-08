@@ -6,16 +6,17 @@
 
     <dimen name="fab_margin">16dp</dimen>
 
-    <dimen name="location_padding">16dp</dimen>
+    <dimen name="general_padding">16dp</dimen>
 
     <!--CardView of business-->
     <dimen name="cardview_layout_LR_padding">4dp</dimen>
+    <dimen name="cardview_buttons_textsize">10sp</dimen>
+    
     <dimen name="layout_side_padding">12dp</dimen>
     <dimen name="layout_topbottom_padding">4dp</dimen>
 
-
-    <dimen name="cardview_buttons_textsize">10sp</dimen>
-    <dimen name="location_labels_textsize">12sp</dimen>
+    <dimen name="label_location_textsize">12sp</dimen>
+    <dimen name="layout_location_height">28dp</dimen>
 
 
 </resources>

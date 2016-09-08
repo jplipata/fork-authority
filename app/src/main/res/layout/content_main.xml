@@ -10,15 +10,31 @@
     android:background="@color/material_gray_100"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <FrameLayout
+        android:id="@+id/layout_progress_bar_location"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/layout_location_height"
+        android:paddingLeft="@dimen/general_padding"
+        android:paddingRight="@dimen/general_padding"
+        android:visibility="gone">
+        <ProgressBar
+            android:id="@+id/progress_bar_location"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:indeterminate="true"/>
+    </FrameLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_location"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/layout_location_height"
         android:paddingTop="6dp"
         android:paddingBottom="6dp"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-
+        android:orientation="horizontal"
+        android:animateLayoutChanges="true">
 
         <TextView
             android:id="@+id/location_text"
@@ -27,7 +43,7 @@
             android:singleLine="true"
             android:scrollHorizontally="true"
             android:ellipsize="marquee"
-            android:paddingLeft="@dimen/location_padding"
+            android:paddingLeft="@dimen/general_padding"
             android:freezesText="true"
             android:text="location" />
 
@@ -38,14 +54,10 @@
             android:layout_alignParentRight="true"
             android:src="@drawable/circle"
             android:scaleType="center"
-            android:paddingRight="@dimen/location_padding"
+            android:paddingRight="@dimen/general_padding"
             android:layout_centerVertical="true" />
 
-
     </RelativeLayout>
-
-
-
 
     <TextView
         android:paddingTop="4dp"
@@ -90,20 +102,8 @@
         android:orientation="vertical"
         android:id="@+id/progressbar_layout"
         android:background="@color/material_gray_100"
-        android:padding="@dimen/location_padding">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/getting_your_location"
-            android:id="@+id/textview_progress_location"/>
-
-        <ProgressBar
-            android:id="@+id/progress_bar_location"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:indeterminate="true"/>
+        android:animateLayoutChanges="true"
+        android:padding="@dimen/general_padding">
 
         <TextView
             android:layout_width="wrap_content"
@@ -118,11 +118,9 @@
             android:layout_height="wrap_content"
             android:indeterminate="false"
             android:max="100"/>
-
-
     </LinearLayout>
 
-        <android.support.v7.widget.RecyclerView
+    <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/activity_horizontal_margin_thin"

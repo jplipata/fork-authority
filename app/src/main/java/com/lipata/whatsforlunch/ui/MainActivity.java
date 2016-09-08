@@ -17,9 +17,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,22 +62,19 @@ public class MainActivity extends AppCompatActivity {
     // Views
     protected CoordinatorLayout mCoordinatorLayout;
     protected TextView mTextView_ApproxLocation;
-    protected TextView mTextView_Accuracy;
     protected RecyclerView mRecyclerView_suggestionList;
     private LinearLayoutManager mSuggestionListLayoutManager;
     private BusinessListAdapter mSuggestionListAdapter;
     FloatingActionButton mFAB_refresh;
     ObjectAnimator mFAB_refreshAnimation;
     Snackbar mSnackbar;
+    FrameLayout mLayout_ProgressBar_Location;
+    LocationQualityView mLocationQualityView;
     LinearLayout mProgressBarLayout;
-    TextView mTextView_Progress_Location;
+    RelativeLayout mLayout_LocationViews;
     ProgressBar mProgressBar_Location;
     TextView mTextView_Progress_Businesses;
     ProgressBar mProgressBar_Businesses;
-    //ImageView mImageView_AccuracyCircle_left;
-    //ImageView mImageView_AccuracyCircle_right;
-  //  Drawable mDrawable_AccuracyCircle;
-    LocationQualityView mLocationQualityView;
 
     // App modules
     GooglePlayApi mGooglePlayApi;
@@ -109,18 +108,17 @@ public class MainActivity extends AppCompatActivity {
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
         mTextView_ApproxLocation = (TextView) findViewById(R.id.location_text);
-        //mTextView_Accuracy = (TextView) findViewById(R.id.accuracy_text);
         mLocationQualityView = new LocationQualityView (this, (ImageView) findViewById(R.id.accuracy_circle_left));
-        //mImageView_AccuracyCircle_right = (ImageView) findViewById(R.id.accuracy_circle_right);
-
+        mLayout_LocationViews = (RelativeLayout) findViewById(R.id.layout_location);
 
         // Progress bar views
         mProgressBarLayout = (LinearLayout) findViewById(R.id.progressbar_layout);
         mProgressBarLayout.setVisibility(View.GONE);
-        mTextView_Progress_Location = (TextView) findViewById(R.id.textview_progress_location);
         mProgressBar_Location = (ProgressBar) findViewById(R.id.progress_bar_location);
         mTextView_Progress_Businesses = (TextView) findViewById(R.id.textview_progress_loadbusinesses);
         mProgressBar_Businesses = (ProgressBar) findViewById(R.id.progress_bar_businesses);
+        mLayout_ProgressBar_Location = (FrameLayout) findViewById(R.id.layout_progress_bar_location);
+
 
         // RecyclerView
         mRecyclerView_suggestionList = (RecyclerView) findViewById(R.id.suggestion_list);
@@ -245,23 +243,19 @@ public class MainActivity extends AppCompatActivity {
      * This gets called first, newBusinessList next
      */
     public void onDeviceLocationRequested(){
-        if(mProgressBarLayout.getVisibility() != View.VISIBLE ){
-            mProgressBarLayout.setVisibility(View.VISIBLE);
-        }
+        mLayout_LocationViews.setVisibility(View.GONE);
+        mLayout_ProgressBar_Location.setVisibility(View.VISIBLE);
+
         // Reset progress text for both business list and location
         mTextView_Progress_Businesses.setText(getResources().getText(R.string.loading_businesses));
-        mTextView_Progress_Location.setText(getResources().getText(R.string.getting_your_location));
+        mTextView_ApproxLocation.setText(getResources().getText(R.string.getting_your_location));
 
-        // Clear location header
-        mTextView_ApproxLocation.setText("");
         mLocationQualityView.setAccuracyCircleStatus(LocationQualityView.HIDE);
-
-        mProgressBar_Location.setVisibility(View.VISIBLE);
     }
 
     public void onDeviceLocationRetrieved(){
-        mTextView_Progress_Location.setText(getResources().getText(R.string.getting_your_location)+"OK");
-        mProgressBar_Location.setVisibility(View.GONE);
+        mLayout_ProgressBar_Location.setVisibility(View.GONE);
+        mLayout_LocationViews.setVisibility(View.VISIBLE);
 
         Utility.reportExecutionTime(this, AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mStartTime_Location);
         logFabricAnswersMetric(AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mStartTime_Location);

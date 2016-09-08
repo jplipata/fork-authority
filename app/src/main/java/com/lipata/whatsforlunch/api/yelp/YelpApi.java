@@ -36,17 +36,6 @@ public class YelpApi {
     public static final int RESULTS_PER_PAGE = 20; // However many results the Yelp API returns per page
 
     /**
-     * Max number of businesses that will be fetched from Yelp.  We were previously fetching all available
-     * results, however load times were taking up to 1 minute on devices with slower connections
-     *
-     * 9/5/2016 Analyzing execution times of the entire fetch businesses sequence, fetching data from Yelp API is
-     * the most time consuming part. With `MAX_NO_OF_RESULTS = 240` we are averaging 4-6 seconds execution
-     * time over wifi (I assume mobile data would be even slower).
-     * `MAX_NO_OF_RESULTS = 120` averages 2-3 seconds
-     */
-    public static final int MAX_NO_OF_RESULTS = 120;
-
-    /**
      * Amount by which to update the progress bar when making initial Yelp Api call
      */
     public static final int INITIAL_YELPAPICALL_PROGRESS_VALUE = 10;
@@ -177,8 +166,8 @@ public class YelpApi {
 
         // Figure out actual number of results to get
         // TODO This is a mess.  mTotalResultsAsPerFirstYelpCall, mActionableResults, etc.  Too many variables
-        if(mTotalResultsAsPerFirstYelpCall > MAX_NO_OF_RESULTS){
-            mActionableResults = MAX_NO_OF_RESULTS;
+        if(mTotalResultsAsPerFirstYelpCall > AppSettings.MAX_NO_OF_RESULTS){
+            mActionableResults = AppSettings.MAX_NO_OF_RESULTS;
         } else {
             mActionableResults = mTotalResultsAsPerFirstYelpCall;
         }
