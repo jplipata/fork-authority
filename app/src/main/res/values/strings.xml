@@ -1,6 +1,6 @@
 <resources>
     <!-- UI - App -->
-    <string name="app_name">fork authority</string>
+    <string name="app_name">Fork Authority</string>
     <string name="action_settings">Settings</string>
 
     <!-- UI - Location Strings -->

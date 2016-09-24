@@ -13,8 +13,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by jlipatap on 1/17/16.
- *
+ * I was concerned that some of the iterative O(n) implementations in this class would result in
+ * poor performance, however as of 2016/9/8 execution times for this module are approx 20 ms.  Compared to
+ * 1-2 secs for getting the device location plus 3-6 seconds to load Yelp data, this seems insignificant.
  */
 public class BusinessListManager {
     private static String LOG_TAG = BusinessListManager.class.getSimpleName();

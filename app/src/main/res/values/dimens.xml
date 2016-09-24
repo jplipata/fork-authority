@@ -11,12 +11,12 @@
     <!--CardView of business-->
     <dimen name="cardview_layout_LR_padding">4dp</dimen>
     <dimen name="cardview_buttons_textsize">10sp</dimen>
-    
+
     <dimen name="layout_side_padding">12dp</dimen>
     <dimen name="layout_topbottom_padding">4dp</dimen>
 
     <dimen name="label_location_textsize">12sp</dimen>
-    <dimen name="layout_location_height">28dp</dimen>
+    <dimen name="layout_location_height">30dp</dimen>
 
 
 </resources>
