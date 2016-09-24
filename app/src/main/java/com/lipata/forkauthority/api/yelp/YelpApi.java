@@ -93,6 +93,7 @@ public class YelpApi {
 
     public void callYelpApi(final String term, final String location, final String radius){
         mCallYelpApiStartTime = System.nanoTime();
+        mMasterList = new ArrayList<>();
 
         // Update UI
         mMainActivity.onNewBusinessListRequested();
@@ -154,8 +155,7 @@ public class YelpApi {
 
     private void getMoreThan20Results(final YelpResponse yelpResponse, String term, String location, String radius) {
 
-        // Reset mMasterList & mCallLog
-        mMasterList = new ArrayList<>();
+        // Reset mCallLog
         mCallLog = new HashMap<>();
 
         // Using an array `businessArray` so that we can use the indexes to keep the results in order since

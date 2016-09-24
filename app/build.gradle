@@ -24,7 +24,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
-        versionName "0.1"
+        versionName "1.0 beta"
 
         Properties properties = new Properties()
         properties.load(project.rootProject.file('apikeys').newDataInputStream())
