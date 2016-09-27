@@ -2,7 +2,7 @@
 Can't decide what to eat? Let us help you!
 
 #### Background
-<img src="https://cloud.githubusercontent.com/assets/11450465/14229888/806b9cd6-f910-11e5-9f5f-982ea09fe3a1.gif" width="325" align="right">
+<img src="https://cloud.githubusercontent.com/assets/11450465/18818300/b78559a6-8343-11e6-8869-e0a2d0266eaa.gif" align="right">
 
 No matter how many stars a restaurant has on Yelp, you'll get sick of it if you eat there everyday.  Fork Authority let's you specify things like "just ate here", "like", or "don't like".  The app will store your preferences and provide you with a personalized list of search results.  You can also "swipe to dismiss" to help narrow down your options.
 
