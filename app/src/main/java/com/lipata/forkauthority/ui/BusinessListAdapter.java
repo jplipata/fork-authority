@@ -68,10 +68,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         public Button mButton_Like;
         public Button mButton_DontLike;
 
-        //public View mView_Separater;
-        //public LinearLayout mLayout_DescriptiveText;
         public TextView mTextView_DescriptiveText;
-        //public TextView mTextView_LikeDontLike;
 
         public ViewHolder(View v) {
             super(v);
@@ -88,10 +85,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             mButton_Like = (Button) v.findViewById(R.id.button_like);
             mButton_DontLike = (Button) v.findViewById(R.id.button_dontlike);
 
-            //mView_Separater = v.findViewById(R.id.bottom_separator);
-            //mLayout_DescriptiveText = (LinearLayout) v.findViewById(R.id.descriptive_text_layout);
             mTextView_DescriptiveText = (TextView) v.findViewById(R.id.business_descriptive_text);
-            //mTextView_LikeDontLike = (TextView) v.findViewById(R.id.business_likeordontlike);
         }
     }
 
