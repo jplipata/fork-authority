@@ -50,7 +50,7 @@ import io.fabric.sdk.android.Fabric;
  *  and uses GSON to parse and display the response.
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainView {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     // Constants
@@ -203,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
 
     // UI methods
 
+    @Override
     public void updateLocationViews(double latitude, double longitude, int accuracyQuality){
         // Latitude range is 0 to +-90.  Longitude is 0 to +-180.
         // 6 decimal places is accurate to 43.496-111.32 mm
@@ -213,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
         mLocationQualityView.setAccuracyCircleStatus(accuracyQuality);
     }
 
+    @Override
     public void startRefreshAnimation(){
         Log.d(LOG_TAG, "Starting animation");
         if(!mFAB_refreshAnimation.isRunning()) {
@@ -220,20 +222,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
     public void stopRefreshAnimation(){
         Log.d(LOG_TAG, "Stop animation");
         mFAB_refreshAnimation.cancel();
     }
 
+    @Override
     public void showSnackBarIndefinite(String text){
         mSnackbar = Snackbar.make(mCoordinatorLayout, text, Snackbar.LENGTH_INDEFINITE);
         mSnackbar.show();
     }
 
+    @Override
     public void showToast(String text){
         Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
     public void setLocationText(String text){
         mTextView_ApproxLocation.setText(text);
     }
@@ -242,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * This gets called first, newBusinessList next
      */
+    @Override
     public void onDeviceLocationRequested(){
         mLayout_LocationViews.setVisibility(View.GONE);
         mLayout_ProgressBar_Location.setVisibility(View.VISIBLE);
@@ -250,9 +257,10 @@ public class MainActivity extends AppCompatActivity {
         mTextView_Progress_Businesses.setText(getResources().getText(R.string.loading_businesses));
         mTextView_ApproxLocation.setText(getResources().getText(R.string.getting_your_location));
 
-        mLocationQualityView.setAccuracyCircleStatus(LocationQualityView.HIDE);
+        mLocationQualityView.setAccuracyCircleStatus(LocationQualityView.Status.HIDE);
     }
 
+    @Override
     public void onDeviceLocationRetrieved(){
         mLayout_ProgressBar_Location.setVisibility(View.GONE);
         mLayout_LocationViews.setVisibility(View.VISIBLE);
@@ -261,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
         logFabricAnswersMetric(AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mStartTime_Location);
     }
 
+    @Override
     public void onNewBusinessListRequested(){
         if(mProgressBarLayout.getVisibility() != View.VISIBLE ){
             mProgressBarLayout.setVisibility(View.VISIBLE);
@@ -271,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
         mProgressBar_Businesses.setVisibility(View.VISIBLE);
     }
 
+    @Override
     public void onNewBusinessListReceived(){
         // UI
         mTextView_Progress_Businesses.setText(getResources().getText(R.string.loading_businesses)+"OK");
@@ -281,6 +291,7 @@ public class MainActivity extends AppCompatActivity {
         logFabricAnswersMetric(AppSettings.FABRIC_METRIC_FETCH_BIZ_SEQUENCE, mStartTime_Fetch);
     }
 
+    @Override
     public void incrementProgress_BusinessProgressBar(int value){
         int currentValue = mProgressBar_Businesses.getProgress();
         int maxValue = mProgressBar_Businesses.getMax();
@@ -294,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
     public void incrementSecondaryProgress_BusinessProgressBar(int value){
         int currentValue = mProgressBar_Businesses.getSecondaryProgress();
         int maxValue = mProgressBar_Businesses.getMax();
@@ -307,6 +319,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
     public void hideProgressLayout(){
         mProgressBarLayout.setVisibility(View.GONE);
     }
@@ -370,6 +383,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // Trigger location + yelp calls
+    @Override
     public void fetchBusinessList(){
         mStartTime_Fetch = System.nanoTime();
         // UI
@@ -406,6 +420,7 @@ public class MainActivity extends AppCompatActivity {
      * @param metricName
      * @param startTime In nanoseconds, will be converted to milliseconds
      */
+    @Override
     public void logFabricAnswersMetric(String metricName, long startTime) {
         long executionTime = System.nanoTime()-startTime;
         long executionTime_ms = executionTime / 1000000;
@@ -413,8 +428,6 @@ public class MainActivity extends AppCompatActivity {
                 .putCustomAttribute("Execution time (ms)", executionTime_ms));
     }
 
-
-    // Helper methods
 
     private void executeGooglePlayApiLocation(){
         mStartTime_Location = System.nanoTime();
@@ -430,7 +443,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Retain Activity state
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState){
         super.onSaveInstanceState(savedInstanceState);
@@ -442,7 +454,6 @@ public class MainActivity extends AppCompatActivity {
         savedInstanceState.putString(SUGGESTIONLIST_KEY, suggestionListStr);
     }
 
-    // MainActivity template menu override methods
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -469,18 +480,22 @@ public class MainActivity extends AppCompatActivity {
     // Getters
 
     //TODO RecyclerView.LayoutManager has been replaced by android.support.v7.widget.LinearLayoutManager.  For some reason this still works, but it could cause problems later.
+    @Override
     public RecyclerView.LayoutManager getRecyclerViewLayoutManager(){
         return mSuggestionListLayoutManager;
     }
 
+    @Override
     public CoordinatorLayout getCoordinatorLayout(){
         return mCoordinatorLayout;
     }
 
+    @Override
     public BusinessListAdapter getSuggestionListAdapter() {
         return mSuggestionListAdapter;
     }
 
+    @Override
     public BusinessListManager getBusinessListManager() {
         return mBusinessListManager;
     }

@@ -9,6 +9,7 @@ import com.lipata.forkauthority.api.yelp.model.YelpResponse;
 import com.lipata.forkauthority.data.AppSettings;
 import com.lipata.forkauthority.ui.BusinessListAdapter;
 import com.lipata.forkauthority.ui.MainActivity;
+import com.lipata.forkauthority.ui.MainView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,9 +28,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import se.akerfeldt.okhttp.signpost.OkHttpOAuthConsumer;
 import se.akerfeldt.okhttp.signpost.SigningInterceptor;
 
-/**
- * Created by jlipata on 5/15/16.
- */
 public class YelpApi {
     public static final String LOG_TAG = "YelpApi";
     public static final String BASE_URL = "https://api.yelp.com/";
@@ -47,8 +45,7 @@ public class YelpApi {
     Retrofit mRetrofit;
     final Endpoints mApiService;
 
-    // TODO Need to abstract this
-    MainActivity mMainActivity;
+    MainView view;
 
     List<Business> mMasterList; // This is our main data
 
@@ -67,7 +64,7 @@ public class YelpApi {
     long mCallYelpApiStartTime;
 
     public YelpApi(MainActivity mainActivity) {
-        this.mMainActivity = mainActivity;
+        this.view = mainActivity;
 
         // OAuth
         mConsumer = new OkHttpOAuthConsumer(BuildConfig.CONSUMER_KEY, BuildConfig.CONSUMER_SECRET);
@@ -96,8 +93,8 @@ public class YelpApi {
         mMasterList = new ArrayList<>();
 
         // Update UI
-        mMainActivity.onNewBusinessListRequested();
-        mMainActivity.incrementSecondaryProgress_BusinessProgressBar(INITIAL_YELPAPICALL_PROGRESS_VALUE);
+        view.onNewBusinessListRequested();
+        view.incrementSecondaryProgress_BusinessProgressBar(INITIAL_YELPAPICALL_PROGRESS_VALUE);
 
 
         // Call Yelp
@@ -108,22 +105,22 @@ public class YelpApi {
 
                 final YelpResponse yelpResponse = response.body();
 
-                mMainActivity.incrementProgress_BusinessProgressBar(INITIAL_YELPAPICALL_PROGRESS_VALUE);
+                view.incrementProgress_BusinessProgressBar(INITIAL_YELPAPICALL_PROGRESS_VALUE);
 
                 if (yelpResponse != null) {
                     // Handle Yelp API "error"
                     if (yelpResponse.getError() != null) {
                         Log.e(LOG_TAG, "YELP API ERROR RETURNED: " + yelpResponse.getError().getText()
                                 + " ID: " + yelpResponse.getError().getId());
-                        mMainActivity.stopRefreshAnimation();
-                        mMainActivity.showSnackBarIndefinite("Yelp API Error: " + yelpResponse.getError().getText());
+                        view.stopRefreshAnimation();
+                        view.showSnackBarIndefinite("Yelp API Error: " + yelpResponse.getError().getText());
                     }
 
                     // Handle case where there's no error but no results are returned
                     else if (yelpResponse.getBusinesses().size() == 0) {
                         Log.d(LOG_TAG, "Yelp API returned no results");
-                        mMainActivity.stopRefreshAnimation();
-                        mMainActivity.showSnackBarIndefinite("No businesses found.");
+                        view.stopRefreshAnimation();
+                        view.showSnackBarIndefinite("No businesses found.");
                     }
 
                     // Handle case where there are 20 or less results
@@ -138,8 +135,8 @@ public class YelpApi {
                         getMoreThan20Results(yelpResponse, term, location, radius);
                     }
                 } else {
-                    mMainActivity.showSnackBarIndefinite("Yelp API Error: Null response.");
-                    mMainActivity.stopRefreshAnimation();
+                    view.showSnackBarIndefinite("Yelp API Error: Null response.");
+                    view.stopRefreshAnimation();
                 }
             }
 
@@ -147,8 +144,8 @@ public class YelpApi {
             public void onFailure(Call<YelpResponse> call, Throwable t) {
                 Log.e(LOG_TAG, "Retrofit FAILURE", t);
                 t.printStackTrace();
-                mMainActivity.stopRefreshAnimation();
-                mMainActivity.showSnackBarIndefinite("Yelp API error.  Check your internet connection or perhaps there's a problem with Yelp at the moment.");
+                view.stopRefreshAnimation();
+                view.showSnackBarIndefinite("Yelp API error.  Check your internet connection or perhaps there's a problem with Yelp at the moment.");
             }
         });
     }
@@ -232,7 +229,7 @@ public class YelpApi {
             });
 
             // Update UI
-            mMainActivity.incrementSecondaryProgress_BusinessProgressBar(getProgressValue(RESULTS_PER_PAGE));
+            view.incrementSecondaryProgress_BusinessProgressBar(getProgressValue(RESULTS_PER_PAGE));
 
             // Update `i`
             // We cannot increment `i` by the actual number of responses received because the response
@@ -252,7 +249,7 @@ public class YelpApi {
             businessArray[offset+i] = businessList.get(i);
         }
 
-        mMainActivity.incrementProgress_BusinessProgressBar(getProgressValue(businessList.size()));
+        view.incrementProgress_BusinessProgressBar(getProgressValue(businessList.size()));
 
         // Check to see if all calls have been received.  If yes, proceed to filter list and update UI
         tryUpdateMasterListandUpdateUI(businessArray);
@@ -292,20 +289,20 @@ public class YelpApi {
         Log.d(LOG_TAG, "Total results received " + mMasterList.size());
 
         // Pass list to BusinessListManager to be processed and update UI
-        BusinessListAdapter businessListAdapter = mMainActivity.getSuggestionListAdapter();
-        List<Business> filteredBusinesses = mMainActivity.getBusinessListManager().filter(mMasterList);
+        BusinessListAdapter businessListAdapter = view.getSuggestionListAdapter();
+        List<Business> filteredBusinesses = view.getBusinessListManager().filter(mMasterList);
         businessListAdapter.setBusinessList(filteredBusinesses);
         businessListAdapter.notifyDataSetChanged();
 
         // Analytics
         Utility.reportExecutionTime(this, "callYelpApi sequence, time to get "+mMasterList.size()+" businesses", mCallYelpApiStartTime);
-        mMainActivity.logFabricAnswersMetric(AppSettings.FABRIC_METRIC_YELPAPI, mCallYelpApiStartTime);
+        view.logFabricAnswersMetric(AppSettings.FABRIC_METRIC_YELPAPI, mCallYelpApiStartTime);
 
         // UI
-        mMainActivity.onNewBusinessListReceived();
-        mMainActivity.hideProgressLayout(); // This is the final step of the exectuion sequence so hide progress bar layout
-        mMainActivity.stopRefreshAnimation();
-        mMainActivity.getRecyclerViewLayoutManager().scrollToPosition(0);
+        view.onNewBusinessListReceived();
+        view.hideProgressLayout(); // This is the final step of the exectuion sequence so hide progress bar layout
+        view.stopRefreshAnimation();
+        view.getRecyclerViewLayoutManager().scrollToPosition(0);
     }
 
 }
