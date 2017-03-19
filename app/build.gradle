@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.24.4'
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 apply plugin: 'com.android.application'
@@ -12,31 +12,28 @@ apply plugin: 'io.fabric'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
-    google()
 }
 
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 23
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "com.lipata.forkauthority"
         minSdkVersion 16
-        targetSdkVersion 25
-        versionCode 2
-        versionName "1.01 beta"
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0 beta"
 
         Properties properties = new Properties()
         properties.load(project.rootProject.file('apikeys').newDataInputStream())
-        buildConfigField "String", "YELPFUSION_CLIENT_ID", properties.getProperty('YELPFUSION_CLIENT_ID')
-        buildConfigField "String", "YELPFUSION_CLIENT_SECRET", properties.getProperty('YELPFUSION_CLIENT_SECRET')
-        buildConfigField "String", "YELPFUSION_TEST_TOKEN", properties.getProperty('YELPFUSION_TEST_TOKEN')
+        buildConfigField "String", "CONSUMER_KEY", properties.getProperty('apikey.CONSUMER_KEY')
+        buildConfigField "String", "CONSUMER_SECRET", properties.getProperty('apikey.CONSUMER_SECRET')
+        buildConfigField "String", "TOKEN", properties.getProperty('apikey.TOKEN')
+        buildConfigField "String", "TOKEN_SECRET", properties.getProperty('apikey.TOKEN_SECRET')
 
-        manifestPlaceholders = [ crashlytics:properties.getProperty('crashlytics') ]
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+        manifestPlaceholders = [ crashlytics:properties.getProperty('apikey.crashlytics') ]
     }
     buildTypes {
         release {
@@ -44,56 +41,36 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
-    }
-
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.7.22'
-    androidTestCompile 'com.android.support:support-annotations:25.4.0'
-    androidTestCompile 'com.android.support.test:runner:1.0.1'
-    androidTestCompile 'com.android.support.test:rules:1.0.1'
-    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'org.mockito:mockito-core:1.10.19'
 
-
-    compile 'com.android.support:appcompat-v7:25.4.0'
-    compile 'com.android.support:design:25.4.0'
-    compile 'com.google.android.gms:play-services-location:11.4.2'
-    compile 'com.android.support:recyclerview-v7:25.4.0'
-    compile 'com.android.support:cardview-v7:25.4.0'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:design:23.4.0'
+    compile 'com.google.android.gms:play-services-location:8.4.0'
+    compile 'com.android.support:recyclerview-v7:23.4.0'
+    compile 'com.android.support:cardview-v7:23.4.0'
 
     compile 'com.squareup.picasso:picasso:2.5.2'
 
-    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.google.code.gson:gson:2.6.2'
 
     provided 'org.glassfish:javax.annotation:10.0-b28'
 
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
-    compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-    compile 'com.squareup.okhttp3:okhttp:3.9.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+    compile 'com.squareup.retrofit2:retrofit:2.0.2'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
 
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile "io.reactivex.rxjava2:rxjava:2.1.5"
+    compile 'se.akerfeldt:okhttp-signpost:1.1.0'
+    compile 'oauth.signpost:signpost-core:1.2.1.2'
 
-    // Dagger core dependencies
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.10'
-    compile 'com.google.dagger:dagger:2.10'
-
-    // Dagger Android dependencies
-    annotationProcessor 'com.google.dagger:dagger-android-processor:2.10'
-    compile 'com.google.dagger:dagger-android-support:2.10'
-
+    compile 'io.reactivex:rxandroid:1.2.0'
+    compile 'io.reactivex:rxjava:1.1.5'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
         transitive = true;
     }
