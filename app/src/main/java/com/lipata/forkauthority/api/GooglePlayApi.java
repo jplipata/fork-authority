@@ -28,7 +28,6 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.lipata.forkauthority.api.yelp.YelpApi;
 import com.lipata.forkauthority.data.AppSettings;
-import com.lipata.forkauthority.ui.LocationQualityView;
 import com.lipata.forkauthority.ui.MainActivity;
 
 import java.util.ArrayList;
@@ -38,6 +37,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static com.lipata.forkauthority.ui.LocationQualityView.Status.*;
 
 /**
  * Created by jlipata on 4/2/16.
@@ -70,10 +70,10 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     private GeocoderApi mGeocoder;
 
-    protected GoogleApiClient mGoogleApiClient;
-    protected Location mLastLocation;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
     private LocationRequest mLocationRequest;
-    long mLocationUpdateTimestamp; // in milliseconds
+    private long mLocationUpdateTimestamp; // in milliseconds
 
     private List<Location> mLocationArray;
 
@@ -403,10 +403,10 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     private int getLocationQuality(float accuracy){
         Log.d(LOG_TAG, "getLocationQuality() accuracy "+accuracy);
         if(accuracy< LOCATION_QUALITY_THRESHOLD_BEST){
-            return LocationQualityView.BEST;
+            return BEST;
         } else if(accuracy> LOCATION_QUALITY_THRESHOLD_BAD){
-            return LocationQualityView.BAD;
-        } else return LocationQualityView.OK;
+            return BAD;
+        } else return OK;
     }
 
     // Getters

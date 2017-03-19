@@ -22,7 +22,7 @@ public class UserRecords {
 
     Context mContext;
 
-    //TODO Replace this inefficient list implementation with a HashMap
+    //TODO Replace this inefficient list implementation with a HashMap.  This is the biggest technical debt
     List<BusinessItemRecord> mList;
 
     public UserRecords(Context context) {
