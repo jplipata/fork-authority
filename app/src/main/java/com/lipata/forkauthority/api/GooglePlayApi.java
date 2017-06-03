@@ -33,11 +33,12 @@ import com.lipata.forkauthority.ui.MainActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
-import static com.lipata.forkauthority.ui.LocationQualityView.Status.*;
+import static com.lipata.forkauthority.ui.LocationQualityView.Status.BAD;
+import static com.lipata.forkauthority.ui.LocationQualityView.Status.BEST;
+import static com.lipata.forkauthority.ui.LocationQualityView.Status.OK;
 
 /**
  * Created by jlipata on 4/2/16.
@@ -77,7 +78,6 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     private List<Location> mLocationArray;
 
-    private long mRequestLocationStartTime;
     private long mLastLocationChangeTime;
 
     public GooglePlayApi(MainActivity mainActivity, GeocoderApi geocoder) {
@@ -87,7 +87,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         mGoogleApiClient = new GoogleApiClient.Builder(mMainActivity)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
-                 .addApi(LocationServices.API).build();
+                .addApi(LocationServices.API).build();
 
         /**
          * Regarding these settings see:
@@ -99,8 +99,8 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(LOCATION_REQUEST_INTERVAL)
                 .setFastestInterval(LOCATION_REQUEST_FASTEST_INTERVAL)
-                //.setMaxWaitTime(LOCATION_REQUEST_MAX_WAIT_TIME)
-            ;
+        //.setMaxWaitTime(LOCATION_REQUEST_MAX_WAIT_TIME)
+        ;
     }
 
     // Callbacks for Google Play API
@@ -108,16 +108,15 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     /**
      * This is the first step/entry point in the sequence of execution steps, unless the client is already connected
      * See MainActivity.executeGooglePlayApiLocation()
+     *
      * @param connectionHint
      */
-    @Override public void onConnected(Bundle connectionHint) {
+    @Override
+    public void onConnected(Bundle connectionHint) {
         Log.d(LOG_TAG, "onConnected()");
 
-        // Timestamp to measure entire location request process
-        mRequestLocationStartTime = System.nanoTime();
-
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if(location!=null && location.getAccuracy()<ACCURACY_TOLERANCE) {
+        if (location != null && location.getAccuracy() < ACCURACY_TOLERANCE) {
             Log.d(LOG_TAG, "LastLocation not null and within ACCURACY_TOLERANCE");
 
             onBestLocationDetermined(location);
@@ -126,7 +125,8 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    @Override public void onConnectionFailed(ConnectionResult result) {
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
         // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
         // onConnectionFailed.
         // https://developers.google.com/android/reference/com/google/android/gms/common/ConnectionResult
@@ -135,7 +135,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
         Log.i(LOG_TAG, "GoogleApiClient Connection failed: ConnectionResult.getErrorCode() = " + errorCode);
 
-        switch (errorCode){
+        switch (errorCode) {
             case 1:
                 mMainActivity.showSnackBarIndefinite("ERROR: Google Play services is missing on this device");
                 break;
@@ -148,7 +148,8 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    @Override public void onConnectionSuspended(int cause) {
+    @Override
+    public void onConnectionSuspended(int cause) {
         // The connection to Google Play services was lost for some reason. We call connect() to
         // attempt to re-establish the connection.
         Log.i(LOG_TAG, "Connection suspended");
@@ -157,19 +158,17 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     }
 
     // Callback method for LocationRequest
-    @Override public void onLocationChanged(Location location) {
-
-        Log.d(LOG_TAG,"onLocationChanged() Execution analytics: Time since last update "+ ((System.nanoTime()- mLastLocationChangeTime)/1000000)+" ms");
-
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d(LOG_TAG, "onLocationChanged() Execution analytics: Time since last update " + ((System.nanoTime() - mLastLocationChangeTime) / 1000000) + " ms");
         mLastLocationChangeTime = System.nanoTime();
-
         mLocationArray.add(location);
-
         areAllLocationsReceived();
     }
 
     // Callback for LocationSettingsRequest
-    @Override public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
+    @Override
+    public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
         final Status status = locationSettingsResult.getStatus();
 
         Log.d(LOG_TAG, "Location Settings result received. Code = " + status.getStatusCode());
@@ -204,7 +203,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     // Public methods
 
-    public void checkDeviceLocationEnabled(){
+    public void checkDeviceLocationEnabled() {
 
         Log.d(LOG_TAG, "Checking that Location is enabled on device...");
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -220,41 +219,39 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     }
 
-    public boolean isLocationStale(){
+    public boolean isLocationStale() {
         long currentTime = SystemClock.elapsedRealtime();
         Log.d(LOG_TAG, "currentTime = " + currentTime);
         Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
 
-        if(getLastLocation()==null){
+        if (getLastLocation() == null) {
             return true;
-        } else if ((currentTime - mLocationUpdateTimestamp) > AppSettings.LOCATION_LIFESPAN){
+        } else if ((currentTime - mLocationUpdateTimestamp) > AppSettings.LOCATION_LIFESPAN) {
             return true;
         } else {
-            return false;}
+            return false;
+        }
     }
 
-    public void requestLocationUpdates(){
-
-        /*
-         * Public method called by onRequestPermissionsResult in MainActivity
-         */
-
-        // Timestamp to measure entire location request process
-        //mRequestLocationStartTime = System.nanoTime();
-
+    /**
+     * Public method called by onRequestPermissionsResult in MainActivity
+     */
+    public void requestLocationUpdates() {
         // We want to get a few locations from the API and pick the best one
         // We'll store them in an array
         mLocationArray = new ArrayList<>();
 
         // Timestamp for individual location updates { onLocationChanged() }
         mLastLocationChangeTime = System.nanoTime();
+
+        //TODO Suppress this warning
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, mLocationRequest, this);
     }
 
     public void stopLocationUpdates() {
 
-        if(mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
 
             // For our purposes, once we have the location, we no longer need the client, so disconnect
@@ -275,21 +272,21 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
      */
     private void areAllLocationsReceived() {
         Log.d(LOG_TAG, String.format("Location request #%d", mLocationArray.size()));
-        if(mLocationArray.size()>= LOCATION_REQUEST_SAMPLE_SIZE){
+        if (mLocationArray.size() >= LOCATION_REQUEST_SAMPLE_SIZE) {
             stopLocationUpdates();
-            onBestLocationDetermined(identifyBestLocation());
+            onBestLocationDetermined(getBestLocation());
         }
     }
 
-    private Location identifyBestLocation() {
+    private Location getBestLocation() {
 
         Location bestLocation = mLocationArray.get(0); // Get the first one, we'll compare next
         Log.d(LOG_TAG, String.format("Location #0: Accuracy %f", mLocationArray.get(0).getAccuracy()));
 
-        for(int i=1 /* Start with the second one */ ; i<mLocationArray.size(); i++){
+        for (int i = 1 /* Start with the second one */; i < mLocationArray.size(); i++) {
             float accuracy = mLocationArray.get(i).getAccuracy();
             Log.d(LOG_TAG, String.format("Location #%d: Accuracy %f", i, accuracy));
-            if(accuracy<bestLocation.getAccuracy()){
+            if (accuracy < bestLocation.getAccuracy()) {
                 bestLocation = mLocationArray.get(i);
             }
         }
@@ -297,38 +294,27 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         return bestLocation;
     }
 
+    // Doing this for now
+    // TODO refactor to a presenter
+    private void onAddressReceived(Address address) {
+        Log.d(LOG_TAG, address.toString());
+        mMainActivity.setLocationText(address.getAddressLine(1));
+    }
+
     private void onBestLocationDetermined(Location location) {
         updateLastLocationAndUpdateUI(location);
 
         // Call Geocoder via RxJava
-        // TODO Consider moving this Subscriber to the UI, e.g. MainActivity
-        mGeocoder.getAddressObservable(location).subscribeOn(Schedulers.io())
+        // TODO Move this to presenter?
+        mGeocoder
+                .getAddressObservable(location)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Address>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(LOG_TAG, e.getMessage(), e);
-                    }
-
-                    @Override
-                    public void onNext(Address address) {
-
-                        Log.d(LOG_TAG, address.toString());
-                        mMainActivity.setLocationText(address.getAddressLine(1));
-
-                    }
+                .subscribe(this::onAddressReceived, throwable -> {
+                    Log.e(LOG_TAG, throwable.getMessage(), throwable);
                 });
 
         checkNetworkPermissionAndCallYelpApi();
-
-        //Utility.reportExecutionTime(this, AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mRequestLocationStartTime);
-        //mMainActivity.logFabricAnswersMetric(AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mRequestLocationStartTime);
-
     }
 
     private void checkLocationPermissionAndRequestLocation() {
@@ -338,7 +324,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
                 != PackageManager.PERMISSION_GRANTED;
         Log.d(LOG_TAG, "isPermissionMissing = " + isPermissionMissing);
 
-        if(isPermissionMissing) {
+        if (isPermissionMissing) {
             // If permission is missing, we need to ask for it.  See onRequestPermissionResult() callback
             ActivityCompat.requestPermissions(mMainActivity,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -346,7 +332,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         } else {
 
             // Else, permission has already been granted.  Proceed with requestLocationUpdates...
-            if(mGoogleApiClient.isConnected()) {
+            if (mGoogleApiClient.isConnected()) {
                 Log.d(LOG_TAG, "Google API is connected.  Requesting Location Updates...");
                 requestLocationUpdates();
             } else {
@@ -356,7 +342,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    private void updateLastLocationAndUpdateUI(Location location){
+    private void updateLastLocationAndUpdateUI(Location location) {
         Log.d(LOG_TAG, "updateLastLocationAndUpdateUI()...");
 
         // Get last location & update timestamp
@@ -378,14 +364,14 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    public void checkNetworkPermissionAndCallYelpApi(){
+    public void checkNetworkPermissionAndCallYelpApi() {
         // Check for network connectivity
-        ConnectivityManager cm = (ConnectivityManager)mMainActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) mMainActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
         // If connected to network make Yelp API call, if no network, notify user
-        if(isConnected) {
+        if (isConnected) {
             String ll = getLastLocation().getLatitude() + ","
                     + getLastLocation().getLongitude() + ","
                     + getLastLocation().getAccuracy();
@@ -400,31 +386,31 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     }
 
-    private int getLocationQuality(float accuracy){
-        Log.d(LOG_TAG, "getLocationQuality() accuracy "+accuracy);
-        if(accuracy< LOCATION_QUALITY_THRESHOLD_BEST){
+    private int getLocationQuality(float accuracy) {
+        Log.d(LOG_TAG, "getLocationQuality() accuracy " + accuracy);
+        if (accuracy < LOCATION_QUALITY_THRESHOLD_BEST) {
             return BEST;
-        } else if(accuracy> LOCATION_QUALITY_THRESHOLD_BAD){
+        } else if (accuracy > LOCATION_QUALITY_THRESHOLD_BAD) {
             return BAD;
         } else return OK;
     }
 
     // Getters
 
-    public GoogleApiClient getClient(){
+    public GoogleApiClient getClient() {
         return mGoogleApiClient;
     }
 
-    public Location getLastLocation(){
+    public Location getLastLocation() {
         return mLastLocation;
     }
 
-    public long getLocationUpdateTimestamp(){
-        return  mLocationUpdateTimestamp;
+    public long getLocationUpdateTimestamp() {
+        return mLocationUpdateTimestamp;
     }
 
     // Setters
-    public void setLocationUpdateTimestamp(long timestamp){
+    public void setLocationUpdateTimestamp(long timestamp) {
         mLocationUpdateTimestamp = timestamp;
     }
 

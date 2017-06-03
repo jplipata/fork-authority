@@ -14,9 +14,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by jlipata on 2/22/16.
- */
 public class UserRecords {
     private static String LOG_TAG = UserRecords.class.getSimpleName();
 
