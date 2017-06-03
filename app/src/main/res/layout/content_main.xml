@@ -48,7 +48,7 @@
             android:text="location" />
 
         <ImageView
-            android:id="@+id/accuracy_circle_left"
+            android:id="@+id/accuracy_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

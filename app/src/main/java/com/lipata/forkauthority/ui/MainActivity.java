@@ -54,8 +54,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     // Constants
-    static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp"; // TODO: This should go in R.strings
-    static final String SUGGESTIONLIST_KEY = "suggestionList"; // TODO: This should go in R.strings
+    static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
+    static final String SUGGESTIONLIST_KEY = "suggestionList";
     static final String LOCATION_QUALITY_KEY = "locationQuality";
     static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
         mTextView_ApproxLocation = (TextView) findViewById(R.id.location_text);
-        mLocationQualityView = new LocationQualityView (this, (ImageView) findViewById(R.id.accuracy_circle_left));
+        mLocationQualityView = new LocationQualityView (this, (ImageView) findViewById(R.id.accuracy_indicator));
         mLayout_LocationViews = (RelativeLayout) findViewById(R.id.layout_location);
 
         // Progress bar views
@@ -257,7 +257,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
         mTextView_Progress_Businesses.setText(getResources().getText(R.string.loading_businesses));
         mTextView_ApproxLocation.setText(getResources().getText(R.string.getting_your_location));
 
-        mLocationQualityView.setAccuracyCircleStatus(LocationQualityView.Status.HIDE);
+        mLocationQualityView.setAccuracyCircleStatus(LocationQualityView.Status.HIDDEN);
     }
 
     @Override
