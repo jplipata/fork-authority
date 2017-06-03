@@ -15,13 +15,13 @@ public class LocationQualityView {
     public LocationQualityView(Context context, ImageView imageView) {
         this.mImageView = imageView;
         this.context = context;
-        mStatus = Status.HIDE;
+        mStatus = Status.HIDDEN;
     }
 
     public void setAccuracyCircleStatus(int statusCode) {
         mStatus = statusCode;
         switch (mStatus) {
-            case Status.HIDE:
+            case Status.HIDDEN:
                 mImageView.setColorFilter(context.getResources().getColor(R.color.material_gray_100));
                 break;
             case Status.BEST:
@@ -50,7 +50,7 @@ public class LocationQualityView {
 
     public class Status {
         // Status codes
-        public static final int HIDE = 0;
+        public static final int HIDDEN = 0;
         public static final int BEST = 10;
         public static final int OK = 20;
         public static final int BAD = 30;
