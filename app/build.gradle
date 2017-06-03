@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.22.2'
     }
 }
 apply plugin: 'com.android.application'
@@ -16,30 +16,34 @@ repositories {
 
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 25
     buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "com.lipata.forkauthority"
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0 beta"
 
         Properties properties = new Properties()
         properties.load(project.rootProject.file('apikeys').newDataInputStream())
-        buildConfigField "String", "CONSUMER_KEY", properties.getProperty('apikey.CONSUMER_KEY')
-        buildConfigField "String", "CONSUMER_SECRET", properties.getProperty('apikey.CONSUMER_SECRET')
-        buildConfigField "String", "TOKEN", properties.getProperty('apikey.TOKEN')
-        buildConfigField "String", "TOKEN_SECRET", properties.getProperty('apikey.TOKEN_SECRET')
+        buildConfigField "String", "CONSUMER_KEY", properties.getProperty('CONSUMER_KEY')
+        buildConfigField "String", "CONSUMER_SECRET", properties.getProperty('CONSUMER_SECRET')
+        buildConfigField "String", "TOKEN", properties.getProperty('TOKEN')
+        buildConfigField "String", "TOKEN_SECRET", properties.getProperty('TOKEN_SECRET')
 
-        manifestPlaceholders = [ crashlytics:properties.getProperty('apikey.crashlytics') ]
+        manifestPlaceholders = [ crashlytics:properties.getProperty('crashlytics') ]
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
     }
 }
 
@@ -49,15 +53,15 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
 
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:design:23.4.0'
-    compile 'com.google.android.gms:play-services-location:8.4.0'
-    compile 'com.android.support:recyclerview-v7:23.4.0'
-    compile 'com.android.support:cardview-v7:23.4.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.google.android.gms:play-services-location:10.2.6'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'com.android.support:cardview-v7:25.3.1'
 
     compile 'com.squareup.picasso:picasso:2.5.2'
 
-    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.google.code.gson:gson:2.7'
 
     provided 'org.glassfish:javax.annotation:10.0-b28'
 
@@ -69,8 +73,9 @@ dependencies {
     compile 'se.akerfeldt:okhttp-signpost:1.1.0'
     compile 'oauth.signpost:signpost-core:1.2.1.2'
 
-    compile 'io.reactivex:rxandroid:1.2.0'
-    compile 'io.reactivex:rxjava:1.1.5'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    compile "io.reactivex.rxjava2:rxjava:2.1.0"
+
     compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
         transitive = true;
     }

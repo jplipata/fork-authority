@@ -1,8 +1,5 @@
 package com.lipata.forkauthority.data.user;
 
-/**
- * Created by jlipata on 2/22/16.
- */
 public class BusinessItemRecord {
 
     public static final int LIKE_FLAG = -1; // I'm using the dontLikeClickDate field for "Like" status.  "-1" means "Like"

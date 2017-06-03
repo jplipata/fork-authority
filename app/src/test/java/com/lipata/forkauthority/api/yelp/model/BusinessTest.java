@@ -39,28 +39,6 @@ public class BusinessTest {
         Assert.assertNull(business.getDescriptiveText());
     }
 
-    /* OLD TESTS
-    @Test
-    public void testGetDescriptiveText_JustAteHereSolo_ExpiredCase() throws Exception {
-        business = new Business();
-        business.setDontLikeClickDate(0); // Sets to unassigned
-        business.setTooSoonClickDate(1465446266588L); // Sets Just Ate Here to 6/9/2016 *I THINK*, i.e. this is from my device's system time, not sure if it will be universal for other devices
-
-        Assert.assertEquals(Business.ATE_HERE_SOLO+"6/9/2016" ,business.getDescriptiveText());
-    }
-
-    @Test
-    public void testGetDescriptiveText_JustAteHereSolo_NotExpiredCase() throws Exception {
-        business = new Business();
-        business.setDontLikeClickDate(0); // Sets to unassigned
-
-        long now = System.currentTimeMillis();
-        business.setTooSoonClickDate(now); // Sets Just Ate Here to today
-
-        Assert.assertEquals(Business.JUST_ATE_HERE_SOLO+ Utility.formatDate(now),business.getDescriptiveText());
-    }
-    */
-
     @Test
     public void testGetDescriptiveText_JustAteHere_Solo() throws Exception {
         final long DAY = 86400000L; // 1 day in ms
