@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lipata.forkauthority.R;
-import com.lipata.forkauthority.api.yelp.model.Business;
+import com.lipata.forkauthority.api.yelp.entities.Business;
 import com.lipata.forkauthority.data.BusinessListManager;
 import com.lipata.forkauthority.data.user.BusinessItemRecord;
 import com.lipata.forkauthority.data.user.UserRecords;
@@ -164,7 +164,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 if(business.getDontLikeClickDate()!= BusinessItemRecord.LIKE_FLAG) {
 
-                    // Backend stuff
                     // Update UserRecords
                     mUserRecords.updateClickDate(business, BusinessItemRecord.LIKE_FLAG, LIKE);
                     mUserRecords.commit();
@@ -196,7 +195,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                 } else {
                     // Unlike
 
-                    // Backend stuff
                     // Update UserRecords
                     mUserRecords.updateClickDate(business, 0, LIKE);
                     mUserRecords.commit();
@@ -215,9 +213,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         holder.mButton_TooSoon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Log.d(LOG_TAG, "Too Soon Clicked");
-
-                // UI Stuff:
                 // Get business and hold in temp variable
                 Business business = mBusinessList.get(position);
 
@@ -238,7 +233,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                         "Noted. You just ate at " + business.getName() + mMainActivity.getString(R.string.moved_to_bottom),
                         Snackbar.LENGTH_LONG).show();
 
-                // Backend stuff
                 // Get current date/time
                 long systemTime_ms = System.currentTimeMillis();
 
@@ -259,7 +253,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 if(business.getDontLikeClickDate()<=0) {
 
-                    // UI Stuff:
                     // Get business and hold in temp variable
                     Business business = mBusinessList.get(position);
 
@@ -280,7 +273,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                             "Noted. You don't like " + business.getName() + mMainActivity.getString(R.string.moved_to_bottom),
                             Snackbar.LENGTH_LONG).show();
 
-                    // Backend stuff
                     // Get current date/time
                     long systemTime_ms = System.currentTimeMillis();
 
@@ -295,7 +287,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                 } else {
                     // Un-Don't Like
 
-                    // Backend stuff
                     // Update UserRecords
                     mUserRecords.updateClickDate(business, 0, DONTLIKE);
                     mUserRecords.commit();
@@ -367,19 +358,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         // Update user records
         mUserRecords.incrementDismissedCount(business);
         mUserRecords.commit();
-
-//        Temporarily disabling this
-//        // Backend stuff:
-//        // Get current date/time
-//        long systemTime_ms = System.currentTimeMillis();
-//
-//        // Update user records
-//        mUserRecords.updateClickDate(business, systemTime_ms, DISMISS);
-//        mUserRecords.commit();
-//
-//        // Update object field
-//        business.setDismissedDate(systemTime_ms); ;
-//        Log.d(LOG_TAG, "Updated dismissedDate for " + business.getName() + " to " + systemTime_ms);
 
     }
 

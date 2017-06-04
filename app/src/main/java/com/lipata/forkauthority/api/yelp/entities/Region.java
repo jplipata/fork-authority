@@ -1,5 +1,5 @@
 
-package com.lipata.forkauthority.api.yelp.model;
+package com.lipata.forkauthority.api.yelp.entities;
 
 import javax.annotation.Generated;
 

@@ -7,7 +7,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.forkauthority.R;
-import com.lipata.forkauthority.api.yelp.model.Business;
+import com.lipata.forkauthority.api.yelp.entities.Business;
 import com.lipata.forkauthority.ui.BusinessListAdapter;
 
 import java.lang.reflect.Type;

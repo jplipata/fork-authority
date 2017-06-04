@@ -1,7 +1,7 @@
 package com.lipata.forkauthority.api.yelp;
 
 
-import com.lipata.forkauthority.api.yelp.model.YelpResponse;
+import com.lipata.forkauthority.api.yelp.entities.YelpResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

@@ -1,10 +1,10 @@
 
-package com.lipata.forkauthority.api.yelp.model;
+package com.lipata.forkauthority.api.yelp.entities;
 
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
-public class Center {
+public class Coordinate {
 
     private double latitude;
     private double longitude;

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.lipata.forkauthority.Utility;
-import com.lipata.forkauthority.api.yelp.model.Business;
+import com.lipata.forkauthority.api.yelp.entities.Business;
 import com.lipata.forkauthority.data.user.BusinessItemRecord;
 import com.lipata.forkauthority.data.user.UserRecords;
 
