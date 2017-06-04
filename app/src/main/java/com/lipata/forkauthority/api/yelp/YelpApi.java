@@ -4,11 +4,10 @@ import android.util.Log;
 
 import com.lipata.forkauthority.BuildConfig;
 import com.lipata.forkauthority.Utility;
-import com.lipata.forkauthority.api.yelp.model.Business;
-import com.lipata.forkauthority.api.yelp.model.YelpResponse;
+import com.lipata.forkauthority.api.yelp.entities.Business;
+import com.lipata.forkauthority.api.yelp.entities.YelpResponse;
 import com.lipata.forkauthority.data.AppSettings;
 import com.lipata.forkauthority.ui.BusinessListAdapter;
-import com.lipata.forkauthority.ui.MainActivity;
 import com.lipata.forkauthority.ui.MainView;
 
 import java.util.ArrayList;
@@ -63,8 +62,8 @@ public class YelpApi {
 
     long mCallYelpApiStartTime;
 
-    public YelpApi(MainActivity mainActivity) {
-        this.view = mainActivity;
+    public YelpApi(MainView view) {
+        this.view = view;
 
         // OAuth
         mConsumer = new OkHttpOAuthConsumer(BuildConfig.CONSUMER_KEY, BuildConfig.CONSUMER_SECRET);

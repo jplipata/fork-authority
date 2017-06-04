@@ -1,10 +1,11 @@
 package com.lipata.forkauthority.api.yelp.entities;
 
-import com.lipata.forkauthority.api.yelp3.entities.Business;
-
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Created by jlipata on 6/21/16.
+ */
 public class BusinessTest {
 
     final long ONE_DAY=86400000; // One day in milliseconds

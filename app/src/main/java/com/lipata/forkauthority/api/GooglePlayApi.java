@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.location.Address;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -33,8 +32,8 @@ import com.lipata.forkauthority.ui.MainActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import static com.lipata.forkauthority.ui.LocationQualityView.Status.BAD;
 import static com.lipata.forkauthority.ui.LocationQualityView.Status.BEST;
@@ -42,8 +41,13 @@ import static com.lipata.forkauthority.ui.LocationQualityView.Status.OK;
 
 /**
  * Created by jlipata on 4/2/16.
+ *
  * Class responsible for obtaining device location.
+ *
+ * Because this class requires a substantial amount of calls to the Activity due to permissions,
+ * location services, etc., we bypass the presenter and reference the Activity directly.
  */
+@Singleton
 public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, ResultCallback<LocationSettingsResult> {
 
@@ -66,12 +70,9 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     // Google Play API - Location Setting Request.  Constant used in the location settings dialog.
     public static final int REQUEST_CHECK_SETTINGS = 0x1;
 
-    // TODO Need to abstract this
     private MainActivity mMainActivity;
-
-    private GeocoderApi mGeocoder;
-
     private GoogleApiClient mGoogleApiClient;
+
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
     private long mLocationUpdateTimestamp; // in milliseconds
@@ -80,11 +81,8 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     private long mLastLocationChangeTime;
 
-    public GooglePlayApi(MainActivity mainActivity, GeocoderApi geocoder) {
-        this.mMainActivity = mainActivity;
-        this.mGeocoder = geocoder;
-
-        mGoogleApiClient = new GoogleApiClient.Builder(mMainActivity)
+    @Inject GooglePlayApi(final Context context) {
+        mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API).build();
@@ -294,26 +292,9 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         return bestLocation;
     }
 
-    // Doing this for now
-    // TODO refactor to a presenter
-    private void onAddressReceived(Address address) {
-        Log.d(LOG_TAG, address.toString());
-        mMainActivity.setLocationText(address.getAddressLine(1));
-    }
-
     private void onBestLocationDetermined(Location location) {
         updateLastLocationAndUpdateUI(location);
-
-        // Call Geocoder via RxJava
-        // TODO Move this to presenter?
-        mGeocoder
-                .getAddressObservable(location)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::onAddressReceived, throwable -> {
-                    Log.e(LOG_TAG, throwable.getMessage(), throwable);
-                });
-
+        mMainActivity.getPresenter().onBestLocation(location);
         checkNetworkPermissionAndCallYelpApi();
     }
 
@@ -376,7 +357,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
                     + getLastLocation().getLongitude() + ","
                     + getLastLocation().getAccuracy();
             Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
-            new YelpApi(mMainActivity).callYelpApi(AppSettings.SEARCH_TERM, ll, Integer.toString(AppSettings.SEARCH_RADIUS));
+            mMainActivity.getPresenter().callYelpApi(AppSettings.SEARCH_TERM, ll, Integer.toString(AppSettings.SEARCH_RADIUS));
         } else {
 
             // UI
@@ -414,4 +395,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         mLocationUpdateTimestamp = timestamp;
     }
 
+    public void setActivity(MainActivity mainActivity) {
+        this.mMainActivity = mainActivity;
+    }
 }

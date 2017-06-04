@@ -30,11 +30,14 @@ import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.lipata.forkauthority.AppComponent;
+import com.lipata.forkauthority.AppModule;
+import com.lipata.forkauthority.DaggerAppComponent;
 import com.lipata.forkauthority.R;
 import com.lipata.forkauthority.Utility;
 import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
-import com.lipata.forkauthority.api.yelp.model.Business;
+import com.lipata.forkauthority.api.yelp.entities.Business;
 import com.lipata.forkauthority.data.AppSettings;
 import com.lipata.forkauthority.data.BusinessListManager;
 import com.lipata.forkauthority.data.user.UserRecords;
@@ -43,11 +46,13 @@ import java.lang.reflect.Type;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.fabric.sdk.android.Fabric;
 
 /**
- *  This Android app gets device location, queries the Yelp API for restaurant recommendations,
- *  and uses GSON to parse and display the response.
+ * This Android app gets device location, queries the Yelp API for restaurant recommendations,
+ * and uses GSON to parse and display the response.
  */
 
 public class MainActivity extends AppCompatActivity implements MainView {
@@ -58,6 +63,14 @@ public class MainActivity extends AppCompatActivity implements MainView {
     static final String SUGGESTIONLIST_KEY = "suggestionList";
     static final String LOCATION_QUALITY_KEY = "locationQuality";
     static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
+
+    // App modules
+    AppComponent component;
+    @Inject GeocoderApi mGeocoder;
+    @Inject MainPresenter presenter;
+    @Inject GooglePlayApi mGooglePlayApi;
+    UserRecords mUserRecords;
+    BusinessListManager mBusinessListManager;
 
     // Views
     protected CoordinatorLayout mCoordinatorLayout;
@@ -76,12 +89,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
     TextView mTextView_Progress_Businesses;
     ProgressBar mProgressBar_Businesses;
 
-    // App modules
-    GooglePlayApi mGooglePlayApi;
-    GeocoderApi mGeocoder;
-    UserRecords mUserRecords;
-    BusinessListManager mBusinessListManager;
-
     // Analytics
     long mStartTime_Fetch;
     long mStartTime_Location;
@@ -90,6 +97,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        component = DaggerAppComponent
+                .builder()
+                .appModule(new AppModule(getApplication())).build();
+        component.inject(this);
 
         Fabric.with(this, new Crashlytics());
 
@@ -103,12 +114,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        presenter.setView(this);
         mUserRecords = new UserRecords(this);
         mBusinessListManager = new BusinessListManager(this, mUserRecords);
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
         mTextView_ApproxLocation = (TextView) findViewById(R.id.location_text);
-        mLocationQualityView = new LocationQualityView (this, (ImageView) findViewById(R.id.accuracy_indicator));
+        mLocationQualityView = new LocationQualityView(this, (ImageView) findViewById(R.id.accuracy_indicator));
         mLayout_LocationViews = (RelativeLayout) findViewById(R.id.layout_location);
 
         // Progress bar views
@@ -154,8 +166,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
         mFAB_refreshAnimation.setInterpolator(null);
 
         // Location API
-        mGeocoder = new GeocoderApi(this);
-        mGooglePlayApi = new GooglePlayApi(this, mGeocoder);
+        mGooglePlayApi.setActivity(this);
 
         // Restore state
         if (savedInstanceState != null) {
@@ -164,36 +175,26 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
             String storedSuggestionList = savedInstanceState.getString(SUGGESTIONLIST_KEY, null);
             if (storedSuggestionList != null) {
-                Type listType = new TypeToken<List<Business>>(){}.getType();
+                Type listType = new TypeToken<List<Business>>() {
+                }.getType();
                 List<Business> retrievedBusinessList = new Gson().fromJson(storedSuggestionList, listType);
                 mSuggestionListAdapter.setBusinessList(retrievedBusinessList);
             }
         }
     }
 
-    @Override protected void onStart(){
+    @Override
+    protected void onStart() {
         super.onStart();
 
         // Check whether there are suggestion items in the RecyclerView.  If not, load some.
-        if(mSuggestionListAdapter.getItemCount()==0){
+        if (mSuggestionListAdapter.getItemCount() == 0) {
             fetchBusinessList();
         }
-
-        //TESTING
-        //setAccuracyCircleStatus(10);
     }
 
-    @Override protected void onResume(){
-        Log.d(LOG_TAG, "onResume()");
-        super.onResume();
-    }
-
-    @Override protected void onPause() {
-        super.onPause();
-        Log.d(LOG_TAG, "onPause");
-    }
-
-    @Override protected void onStop(){
+    @Override
+    protected void onStop() {
         Log.d(LOG_TAG, "onStop()");
         super.onStop();
         if (mGooglePlayApi.getClient().isConnected()) {
@@ -204,43 +205,43 @@ public class MainActivity extends AppCompatActivity implements MainView {
     // UI methods
 
     @Override
-    public void updateLocationViews(double latitude, double longitude, int accuracyQuality){
+    public void updateLocationViews(double latitude, double longitude, int accuracyQuality) {
         // Latitude range is 0 to +-90.  Longitude is 0 to +-180.
         // 6 decimal places is accurate to 43.496-111.32 mm
         // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
-        mTextView_ApproxLocation.setText(new DecimalFormat("##.######").format(latitude)+", "
-                +new DecimalFormat("###.######").format(longitude));
+        mTextView_ApproxLocation.setText(new DecimalFormat("##.######").format(latitude) + ", "
+                + new DecimalFormat("###.######").format(longitude));
         //mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
         mLocationQualityView.setAccuracyCircleStatus(accuracyQuality);
     }
 
     @Override
-    public void startRefreshAnimation(){
+    public void startRefreshAnimation() {
         Log.d(LOG_TAG, "Starting animation");
-        if(!mFAB_refreshAnimation.isRunning()) {
+        if (!mFAB_refreshAnimation.isRunning()) {
             mFAB_refreshAnimation.start();
         }
     }
 
     @Override
-    public void stopRefreshAnimation(){
+    public void stopRefreshAnimation() {
         Log.d(LOG_TAG, "Stop animation");
         mFAB_refreshAnimation.cancel();
     }
 
     @Override
-    public void showSnackBarIndefinite(String text){
+    public void showSnackBarIndefinite(String text) {
         mSnackbar = Snackbar.make(mCoordinatorLayout, text, Snackbar.LENGTH_INDEFINITE);
         mSnackbar.show();
     }
 
     @Override
-    public void showToast(String text){
+    public void showToast(String text) {
         Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void setLocationText(String text){
+    public void setLocationText(String text) {
         mTextView_ApproxLocation.setText(text);
     }
 
@@ -249,7 +250,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
      * This gets called first, newBusinessList next
      */
     @Override
-    public void onDeviceLocationRequested(){
+    public void onDeviceLocationRequested() {
+        mStartTime_Location = System.nanoTime();
+
         mLayout_LocationViews.setVisibility(View.GONE);
         mLayout_ProgressBar_Location.setVisibility(View.VISIBLE);
 
@@ -261,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
-    public void onDeviceLocationRetrieved(){
+    public void onDeviceLocationRetrieved() {
         mLayout_ProgressBar_Location.setVisibility(View.GONE);
         mLayout_LocationViews.setVisibility(View.VISIBLE);
 
@@ -270,8 +273,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
-    public void onNewBusinessListRequested(){
-        if(mProgressBarLayout.getVisibility() != View.VISIBLE ){
+    public void onNewBusinessListRequested() {
+        if (mProgressBarLayout.getVisibility() != View.VISIBLE) {
             mProgressBarLayout.setVisibility(View.VISIBLE);
         }
         mProgressBar_Businesses.setSecondaryProgress(0);
@@ -281,9 +284,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
-    public void onNewBusinessListReceived(){
+    public void onNewBusinessListReceived() {
         // UI
-        mTextView_Progress_Businesses.setText(getResources().getText(R.string.loading_businesses)+"OK");
+        mTextView_Progress_Businesses.setText(getResources().getText(R.string.loading_businesses) + "OK");
         mProgressBar_Businesses.setVisibility(View.GONE);
 
         // Analytics
@@ -292,13 +295,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
-    public void incrementProgress_BusinessProgressBar(int value){
+    public void incrementProgress_BusinessProgressBar(int value) {
         int currentValue = mProgressBar_Businesses.getProgress();
         int maxValue = mProgressBar_Businesses.getMax();
 
         int newProgress = currentValue + value;
 
-        if(newProgress<=maxValue){
+        if (newProgress <= maxValue) {
             mProgressBar_Businesses.setProgress(newProgress);
         } else {
             Log.d(LOG_TAG, "Business Progress Bar setProgress() ALREADY MAXED");
@@ -306,13 +309,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
-    public void incrementSecondaryProgress_BusinessProgressBar(int value){
+    public void incrementSecondaryProgress_BusinessProgressBar(int value) {
         int currentValue = mProgressBar_Businesses.getSecondaryProgress();
         int maxValue = mProgressBar_Businesses.getMax();
 
         int newProgress = currentValue + value;
 
-        if(newProgress<=maxValue){
+        if (newProgress <= maxValue) {
             mProgressBar_Businesses.setSecondaryProgress(newProgress);
         } else {
             Log.d(LOG_TAG, "Business Progress Bar setSecondaryProgress() ALREADY MAXED");
@@ -320,10 +323,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
-    public void hideProgressLayout(){
+    public void hideProgressLayout() {
         mProgressBarLayout.setVisibility(View.GONE);
     }
-
 
 
     // Callback for Marshmallow requestPermissions() response
@@ -336,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    if(mGooglePlayApi.getClient().isConnected()) {
+                    if (mGooglePlayApi.getClient().isConnected()) {
                         mGooglePlayApi.requestLocationUpdates();
                     } else {
                         mGooglePlayApi.getClient().connect();
@@ -362,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
                         // All required changes were successfully made
 
                         Log.d(LOG_TAG, "onActivityResult() RESULT_OK");
-                        executeGooglePlayApiLocation();
+                        presenter.executeGooglePlayApiLocation();
 
                         break;
                     case Activity.RESULT_CANCELED:
@@ -384,67 +386,43 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     // Trigger location + yelp calls
     @Override
-    public void fetchBusinessList(){
+    public void fetchBusinessList() {
         mStartTime_Fetch = System.nanoTime();
+
         // UI
 
-            // Dismiss any Snackbars
-            if(mSnackbar!=null){
-                mSnackbar.dismiss();
-            }
+        // Dismiss any Snackbars
+        if (mSnackbar != null) {
+            mSnackbar.dismiss();
+        }
 
-            // Clear recyclerview
-            mSuggestionListAdapter.setBusinessList(null);
-            mSuggestionListAdapter.notifyDataSetChanged();
+        // Clear recyclerview
+        mSuggestionListAdapter.setBusinessList(null);
+        mSuggestionListAdapter.notifyDataSetChanged();
 
-            startRefreshAnimation();
+        startRefreshAnimation();
 
-        // Business Logic
-
-            // If the location has already been recently updated, no need to update it, go straight to querying yelp
-
-            if(!mGooglePlayApi.isLocationStale()) {
-
-                mGooglePlayApi.checkNetworkPermissionAndCallYelpApi();
-
-            } else {
-                // Connect to GooglePlayApi, which will trigger onConnect() callback, i.e. execute sequence of events
-                executeGooglePlayApiLocation();
-            }
-
+        presenter.onFetchBusinessList();
     }
 
 
     /**
      * Fabric Answers Custom Event
+     *
      * @param metricName
-     * @param startTime In nanoseconds, will be converted to milliseconds
+     * @param startTime  In nanoseconds, will be converted to milliseconds
      */
     @Override
     public void logFabricAnswersMetric(String metricName, long startTime) {
-        long executionTime = System.nanoTime()-startTime;
+        long executionTime = System.nanoTime() - startTime;
         long executionTime_ms = executionTime / 1000000;
         Answers.getInstance().logCustom(new CustomEvent(metricName)
                 .putCustomAttribute("Execution time (ms)", executionTime_ms));
     }
 
 
-    private void executeGooglePlayApiLocation(){
-        mStartTime_Location = System.nanoTime();
-
-        // Trigger UI progress bar
-        onDeviceLocationRequested();
-
-        // Request location from Google Play API
-        if(!mGooglePlayApi.getClient().isConnected()){
-            mGooglePlayApi.getClient().connect();
-        } else {
-            mGooglePlayApi.checkDeviceLocationEnabled();
-        }
-    }
-
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState){
+    public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, mGooglePlayApi.getLocationUpdateTimestamp());
         savedInstanceState.putInt(LOCATION_QUALITY_KEY, mLocationQualityView.getStatus());
@@ -481,12 +459,12 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     //TODO RecyclerView.LayoutManager has been replaced by android.support.v7.widget.LinearLayoutManager.  For some reason this still works, but it could cause problems later.
     @Override
-    public RecyclerView.LayoutManager getRecyclerViewLayoutManager(){
+    public RecyclerView.LayoutManager getRecyclerViewLayoutManager() {
         return mSuggestionListLayoutManager;
     }
 
     @Override
-    public CoordinatorLayout getCoordinatorLayout(){
+    public CoordinatorLayout getCoordinatorLayout() {
         return mCoordinatorLayout;
     }
 
@@ -498,5 +476,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     public BusinessListManager getBusinessListManager() {
         return mBusinessListManager;
+    }
+
+    public MainPresenter getPresenter() {
+        return presenter;
     }
 }
