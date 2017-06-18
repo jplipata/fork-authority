@@ -1,7 +1,5 @@
 package com.lipata.forkauthority.api.yelp3;
 
-import android.util.Log;
-
 import com.lipata.forkauthority.api.yelp3.entities.SearchResponse;
 import com.lipata.forkauthority.api.yelp3.entities.TokenResponse;
 
@@ -26,7 +24,7 @@ public class Yelp3ApiClient implements Yelp3Api {
     @Inject
     public Yelp3ApiClient() {
         final HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
         final OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(logging)

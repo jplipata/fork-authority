@@ -29,15 +29,15 @@ public class Business {
 
     @SerializedName("price")
     @Expose
-    private String price;
+    public String price;
 
     @SerializedName("phone")
     @Expose
-    private String phone;
+    public String phone;
 
     @SerializedName("id")
     @Expose
-    private String id;
+    public String id;
 
     @SerializedName("is_closed")
     @Expose
@@ -213,10 +213,6 @@ public class Business {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public Integer getReviewCount() {
         return reviewCount;
     }
@@ -226,7 +222,7 @@ public class Business {
     }
 
     public String getRating() {
-        Log.v("Business", "getRating() " + rating);
+        Log.d("Business", "getRating() " + rating);
         return rating;
     }
 }
