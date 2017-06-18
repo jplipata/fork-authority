@@ -62,10 +62,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     // Constants
-    static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
-    static final String SUGGESTIONLIST_KEY = "suggestionList";
-    static final String LOCATION_QUALITY_KEY = "locationQuality";
-    static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
+    final static String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
+    final static String SUGGESTIONLIST_KEY = "suggestionList";
+    final static String LOCATION_QUALITY_KEY = "locationQuality";
+    final static int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
     // App modules
     AppComponent component;

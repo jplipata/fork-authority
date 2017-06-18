@@ -109,10 +109,12 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         });
 
         // Business image
-        Picasso.with(mMainActivity)
-                .load(business.getImageUrl())
-                .fit()
-                .into(holder.mImageView_BusinessImage);
+        if (!business.getImageUrl().isEmpty()) {
+            Picasso.with(mMainActivity)
+                    .load(business.getImageUrl())
+                    .fit()
+                    .into(holder.mImageView_BusinessImage);
+        }
 
         // Business name
         holder.mTextView_BusinessName.setText(position + 1 + ". " + business.getName());
@@ -204,7 +206,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                 Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + business.getDontLikeClickDate());
 
                 notifyItemChanged(position);
-
             }
 
         });
@@ -297,6 +298,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
     /**
      * As per Yelp documentation: Rating for this business (value ranges from 1, 1.5, ... 4.5, 5).
+     *
      * @param rating
      * @return
      */
