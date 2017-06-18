@@ -13,6 +13,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import static com.lipata.forkauthority.ui.BusinessListAdapter.DONTLIKE;
+
 /**
  * I was concerned that some of the iterative O(n) implementations in this class would result in
  * poor performance, however as of 2016/9/8 execution times for this module are approx 20 ms.  Compared to
@@ -98,10 +100,22 @@ public class BusinessListManager {
 
                                 // Add to DontLike list, unless expired
                                 if (dontLikeDelta_days < AppSettings.DONTLIKE_THRESHOLD_INDAYS) {
+                                    // Not expired
                                     Log.v(LOG_TAG, "filter() Deemed DON'T LIKE!");
                                     dontLikeList.add(business);
                                     businessList_temp.set(i, null); // Remove business from original list
-                                } else Log.v(LOG_TAG, "filter() DontLike EXPIRED, not assigned to DONTLIKE list");
+                                } else {
+                                    // Expired
+                                    Log.v(LOG_TAG, "filter() DontLike EXPIRED, not assigned to DONTLIKE list");
+
+                                    // Update SharedPrefs
+                                    Log.d(LOG_TAG, String.format("filter() DontLike EXPIRED, resetting %s in UserRecords", business.getName()));
+                                    mUserRecords.updateClickDate(business, 0, DONTLIKE);
+                                    mUserRecords.commit();
+
+                                    // Update in-memory object
+                                    business.setDontLikeClickDate(0);
+                                }
                             }
 
                         // Handle the "Too Soon" case:

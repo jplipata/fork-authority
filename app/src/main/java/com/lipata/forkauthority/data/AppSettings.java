@@ -10,6 +10,8 @@ public class AppSettings {
     public static int SEARCH_RADIUS = 1000; // Search radius in meters. If the value is too large, a AREA_TOO_LARGE error may be returned. The max value is 40000 meters (25 miles).
 
     /**
+     * Deprecated. Replaced with MAX_API_CALLS
+     *
      * Max number of businesses that will be fetched from Yelp.  We were previously fetching all available
      * results, however load times were taking up to 1 minute on devices with slower connections
      *
@@ -20,13 +22,19 @@ public class AppSettings {
      */
     public static int MAX_NO_OF_RESULTS = 160;
 
+    /**
+     * Maximum number of API calls to make (including first call).  The higher this value,
+     * the more results returned, however slower.
+     */
+    public static final int MAX_API_CALLS = 4;
+
     public static int RESULTS_TO_DISPLAY_MAX = 100;
 
 
     // Timings
 
     public static long TOOSOON_THRESHOLD = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
-    public static int DONTLIKE_THRESHOLD_INDAYS = 90; // 90 days
+    public static int DONTLIKE_THRESHOLD_INDAYS = 90;
 
     /* "Age" of location data in milliseconds before it becomes "stale"
      */

@@ -103,7 +103,8 @@ public class UserRecords {
     }
 
     /**
-     * `commit()` must be called afterwards to save changes
+     * `commit()` must be called afterwards to save changes.
+     * To un-"Don't Like", set `time` to 0
      *
      * @param business
      * @param time
