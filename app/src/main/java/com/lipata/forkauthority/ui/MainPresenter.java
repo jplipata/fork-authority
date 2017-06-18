@@ -9,7 +9,7 @@ import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.AppSettings;
-import com.lipata.forkauthority.data.BusinessListManager;
+import com.lipata.forkauthority.data.ListRanker;
 import com.lipata.forkauthority.data.ListFetcher;
 
 import java.util.List;
@@ -25,18 +25,18 @@ public class MainPresenter implements Presenter {
     private final ListFetcher fetcher;
     private final GooglePlayApi googlePlayApi;
     private final GeocoderApi geocoderApi;
-    private final BusinessListManager listManager;
+    private final ListRanker listRanker;
 
     @Inject
     MainPresenter(
             final ListFetcher fetcher,
             final GooglePlayApi googlePlayApi,
             final GeocoderApi geocoderApi,
-            final BusinessListManager listManager) {
+            final ListRanker listRanker) {
         this.fetcher = fetcher;
         this.googlePlayApi = googlePlayApi;
         this.geocoderApi = geocoderApi;
-        this.listManager = listManager;
+        this.listRanker = listRanker;
     }
 
     @Override
@@ -111,8 +111,8 @@ public class MainPresenter implements Presenter {
     private void onListReceived(List<Business> businesses) {
         Log.d(LOG_TAG, "Total results received " + businesses.size());
 
-        // Pass list to BusinessListManager to be processed
-        List<Business> filteredBusinesses = listManager.filter(businesses);
+        // Pass list to ListRanker to be processed
+        List<Business> filteredBusinesses = listRanker.filter(businesses);
 
         // Update UI
         BusinessListAdapter businessListAdapter = view.getSuggestionListAdapter();

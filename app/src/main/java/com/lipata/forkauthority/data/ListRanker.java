@@ -9,7 +9,6 @@ import com.lipata.forkauthority.data.user.UserRecords;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -49,83 +48,87 @@ public class ListRanker {
         businessList_temp.addAll(businessList_Source);
 
         // Get user data
-        HashMap<String, BusinessItemRecord> userRecordMap = mUserRecords.getUserRecords();
+        List<BusinessItemRecord> userRecordList = mUserRecords.getList();
 
-        // Iterate through API results, adjust order according to user records
+        // Iterate through API results, adjust order according to user records  TODO: Replace iteration with HashMap
         for(int i=0; i<businessList_Source.size(); i++){
             Business business = businessList_Source.get(i);
             String businessId = business.getId();
 
-            if(userRecordMap.containsKey(businessId)){
+            // Look for this `businessId` in the user records
+            for (int j=0; j<userRecordList.size(); j++){
+                BusinessItemRecord businessItemRecord = userRecordList.get(j);
+                if(businessItemRecord.getId().equals(businessId)){
+                    long tooSoonClickDate = businessItemRecord.getTooSoonClickDate();
+                    long dontLikeClickDate = businessItemRecord.getDontLikeClickDate();
+                    long dismissedDate = businessItemRecord.getDismissedDate();
+                    int dismissedCount = businessItemRecord.getDismissedCount();
 
-                BusinessItemRecord businessItemRecord = userRecordMap.get(businessId);
+                    // Calculate difference between current time
+                    long dontLikeDelta = System.currentTimeMillis() - dontLikeClickDate;
+                    long dontLikeDelta_days = dontLikeDelta / 1000 / 60 / 60 / 24; // Convert to days
 
-                long tooSoonClickDate = businessItemRecord.getTooSoonClickDate();
-                long dontLikeClickDate = businessItemRecord.getDontLikeClickDate();
-                long dismissedDate = businessItemRecord.getDismissedDate();
-                int dismissedCount = businessItemRecord.getDismissedCount();
-
-                // Calculate difference between current time
-                long dontLikeDelta = System.currentTimeMillis() - dontLikeClickDate;
-                long dontLikeDelta_days = dontLikeDelta / 1000 / 60 / 60 / 24; // Convert to days
-
-                Log.d(LOG_TAG, "Match found! Id = " + businessId + " tooSoonClickDate = "
-                        + tooSoonClickDate + " dontLikeClickDate = "+ dontLikeClickDate +
-                        " dismissedDate = "+dismissedDate
+                    Log.d(LOG_TAG, "Match found! Id = " + businessId + " tooSoonClickDate = "
+                            + tooSoonClickDate + " dontLikeClickDate = "+ dontLikeClickDate +
+                            " dismissedDate = "+dismissedDate
                         + " dismissedCount = "+dismissedCount);
 
-                // On match found, do:
+                    // On match found, do:
 
-                // Update the `business` object in memory
-                business.setDontLikeClickDate(dontLikeClickDate);
-                business.setTooSoonClickDate(tooSoonClickDate);
-                business.setDismissedCount(dismissedCount);
+                        // Update the `business` object in memory
+                        business.setDontLikeClickDate(dontLikeClickDate);
+                        business.setTooSoonClickDate(tooSoonClickDate);
+                        business.setDismissedCount(dismissedCount);
 
-                // Handle Like case
+                        // Handle Like case
 
-                if(dontLikeClickDate==-1){
+                            if(dontLikeClickDate==-1){
 
-                    // Assign it to the "Preferred" list, but only if it's not "too soon"
+                                // Assign it to the "Preferred" list, but only if it's not "too soon"
 
-                    if(business.getTooSoonClickDate()==0 || business.isTooSoonClickDateExpired()){
+                                if(business.getTooSoonClickDate()==0 || business.isTooSoonClickDateExpired()){
 
-                        preferredList.add(business);
-                        businessList_temp.set(i, null); // Remove business from original list
-                        Log.v(LOG_TAG, "filter() deemed PREFERRED");
-                    } else Log.v(LOG_TAG, "filter() deemed LIKED BUT TOO SOON, not assigned to the PREFERRED LIST");
-                }
+                                    preferredList.add(business);
+                                    businessList_temp.set(i, null); // Remove business from original list
+                                    Log.v(LOG_TAG, "filter() deemed PREFERRED");
+                                } else Log.v(LOG_TAG, "filter() deemed LIKED BUT TOO SOON, not assigned to the PREFERRED LIST");
+                            }
 
-                // Handle Dont Like case
+                        // Handle Dont Like case
 
-                if (dontLikeClickDate > 0) {
+                            if (dontLikeClickDate > 0) {
 
-                    // Add to DontLike list, unless expired
-                    if (dontLikeDelta_days < AppSettings.DONTLIKE_THRESHOLD_INDAYS) {
-                        // Not expired
-                        Log.v(LOG_TAG, "filter() Deemed DON'T LIKE!");
-                        dontLikeList.add(business);
-                        businessList_temp.set(i, null); // Remove business from original list
-                    } else {
-                        // Expired
-                        Log.v(LOG_TAG, "filter() DontLike EXPIRED, not assigned to DONTLIKE list");
+                                // Add to DontLike list, unless expired
+                                if (dontLikeDelta_days < AppSettings.DONTLIKE_THRESHOLD_INDAYS) {
+                                    // Not expired
+                                    Log.v(LOG_TAG, "filter() Deemed DON'T LIKE!");
+                                    dontLikeList.add(business);
+                                    businessList_temp.set(i, null); // Remove business from original list
+                                } else {
+                                    // Expired
+                                    Log.v(LOG_TAG, "filter() DontLike EXPIRED, not assigned to DONTLIKE list");
 
-                        // Update SharedPrefs
-                        Log.d(LOG_TAG, String.format("filter() DontLike EXPIRED, resetting %s in UserRecords", business.getName()));
-                        mUserRecords.updateClickDate(business, 0, DONTLIKE);
+                                    // Update SharedPrefs
+                                    Log.d(LOG_TAG, String.format("filter() DontLike EXPIRED, resetting %s in UserRecords", business.getName()));
+                                    mUserRecords.updateClickDate(business, 0, DONTLIKE);
+                                    mUserRecords.commit();
 
-                        // Update in-memory object
-                        business.setDontLikeClickDate(0);
-                    }
-                }
+                                    // Update in-memory object
+                                    business.setDontLikeClickDate(0);
+                                }
+                            }
 
-                // Handle the "Too Soon" case:
+                        // Handle the "Too Soon" case:
 
-                if(tooSoonClickDate!=0) {
-                    if (!business.isTooSoonClickDateExpired()) {
-                        Log.v(LOG_TAG, "filter() Deemed too soon!");
-                        tooSoonList.add(business);
-                        businessList_temp.set(i, null); // Remove business from original list
-                    } else Log.v(LOG_TAG, "filter() TooSoon EXPIRED");
+                            if(tooSoonClickDate!=0) {
+                                if (!business.isTooSoonClickDateExpired()) {
+                                    Log.v(LOG_TAG, "filter() Deemed too soon!");
+                                    tooSoonList.add(business);
+                                    businessList_temp.set(i, null); // Remove business from original list
+                                } else Log.v(LOG_TAG, "filter() TooSoon EXPIRED");
+                            }
+
+                        break;  // Once you've found the match, there's no need to keep going. Exit the `for` loop
                 }
             }
         }

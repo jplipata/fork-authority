@@ -3,7 +3,7 @@ package com.lipata.forkauthority.ui;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.RecyclerView;
 
-import com.lipata.forkauthority.data.BusinessListManager;
+import com.lipata.forkauthority.data.ListRanker;
 
 /**
  * Created by jlipata on 3/19/17.
@@ -40,7 +40,7 @@ public interface MainView {
 
     BusinessListAdapter getSuggestionListAdapter();
 
-    BusinessListManager getBusinessListManager();
+    ListRanker getListRanker();
 
     boolean isNetworkConnected();
 }

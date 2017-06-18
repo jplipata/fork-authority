@@ -41,7 +41,7 @@ import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.AppSettings;
-import com.lipata.forkauthority.data.BusinessListManager;
+import com.lipata.forkauthority.data.ListRanker;
 import com.lipata.forkauthority.data.user.UserRecords;
 
 import java.lang.reflect.Type;
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Inject MainPresenter presenter;
     @Inject GooglePlayApi mGooglePlayApi;
     @Inject UserRecords mUserRecords;
-    @Inject BusinessListManager mBusinessListManager;
+    @Inject ListRanker listRanker;
 
     // Views
     protected CoordinatorLayout mCoordinatorLayout;
@@ -399,6 +399,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public boolean isNetworkConnected() {
+        // Check for network connectivity
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
 
     // Getters
 
@@ -419,16 +426,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
-    public BusinessListManager getBusinessListManager() {
-        return mBusinessListManager;
-    }
-
-    @Override
-    public boolean isNetworkConnected() {
-        // Check for network connectivity
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    public ListRanker getListRanker() {
+        return listRanker;
     }
 
     public MainPresenter getPresenter() {
