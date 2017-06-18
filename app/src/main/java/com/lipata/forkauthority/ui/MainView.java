@@ -49,4 +49,6 @@ public interface MainView {
     BusinessListAdapter getSuggestionListAdapter();
 
     BusinessListManager getBusinessListManager();
+
+    boolean isNetworkConnected();
 }

@@ -12,7 +12,7 @@
     <string name="loading_businesses">Loading stuff to eat...</string>
 
     <!-- Shared Preferences Strings -->
-    <string name="SharedPrefsFile">userData</string>
-    <string name="UserRecordList">UserRecordList</string>
-
+    <string name="shared_prefs_file">userData</string>
+    <string name="key_user_records">UserRecordList</string>
+    <string name="key_yelp3_token">YelpV3token</string>
 </resources>

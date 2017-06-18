@@ -2,8 +2,11 @@ package com.lipata.forkauthority.ui;
 
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -34,10 +37,10 @@ import com.lipata.forkauthority.AppComponent;
 import com.lipata.forkauthority.AppModule;
 import com.lipata.forkauthority.DaggerAppComponent;
 import com.lipata.forkauthority.R;
-import com.lipata.forkauthority.Utility;
+import com.lipata.forkauthority.Util.Utility;
 import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
-import com.lipata.forkauthority.api.yelp.entities.Business;
+import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.AppSettings;
 import com.lipata.forkauthority.data.BusinessListManager;
 import com.lipata.forkauthority.data.user.UserRecords;
@@ -69,8 +72,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Inject GeocoderApi mGeocoder;
     @Inject MainPresenter presenter;
     @Inject GooglePlayApi mGooglePlayApi;
-    UserRecords mUserRecords;
-    BusinessListManager mBusinessListManager;
+    @Inject UserRecords mUserRecords;
+    @Inject BusinessListManager mBusinessListManager;
 
     // Views
     protected CoordinatorLayout mCoordinatorLayout;
@@ -115,8 +118,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
         setSupportActionBar(toolbar);
 
         presenter.setView(this);
-        mUserRecords = new UserRecords(this);
-        mBusinessListManager = new BusinessListManager(this, mUserRecords);
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
         mTextView_ApproxLocation = (TextView) findViewById(R.id.location_text);
@@ -131,33 +132,26 @@ public class MainActivity extends AppCompatActivity implements MainView {
         mProgressBar_Businesses = (ProgressBar) findViewById(R.id.progress_bar_businesses);
         mLayout_ProgressBar_Location = (FrameLayout) findViewById(R.id.layout_progress_bar_location);
 
-
         // RecyclerView
         mRecyclerView_suggestionList = (RecyclerView) findViewById(R.id.suggestion_list);
         mRecyclerView_suggestionList.setHasFixedSize(true);
         mSuggestionListLayoutManager = new LinearLayoutManager(this);
         mRecyclerView_suggestionList.setLayoutManager(mSuggestionListLayoutManager);
 
-        mSuggestionListAdapter = new BusinessListAdapter(this, mUserRecords, mBusinessListManager);
+        mSuggestionListAdapter = new BusinessListAdapter(this, mUserRecords);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
 
         ItemTouchHelper.Callback callback = new ListItemTouchHelper(mSuggestionListAdapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(mRecyclerView_suggestionList);
 
-        mRecyclerView_suggestionList.addOnScrollListener(new BusinessListScrollListener(mSuggestionListLayoutManager));
-
-
         // Set up FAB and refresh animation
         mFAB_refresh = (FloatingActionButton) findViewById(R.id.fab);
-        mFAB_refresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mGooglePlayApi.isLocationStale()) {
-                    fetchBusinessList();
-                } else {
-                    Toast.makeText(MainActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
-                }
+        mFAB_refresh.setOnClickListener(view -> {
+            if (mGooglePlayApi.isLocationStale()) {
+                fetchBusinessList();
+            } else {
+                Toast.makeText(MainActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
             }
         });
         mFAB_refreshAnimation = ObjectAnimator.ofFloat(mFAB_refresh, View.ROTATION, 360);
@@ -476,6 +470,14 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     public BusinessListManager getBusinessListManager() {
         return mBusinessListManager;
+    }
+
+    @Override
+    public boolean isNetworkConnected() {
+        // Check for network connectivity
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
     public MainPresenter getPresenter() {

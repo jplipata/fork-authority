@@ -1,8 +1,13 @@
-package com.lipata.forkauthority;
+package com.lipata.forkauthority.Util;
 
 import android.util.Log;
 
 import java.util.Calendar;
+
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by jlipata on 6/21/16.
@@ -41,5 +46,11 @@ public class Utility {
         long executionTime_ms = executionTime / 1000000;
         Log.d(LOG_TAG, "Execution time: "+metricName+" = " + executionTime+
                 " nanoseconds or " + executionTime_ms + " ms");
+    }
+
+    public static <R> SingleSource<R> applySchedulers(Single<R> observable) {
+        return observable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 }

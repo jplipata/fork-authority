@@ -7,63 +7,67 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.forkauthority.R;
-import com.lipata.forkauthority.api.yelp.entities.Business;
+import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.ui.BusinessListAdapter;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class UserRecords {
     private static String LOG_TAG = UserRecords.class.getSimpleName();
 
-    Context mContext;
+    private Context mContext;
+    private SharedPreferences sharedPrefs;
 
     //TODO Replace this inefficient list implementation with a HashMap.  This is the biggest technical debt
-    List<BusinessItemRecord> mList;
+    private List<BusinessItemRecord> mList;
 
-    public UserRecords(Context context) {
-        this.mContext=context;
-
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences(mContext.getString(R.string.SharedPrefsFile),
-                Context.MODE_PRIVATE);
+    @Inject
+    UserRecords(final Context context, final SharedPreferences sharedPrefs) {
+        this.mContext = context;
+        this.sharedPrefs = sharedPrefs;
 
         // If there's an existing list of records, load it
-        if (sharedPreferences.contains(mContext.getString(R.string.UserRecordList))){
+        if (sharedPrefs.contains(mContext.getString(R.string.key_user_records))) {
             Gson gson = new Gson();
-            Type collectionType = new TypeToken<ArrayList<BusinessItemRecord>>(){}.getType();
-            ArrayList<BusinessItemRecord> userRecordList = gson.fromJson(sharedPreferences
-                    .getString(mContext.getString(R.string.UserRecordList), null), collectionType );
-            mList=userRecordList;
+            Type collectionType = new TypeToken<ArrayList<BusinessItemRecord>>() {
+            }.getType();
+            ArrayList<BusinessItemRecord> userRecordList = gson.fromJson(sharedPrefs
+                    .getString(mContext.getString(R.string.key_user_records), null), collectionType);
+            mList = userRecordList;
         }
         // If there's no existing UserRecords
         else {
-            mList = new ArrayList<BusinessItemRecord>();
+            mList = new ArrayList<>();
         }
     }
 
-    public List<BusinessItemRecord> getList(){
+    public List<BusinessItemRecord> getList() {
         return mList;
     }
 
-    public void addRecord(BusinessItemRecord businessItemRecord){
+    public void addRecord(BusinessItemRecord businessItemRecord) {
         mList.add(businessItemRecord);
         Log.d(LOG_TAG, "BusinessItemRecord added");
     }
 
     /**
      * `commit()` must be called afterwards to save changes
+     *
      * @param business Business Object to update
      */
-    public void incrementDismissedCount(Business business){
+    public void incrementDismissedCount(Business business) {
         Log.d(LOG_TAG, "incrementDismissedCount()");
 
         // Check for item
         int itemIndex = getItemIndex(business.getId());
-        Log.d(LOG_TAG, "getItemIndex() "+itemIndex);
+        Log.d(LOG_TAG, "getItemIndex() " + itemIndex);
 
         // -1 means item does not exist
-        if(itemIndex==-1){
+        if (itemIndex == -1) {
             Log.d(LOG_TAG, "Item does not exist");
             // if the item doesn't exist:
             BusinessItemRecord businessItemRecord = new BusinessItemRecord();
@@ -77,49 +81,50 @@ public class UserRecords {
                     " tooSoonClickDate = " + businessItemRecord.getTooSoonClickDate()
                     + " dontlikeClickDate = " + businessItemRecord.getDontLikeClickDate()
                     + " dismissedDate = " + businessItemRecord.getDismissedDate()
-                    + " dismissedCount = "+businessItemRecord.getDismissedCount());
+                    + " dismissedCount = " + businessItemRecord.getDismissedCount());
             // Store data
             addRecord(businessItemRecord);
 
         } else {
-            Log.d(LOG_TAG, "Item does exist.  Index = "+itemIndex);
+            Log.d(LOG_TAG, "Item does exist.  Index = " + itemIndex);
 
             // Update dismissedCount
             BusinessItemRecord record = mList.get(itemIndex);
             record.incrementDismissedCount();
 
-            Log.d(LOG_TAG, "Item at index "+itemIndex+" updated");
+            Log.d(LOG_TAG, "Item at index " + itemIndex + " updated");
 
             // Check
-            Log.d(LOG_TAG, record.getId()+" tooSoonClickDate = "+record.getTooSoonClickDate()
+            Log.d(LOG_TAG, record.getId() + " tooSoonClickDate = " + record.getTooSoonClickDate()
                     + "dontlikeClickDate = " + record.getDontLikeClickDate()
-                    + "dismissedCount = "+record.getDismissedCount());
+                    + "dismissedCount = " + record.getDismissedCount());
         }
 
     }
 
     /**
      * `commit()` must be called afterwards to save changes
+     *
      * @param business
      * @param time
      * @param buttonId
      */
-    public void updateClickDate(Business business, long time, int buttonId){
+    public void updateClickDate(Business business, long time, int buttonId) {
         Log.d(LOG_TAG, "updateClickDate()");
 
         // Check for item
         int itemIndex = getItemIndex(business.getId());
-        Log.d(LOG_TAG, "getItemIndex() "+itemIndex);
+        Log.d(LOG_TAG, "getItemIndex() " + itemIndex);
 
         // -1 means item does not exist
-        if(itemIndex==-1){
+        if (itemIndex == -1) {
             Log.d(LOG_TAG, "Item does not exist");
             // if the item doesn't exist:
             BusinessItemRecord businessItemRecord = new BusinessItemRecord();
             businessItemRecord.setId(business.getId());
 
             // Assign based on button type
-            switch(buttonId){
+            switch (buttonId) {
                 case BusinessListAdapter.TOOSOON:
                     businessItemRecord.setTooSoonClickDate(time);
                     break;
@@ -142,11 +147,11 @@ public class UserRecords {
             addRecord(businessItemRecord);
 
         } else {
-            Log.d(LOG_TAG, "Item does exist.  Index = "+itemIndex);
+            Log.d(LOG_TAG, "Item does exist.  Index = " + itemIndex);
 
             // Update ClickDate
             BusinessItemRecord record = mList.get(itemIndex);
-            switch (buttonId){
+            switch (buttonId) {
                 case BusinessListAdapter.TOOSOON:
                     record.setTooSoonClickDate(time);
                     break;
@@ -158,32 +163,31 @@ public class UserRecords {
                 case BusinessListAdapter.LIKE:
                     record.setDontLikeClickDate(time); // Use "-1" for "Like"
             }
-            Log.d(LOG_TAG, "Item at index "+itemIndex+" updated");
+            Log.d(LOG_TAG, "Item at index " + itemIndex + " updated");
 
             // Check
-            Log.d(LOG_TAG, record.getId()+" tooSoonClickDate = "+record.getTooSoonClickDate()
+            Log.d(LOG_TAG, record.getId() + " tooSoonClickDate = " + record.getTooSoonClickDate()
                     + "dontlikeClickDate = " + record.getDontLikeClickDate());
         }
     }
 
     /**
-     *
      * @param id Business ID to search for
      * @return Returns -1 if item does not exist, otherwise returns index of item
      */
-    int getItemIndex(String id){
+    int getItemIndex(String id) {
         int result = -1;
 
         //TODO Terrible O(n) implementation!  This could be O(1) with HashMap
-        for (int i=0 ; i<mList.size(); i++){
-            if(mList.get(i).getId().equals(id)){
+        for (int i = 0; i < mList.size(); i++) {
+            if (mList.get(i).getId().equals(id)) {
                 result = i;
             }
         }
         return result;
     }
 
-    public void commit(){
+    public void commit() {
         // Convert UserRecords to JSON
         Gson gson = new Gson();
         String jsonString = gson.toJson(mList);
@@ -193,14 +197,12 @@ public class UserRecords {
 
         // Store data
         Log.d(LOG_TAG, "Writing to SharedPreferences...");
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences(mContext.getString(R.string.SharedPrefsFile),
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(mContext.getString(R.string.UserRecordList), jsonString);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putString(mContext.getString(R.string.key_user_records), jsonString);
         editor.apply();
 
         // Check
-        String check = sharedPreferences.getString(mContext.getString(R.string.UserRecordList), null);
-        Log.d(LOG_TAG, "Checking SharedPrefs... "+check);
+        String check = sharedPrefs.getString(mContext.getString(R.string.key_user_records), null);
+        Log.d(LOG_TAG, "Checking SharedPrefs... " + check);
     }
 }

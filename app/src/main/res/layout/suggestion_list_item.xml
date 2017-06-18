@@ -50,16 +50,15 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
                     <ImageView
-                        android:layout_width="105.1333dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="19dp"
-                        android:scaleType="centerInside"
                         android:contentDescription="rating"
                         android:id="@+id/business_rating"/>
                     <TextView
                         android:paddingLeft="8dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
+                        android:layout_gravity="center_vertical"
                         android:id="@+id/business_review_count"
                         style="@style/Base.TextAppearance.AppCompat.Caption"
                         android:text="x Reviews"/>
