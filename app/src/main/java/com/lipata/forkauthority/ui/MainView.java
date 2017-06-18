@@ -26,15 +26,7 @@ public interface MainView {
 
     void onDeviceLocationRetrieved();
 
-    void onNewBusinessListRequested();
-
     void onNewBusinessListReceived();
-
-    void incrementProgress_BusinessProgressBar(int value);
-
-    void incrementSecondaryProgress_BusinessProgressBar(int value);
-
-    void hideProgressLayout();
 
     // Trigger location + yelp calls
     void fetchBusinessList();

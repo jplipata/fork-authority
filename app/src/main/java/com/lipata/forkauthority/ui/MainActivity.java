@@ -22,7 +22,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -86,10 +85,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
     Snackbar mSnackbar;
     FrameLayout mLayout_ProgressBar_Location;
     LocationQualityView mLocationQualityView;
-    LinearLayout mProgressBarLayout;
     RelativeLayout mLayout_LocationViews;
     ProgressBar mProgressBar_Location;
-    TextView mTextView_Progress_Businesses;
     ProgressBar mProgressBar_Businesses;
 
     // Analytics
@@ -125,10 +122,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
         mLayout_LocationViews = (RelativeLayout) findViewById(R.id.layout_location);
 
         // Progress bar views
-        mProgressBarLayout = (LinearLayout) findViewById(R.id.progressbar_layout);
-        mProgressBarLayout.setVisibility(View.GONE);
         mProgressBar_Location = (ProgressBar) findViewById(R.id.progress_bar_location);
-        mTextView_Progress_Businesses = (TextView) findViewById(R.id.textview_progress_loadbusinesses);
         mProgressBar_Businesses = (ProgressBar) findViewById(R.id.progress_bar_businesses);
         mLayout_ProgressBar_Location = (FrameLayout) findViewById(R.id.layout_progress_bar_location);
 
@@ -212,6 +206,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     public void startRefreshAnimation() {
         Log.d(LOG_TAG, "Starting animation");
+
+        mProgressBar_Businesses.setVisibility(View.VISIBLE);
+
         if (!mFAB_refreshAnimation.isRunning()) {
             mFAB_refreshAnimation.start();
         }
@@ -220,6 +217,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     public void stopRefreshAnimation() {
         Log.d(LOG_TAG, "Stop animation");
+
+        mProgressBar_Businesses.setVisibility(View.GONE);
+
         mFAB_refreshAnimation.cancel();
     }
 
@@ -251,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
         mLayout_ProgressBar_Location.setVisibility(View.VISIBLE);
 
         // Reset progress text for both business list and location
-        mTextView_Progress_Businesses.setText(getResources().getText(R.string.loading_businesses));
         mTextView_ApproxLocation.setText(getResources().getText(R.string.getting_your_location));
 
         mLocationQualityView.setAccuracyCircleStatus(LocationQualityView.Status.HIDDEN);
@@ -267,58 +266,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
-    public void onNewBusinessListRequested() {
-        if (mProgressBarLayout.getVisibility() != View.VISIBLE) {
-            mProgressBarLayout.setVisibility(View.VISIBLE);
-        }
-        mProgressBar_Businesses.setSecondaryProgress(0);
-        mProgressBar_Businesses.setProgress(0);
-        mTextView_Progress_Businesses.setText(getResources().getText(R.string.loading_businesses));
-        mProgressBar_Businesses.setVisibility(View.VISIBLE);
-    }
-
-    @Override
     public void onNewBusinessListReceived() {
-        // UI
-        mTextView_Progress_Businesses.setText(getResources().getText(R.string.loading_businesses) + "OK");
-        mProgressBar_Businesses.setVisibility(View.GONE);
-
         // Analytics
         Utility.reportExecutionTime(this, "Fetch businesses until displayed", mStartTime_Fetch);
         logFabricAnswersMetric(AppSettings.FABRIC_METRIC_FETCH_BIZ_SEQUENCE, mStartTime_Fetch);
-    }
-
-    @Override
-    public void incrementProgress_BusinessProgressBar(int value) {
-        int currentValue = mProgressBar_Businesses.getProgress();
-        int maxValue = mProgressBar_Businesses.getMax();
-
-        int newProgress = currentValue + value;
-
-        if (newProgress <= maxValue) {
-            mProgressBar_Businesses.setProgress(newProgress);
-        } else {
-            Log.d(LOG_TAG, "Business Progress Bar setProgress() ALREADY MAXED");
-        }
-    }
-
-    @Override
-    public void incrementSecondaryProgress_BusinessProgressBar(int value) {
-        int currentValue = mProgressBar_Businesses.getSecondaryProgress();
-        int maxValue = mProgressBar_Businesses.getMax();
-
-        int newProgress = currentValue + value;
-
-        if (newProgress <= maxValue) {
-            mProgressBar_Businesses.setSecondaryProgress(newProgress);
-        } else {
-            Log.d(LOG_TAG, "Business Progress Bar setSecondaryProgress() ALREADY MAXED");
-        }
-    }
-
-    @Override
-    public void hideProgressLayout() {
-        mProgressBarLayout.setVisibility(View.GONE);
     }
 
 

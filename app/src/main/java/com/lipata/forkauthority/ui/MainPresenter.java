@@ -20,6 +20,7 @@ public class MainPresenter implements Presenter {
     private final static String LOG_TAG = MainPresenter.class.getSimpleName();
 
     private MainView view;
+    private long callYelpApiStartTime;
 
     private final ListFetcher fetcher;
     private final GooglePlayApi googlePlayApi;
@@ -52,6 +53,7 @@ public class MainPresenter implements Presenter {
         // If connected to network make Yelp API call, if no network, notify user
         if (view.isNetworkConnected()) {
             Log.d(LOG_TAG, "Querying YelpV3api... Search term: " + AppSettings.SEARCH_TERM + " | Location: " + location.toString());
+            callYelpApiStartTime = System.nanoTime();
             //get list
             fetcher
                     .getList(Double.toString(location.getLatitude()), Double.toString(location.getLongitude()))
@@ -118,13 +120,11 @@ public class MainPresenter implements Presenter {
         businessListAdapter.notifyDataSetChanged();
 
         // Analytics
-        // TODO Fix this
-        //Utility.reportExecutionTime(this, "callYelpApi sequence, time to get " + mMasterList.size() + " businesses", mCallYelpApiStartTime);
-        //view.logFabricAnswersMetric(AppSettings.FABRIC_METRIC_YELPAPI, mCallYelpApiStartTime);
+        Utility.reportExecutionTime(this, "callYelpApi sequence, time to get " + businesses.size() + " businesses", callYelpApiStartTime);
+        view.logFabricAnswersMetric(AppSettings.FABRIC_METRIC_YELPAPI, callYelpApiStartTime);
 
         // UI
         view.onNewBusinessListReceived();
-        view.hideProgressLayout(); // This is the final step of the exectuion sequence so hide progress bar layout
         view.stopRefreshAnimation();
         view.getRecyclerViewLayoutManager().scrollToPosition(0);
     }
