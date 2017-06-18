@@ -17,14 +17,10 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
-public class ListFetcher {
-    private static final String LOG_TAG = "ListFetcher";
+import static com.lipata.forkauthority.data.AppSettings.MAX_API_CALLS;
 
-    /**
-     * Maximum number of API calls to make (including first call).  The higher this value,
-     * the more results returned, however slower.
-     */
-    private static final int MAX_API_CALLS = 4;
+public class ListFetcher {
+    private static final String LOG_TAG = ListFetcher.class.getSimpleName();
 
     private final Yelp3ApiClient api;
     private final TokenManager tokenManager;
@@ -97,7 +93,6 @@ public class ListFetcher {
                         .toObservable())
                 .map(SearchResponse::getBusinesses)
                 .reduce((businesses, businesses2) -> {
-                    Log.d(LOG_TAG, "Reducing... " + businesses.size() + ", " + businesses2.size());
                     List<Business> list = new ArrayList<>();
                     list.addAll(businesses);
                     list.addAll(businesses2);
