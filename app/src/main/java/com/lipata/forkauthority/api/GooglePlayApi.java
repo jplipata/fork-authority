@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -25,7 +23,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.lipata.forkauthority.api.yelp.YelpApi;
 import com.lipata.forkauthority.data.AppSettings;
 import com.lipata.forkauthority.ui.MainActivity;
 
@@ -46,29 +43,32 @@ import static com.lipata.forkauthority.ui.LocationQualityView.Status.OK;
  *
  * Because this class requires a substantial amount of calls to the Activity due to permissions,
  * location services, etc., we bypass the presenter and reference the Activity directly.
+ *
+ * I almost wonder if it would be better to just include this as part of the activity class...
  */
 @Singleton
 public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, ResultCallback<LocationSettingsResult> {
-
     private static final String LOG_TAG = GooglePlayApi.class.getSimpleName();
+
     public static final float LOCATION_QUALITY_THRESHOLD_BEST = 100f;
     public static final float LOCATION_QUALITY_THRESHOLD_BAD = 499f;
 
-    final int LOCATION_REQUEST_INTERVAL = 20; // in milliseconds
-    final int LOCATION_REQUEST_FASTEST_INTERVAL = 20;// in milliseconds
-    final int ACCURACY_TOLERANCE = 200; // meters
+    // Google Play API - Location Setting Request.  Constant used in the location settings dialog.
+    public static final int REQUEST_CHECK_SETTINGS = 0x1;
 
-    final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
+    private final int LOCATION_REQUEST_INTERVAL = 20; // in milliseconds
+    private final int LOCATION_REQUEST_FASTEST_INTERVAL = 20;// in milliseconds
+
+    private final int ACCURACY_TOLERANCE = 200; // meters
+
+    private final int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
     /**
      * Number of Location objects to receive before evaluating and returning the best one
      * Originally set this at 3 but it would take up to 15 seconds to execute on S3 Kitkat
      */
-    final int LOCATION_REQUEST_SAMPLE_SIZE = 2;
-
-    // Google Play API - Location Setting Request.  Constant used in the location settings dialog.
-    public static final int REQUEST_CHECK_SETTINGS = 0x1;
+    private final int LOCATION_REQUEST_SAMPLE_SIZE = 2;
 
     private MainActivity mMainActivity;
     private GoogleApiClient mGoogleApiClient;
@@ -277,7 +277,6 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     }
 
     private Location getBestLocation() {
-
         Location bestLocation = mLocationArray.get(0); // Get the first one, we'll compare next
         Log.d(LOG_TAG, String.format("Location #0: Accuracy %f", mLocationArray.get(0).getAccuracy()));
 
@@ -295,11 +294,10 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     private void onBestLocationDetermined(Location location) {
         updateLastLocationAndUpdateUI(location);
         mMainActivity.getPresenter().onBestLocation(location);
-        checkNetworkPermissionAndCallYelpApi();
+        mMainActivity.getPresenter().checkNetworkPermissionAndCallYelpApi(location);
     }
 
     private void checkLocationPermissionAndRequestLocation() {
-
         // Check for Location permission
         boolean isPermissionMissing = ContextCompat.checkSelfPermission(mMainActivity, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED;
@@ -343,28 +341,6 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         } else {
             Log.d(LOG_TAG, "mLastLocation = null");
         }
-    }
-
-    public void checkNetworkPermissionAndCallYelpApi() {
-        // Check for network connectivity
-        ConnectivityManager cm = (ConnectivityManager) mMainActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-
-        // If connected to network make Yelp API call, if no network, notify user
-        if (isConnected) {
-            String ll = getLastLocation().getLatitude() + ","
-                    + getLastLocation().getLongitude() + ","
-                    + getLastLocation().getAccuracy();
-            Log.d(LOG_TAG, "Querying Yelp... ll = " + ll + " Search term: " + AppSettings.SEARCH_TERM);
-            mMainActivity.getPresenter().callYelpApi(AppSettings.SEARCH_TERM, ll, Integer.toString(AppSettings.SEARCH_RADIUS));
-        } else {
-
-            // UI
-            mMainActivity.showSnackBarIndefinite("No network. Try again when you are connected to the internet.");
-            mMainActivity.stopRefreshAnimation();
-        }
-
     }
 
     private int getLocationQuality(float accuracy) {

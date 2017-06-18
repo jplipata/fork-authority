@@ -1,16 +1,17 @@
 package com.lipata.forkauthority.data;
 
-import android.content.Context;
 import android.util.Log;
 
-import com.lipata.forkauthority.Utility;
-import com.lipata.forkauthority.api.yelp.entities.Business;
+import com.lipata.forkauthority.Util.Utility;
+import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.user.BusinessItemRecord;
 import com.lipata.forkauthority.data.user.UserRecords;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * I was concerned that some of the iterative O(n) implementations in this class would result in
@@ -20,12 +21,11 @@ import java.util.List;
 public class BusinessListManager {
     private static String LOG_TAG = BusinessListManager.class.getSimpleName();
 
-    UserRecords mUserRecords;
-    Context mContext;
+    private UserRecords mUserRecords;
 
-    public BusinessListManager(Context context, UserRecords userRecords) {
+    @Inject
+    public BusinessListManager(final UserRecords userRecords) {
         this.mUserRecords = userRecords;
-        this.mContext = context;
     }
 
     /**
@@ -63,7 +63,6 @@ public class BusinessListManager {
                     int dismissedCount = businessItemRecord.getDismissedCount();
 
                     // Calculate difference between current time
-                    // TODO If we're going to keep this functionality, this logic should move to the `Business` class
                     long dontLikeDelta = System.currentTimeMillis() - dontLikeClickDate;
                     long dontLikeDelta_days = dontLikeDelta / 1000 / 60 / 60 / 24; // Convert to days
 
@@ -115,15 +114,16 @@ public class BusinessListManager {
                                 } else Log.v(LOG_TAG, "filter() TooSoon EXPIRED");
                             }
 
-
                         break;  // Once you've found the match, there's no need to keep going. Exit the `for` loop
                 }
             }
         }
 
-
         // Pare down results
         // Let's try only displaying roughly 100 results, I don't think we need more than that
+        // Note: This is separate from fetching results from the backend. When fetching results
+        // from the backend, you want to fetch a higher number to make sure you don't miss any
+        // businesses the user likes
         if(businessList_temp.size() > AppSettings.RESULTS_TO_DISPLAY_MAX){
             Log.d(LOG_TAG, "Paring down businessList_temp. Original size "+businessList_temp.size()+
                     ". "+(businessList_temp.size()- AppSettings.RESULTS_TO_DISPLAY_MAX)+" items removed");
@@ -133,7 +133,7 @@ public class BusinessListManager {
         // Remove null elements
         businessList_temp.removeAll(Collections.singleton(null));
 
-        // Combine the lists for display (for now).  TODO Implement a better way of displaying the categories
+        // Combine the lists for display
         List<Business> newList = new ArrayList<>();
         newList.addAll(preferredList);
         newList.addAll(tooSoonList);
