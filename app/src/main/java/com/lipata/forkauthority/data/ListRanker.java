@@ -20,13 +20,13 @@ import static com.lipata.forkauthority.ui.BusinessListAdapter.DONTLIKE;
  * poor performance, however as of 2016/9/8 execution times for this module are approx 20 ms.  Compared to
  * 1-2 secs for getting the device location plus 3-6 seconds to load Yelp data, this seems insignificant.
  */
-public class BusinessListManager {
-    private static String LOG_TAG = BusinessListManager.class.getSimpleName();
+public class ListRanker {
+    private static String LOG_TAG = ListRanker.class.getSimpleName();
 
     private UserRecords mUserRecords;
 
     @Inject
-    public BusinessListManager(final UserRecords userRecords) {
+    public ListRanker(final UserRecords userRecords) {
         this.mUserRecords = userRecords;
     }
 

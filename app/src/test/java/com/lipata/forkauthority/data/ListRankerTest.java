@@ -3,7 +3,7 @@ package com.lipata.forkauthority.data;
 /**
  * Created by jlipata on 6/21/16.
  */
-public class BusinessListManagerTest {
+public class ListRankerTest {
 /*
     @RunWith(MockitoJUnitRunner.class)
     public void testFilter() throws Exception {
@@ -14,7 +14,7 @@ public class BusinessListManagerTest {
         mContext = Mockito.mock(Context.class);
 
         UserRecords userRecords = new UserRecords(mContext); // Needs a Context
-        BusinessListManager businessListMgr = new BusinessListManager(mContext , userRecords); // Needs a Context
+        ListRanker businessListMgr = new ListRanker(mContext , userRecords); // Needs a Context
 
         // Mock up data - `Business`
 
