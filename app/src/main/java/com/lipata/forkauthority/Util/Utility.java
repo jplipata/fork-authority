@@ -14,6 +14,8 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class Utility {
 
+    private static final String LOG_TAG = Utility.class.getSimpleName();
+
     public static String formatDate(long date){
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(date);

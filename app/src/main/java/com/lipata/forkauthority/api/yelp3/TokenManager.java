@@ -12,6 +12,8 @@ import com.lipata.forkauthority.api.yelp3.entities.TokenResponse;
 
 import javax.inject.Inject;
 
+import io.reactivex.schedulers.Schedulers;
+
 public class TokenManager {
     private static final String LOG_TAG = "TokenManager";
     private static final String AUTH_FORMAT = "Bearer %s";
@@ -42,7 +44,7 @@ public class TokenManager {
                             Yelp3Api.GrantType.CLIENT_CREDENTIALS,
                             BuildConfig.YELPFUSION_CLIENT_ID,
                             BuildConfig.YELPFUSION_CLIENT_SECRET)
-                    .compose(Utility::applySchedulers)
+                    .subscribeOn(Schedulers.io())
                     .doOnSuccess(this::setSharedPrefToken)
                     .map(tokenResponse -> String.format(AUTH_FORMAT, tokenResponse.getAccessToken()))
                     .blockingGet();
