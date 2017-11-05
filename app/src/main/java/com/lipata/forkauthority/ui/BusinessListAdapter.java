@@ -303,7 +303,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
      * @return
      */
     private Drawable getRatingDrawable(String rating) {
-        Log.d(LOG_TAG, "getRatingDrawable: " + rating);
+        Log.v(LOG_TAG, "getRatingDrawable: " + rating);
 
         Resources resources = mMainActivity.getResources();
 

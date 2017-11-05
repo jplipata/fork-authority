@@ -29,15 +29,15 @@ public class Business {
 
     @SerializedName("price")
     @Expose
-    public String price;
+    private String price;
 
     @SerializedName("phone")
     @Expose
-    public String phone;
+    private String phone;
 
     @SerializedName("id")
     @Expose
-    public String id;
+    private String id;
 
     @SerializedName("is_closed")
     @Expose
