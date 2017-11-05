@@ -132,6 +132,5 @@ public class MainPresenter implements Presenter {
         // UI
         view.onNewBusinessListReceived();
         view.stopRefreshAnimation();
-        view.getRecyclerViewLayoutManager().scrollToPosition(0);
     }
 }

@@ -57,6 +57,11 @@ public class Utility {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    /**
+     *
+     * @param address
+     * @return String parsed from Address if all fields are available, otherwise null
+     */
     public static String parseLocAddress(Address address) {
         if (address.getSubLocality() != null &&
                 address.getAdminArea() != null &&

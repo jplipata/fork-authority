@@ -33,7 +33,6 @@ public interface MainView {
 
     void logFabricAnswersMetric(String metricName, long startTime);
 
-    //TODO RecyclerView.LayoutManager has been replaced by android.support.v7.widget.LinearLayoutManager.  For some reason this still works, but it could cause problems later.
     RecyclerView.LayoutManager getRecyclerViewLayoutManager();
 
     CoordinatorLayout getCoordinatorLayout();

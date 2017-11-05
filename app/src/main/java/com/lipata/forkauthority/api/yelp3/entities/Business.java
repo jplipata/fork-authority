@@ -222,7 +222,7 @@ public class Business {
     }
 
     public String getRating() {
-        Log.d("Business", "getRating() " + rating);
+        Log.v("Business", "getRating() " + rating);
         return rating;
     }
 }

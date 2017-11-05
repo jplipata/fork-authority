@@ -409,7 +409,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     // Getters
 
-    //TODO RecyclerView.LayoutManager has been replaced by android.support.v7.widget.LinearLayoutManager.  For some reason this still works, but it could cause problems later.
     @Override
     public RecyclerView.LayoutManager getRecyclerViewLayoutManager() {
         return mSuggestionListLayoutManager;
