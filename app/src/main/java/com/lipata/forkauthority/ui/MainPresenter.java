@@ -105,7 +105,13 @@ public class MainPresenter implements Presenter {
 
     private void onAddressReceived(Address address) {
         Log.d(LOG_TAG, "onAddressReceived() " + address.toString());
-        view.setLocationText(address.getAddressLine(1));
+
+        // Check for parsed Address for completeness, if it's missing fields, don't update LocationText
+        // LocationText should previously display latlong
+        String text = Utility.parseLocAddress(address);
+        if (text != null) {
+            view.setLocationText(text);
+        }
     }
 
     private void onListReceived(List<Business> businesses) {
