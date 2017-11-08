@@ -49,7 +49,7 @@ public class ListRanker {
         businessList_temp.addAll(businessList_Source);
 
         // Get user data
-        HashMap<String, BusinessItemRecord> userRecordMap = mUserRecords.getMap();
+        HashMap<String, BusinessItemRecord> userRecordMap = mUserRecords.getUserRecords();
 
         // Iterate through API results, adjust order according to user records
         for(int i=0; i<businessList_Source.size(); i++){
@@ -112,7 +112,6 @@ public class ListRanker {
                         // Update SharedPrefs
                         Log.d(LOG_TAG, String.format("filter() DontLike EXPIRED, resetting %s in UserRecords", business.getName()));
                         mUserRecords.updateClickDate(business, 0, DONTLIKE);
-                        mUserRecords.commit();
 
                         // Update in-memory object
                         business.setDontLikeClickDate(0);

@@ -52,62 +52,45 @@ public class UserRecords {
         }
     }
 
-    public HashMap<String, BusinessItemRecord> getMap() {
+    public HashMap<String, BusinessItemRecord> getUserRecords() {
         return map;
     }
 
-    public void updateMap(BusinessItemRecord businessItemRecord) {
-        map.put(businessItemRecord.getId(), businessItemRecord);
-
-        Log.d(LOG_TAG, "BusinessItemRecord " + businessItemRecord.getId() + " updated " + map.get(businessItemRecord));
-    }
-
     /**
-     * `commit()` must be called afterwards to save changes
      *
-     * @param business Business Object to update
+     * @param businessId Business to update
      */
-    public void incrementDismissedCount(Business business) {
+    public void incrementDismissedCount(String businessId) {
         Log.d(LOG_TAG, "incrementDismissedCount()");
 
-        if (!map.containsKey(business.getId())) {
+        if (!map.containsKey(businessId)) {
             Log.d(LOG_TAG, "Item does not exist");
             // if the item doesn't exist:
             BusinessItemRecord businessItemRecord = new BusinessItemRecord();
-            businessItemRecord.setId(business.getId());
+            businessItemRecord.setId(businessId);
 
             // Increment
             businessItemRecord.incrementDismissedCount();
 
-            // Check
-            Log.d(LOG_TAG, "businessItemRecord.  Id = " + businessItemRecord.getId() +
-                    " tooSoonClickDate = " + businessItemRecord.getTooSoonClickDate()
-                    + " dontlikeClickDate = " + businessItemRecord.getDontLikeClickDate()
-                    + " dismissedDate = " + businessItemRecord.getDismissedDate()
-                    + " dismissedCount = " + businessItemRecord.getDismissedCount());
             // Store data
-            updateMap(businessItemRecord);
+            updateStores(businessItemRecord);
 
         } else {
             Log.d(LOG_TAG, "Item does exist.");
 
             // Update dismissedCount
-            BusinessItemRecord record = map.get(business.getId());
+            BusinessItemRecord record = map.get(businessId);
             record.incrementDismissedCount();
-            updateMap(record);
 
-            Log.d(LOG_TAG, "Item " + business.getId() + " updated");
+            // Store data
+            updateStores(record);
 
-            // Check
-            Log.d(LOG_TAG, record.getId() + " tooSoonClickDate = " + record.getTooSoonClickDate()
-                    + "dontlikeClickDate = " + record.getDontLikeClickDate()
-                    + "dismissedCount = " + record.getDismissedCount());
+            Log.d(LOG_TAG, "Item " + businessId + " updated");
         }
 
     }
 
     /**
-     * `commit()` must be called afterwards to save changes.
      * To un-"Don't Like", set `time` to 0
      *
      * @param business
@@ -118,7 +101,7 @@ public class UserRecords {
         Log.d(LOG_TAG, "updateClickDate()");
 
         if (!map.containsKey(business.getId())) {
-            Log.d(LOG_TAG, business.getId()+ " - Item does not exist");
+            Log.d(LOG_TAG, business.getId() + " - Item does not exist");
             // if the item doesn't exist:
             BusinessItemRecord businessItemRecord = new BusinessItemRecord();
             businessItemRecord.setId(business.getId());
@@ -139,7 +122,7 @@ public class UserRecords {
             }
 
             // Store data
-            updateMap(businessItemRecord);
+            updateStores(businessItemRecord);
 
             // Check
             Log.d(LOG_TAG, "businessItemRecord.  Id = " + businessItemRecord.getId() +
@@ -166,7 +149,7 @@ public class UserRecords {
                     record.setDontLikeClickDate(time); // Use "-1" for "Like"
             }
 
-            updateMap(record);
+            updateStores(record);
 
             // Check
             Log.d(LOG_TAG, record.getId() + " tooSoonClickDate = " + record.getTooSoonClickDate()
@@ -176,7 +159,18 @@ public class UserRecords {
         }
     }
 
-    public void commit() {
+    private void insertUserRecord(BusinessItemRecord businessItemRecord) {
+        map.put(businessItemRecord.getId(), businessItemRecord);
+
+        Log.d(LOG_TAG, "BusinessItemRecord " + businessItemRecord.getId() + " updated " + map.get(businessItemRecord));
+    }
+
+    private void updateStores(BusinessItemRecord businessItemRecord) {
+        insertUserRecord(businessItemRecord);
+        updateSharedPrefs();
+    }
+
+    private void updateSharedPrefs() {
         // Convert UserRecords to JSON
         String jsonString = gson.toJson(map, collectionType);
 

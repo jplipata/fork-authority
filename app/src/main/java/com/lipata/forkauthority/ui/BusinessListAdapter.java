@@ -168,7 +168,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 // Update UserRecords
                 mUserRecords.updateClickDate(business, BusinessItemRecord.LIKE_FLAG, LIKE);
-                mUserRecords.commit();
 
                 // Update object field
                 business.setDontLikeClickDate(BusinessItemRecord.LIKE_FLAG);
@@ -199,7 +198,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 // Update UserRecords
                 mUserRecords.updateClickDate(business, 0, LIKE);
-                mUserRecords.commit();
 
                 // Update object field
                 business.setDontLikeClickDate(0);
@@ -236,7 +234,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
             // Update user records
             mUserRecords.updateClickDate(business1, systemTime_ms, TOOSOON);
-            mUserRecords.commit();
 
             // Update object field
             business1.setTooSoonClickDate(systemTime_ms);
@@ -273,7 +270,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 // Update user records
                 mUserRecords.updateClickDate(business12, systemTime_ms, DONTLIKE);
-                mUserRecords.commit();
 
                 // Update object field
                 business12.setDontLikeClickDate(systemTime_ms);
@@ -284,7 +280,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 // Update UserRecords
                 mUserRecords.updateClickDate(business, 0, DONTLIKE);
-                mUserRecords.commit();
 
                 // Update object field
                 business.setDontLikeClickDate(0);
@@ -382,8 +377,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                 .show();
 
         // Update user records
-        mUserRecords.incrementDismissedCount(business);
-        mUserRecords.commit();
-
+        mUserRecords.incrementDismissedCount(business.getId());
     }
 }

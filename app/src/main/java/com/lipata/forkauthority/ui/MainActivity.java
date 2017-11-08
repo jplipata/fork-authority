@@ -163,8 +163,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
             String storedSuggestionList = savedInstanceState.getString(SUGGESTIONLIST_KEY, null);
             if (storedSuggestionList != null) {
-                Type listType = new TypeToken<List<Business>>() {
-                }.getType();
+                Type listType = new TypeToken<List<Business>>(){}.getType();
                 List<Business> retrievedBusinessList = new Gson().fromJson(storedSuggestionList, listType);
                 mSuggestionListAdapter.setBusinessList(retrievedBusinessList);
             }
@@ -199,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
         // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
         mTextView_ApproxLocation.setText(new DecimalFormat("##.######").format(latitude) + ", "
                 + new DecimalFormat("###.######").format(longitude));
-        //mTextView_Accuracy.setText(Float.toString(accuracy) + " meters");
         mLocationQualityView.setAccuracyCircleStatus(accuracyQuality);
     }
 
