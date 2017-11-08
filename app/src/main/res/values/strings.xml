@@ -13,6 +13,7 @@
 
     <!-- Shared Preferences Strings -->
     <string name="shared_prefs_file">userData</string>
+    <string name="test_shared_prefs_file">userData_Test</string>
     <string name="key_user_records">UserRecordList</string> <!-- Deprecated -->
     <string name="key_user_records_v2">UserRecordMap</string>
     <string name="key_yelp3_token">YelpV3token</string>

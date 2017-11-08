@@ -57,12 +57,7 @@ public class MainPresenter implements Presenter {
             //get list
             fetcher
                     .getList(Double.toString(location.getLatitude()), Double.toString(location.getLongitude()))
-                    .subscribe(
-                            this::onListReceived,
-                            throwable -> {
-                                onError(throwable);
-                            }
-                    );
+                    .subscribe(this::onListReceived, this::onError);
 
         } else {
             view.showSnackBarIndefinite("No network. Try again when you are connected to the internet.");
