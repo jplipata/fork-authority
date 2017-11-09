@@ -65,7 +65,7 @@ public class UserRecords {
 
         if (!map.containsKey(businessId)) {
             Log.d(LOG_TAG, "Item does not exist");
-            // if the item doesn't exist:
+
             BusinessItemRecord businessItemRecord = new BusinessItemRecord();
             businessItemRecord.setId(businessId);
 
@@ -102,7 +102,7 @@ public class UserRecords {
 
         if (!map.containsKey(business.getId())) {
             Log.d(LOG_TAG, business.getId() + " - Item does not exist");
-            // if the item doesn't exist:
+
             BusinessItemRecord businessItemRecord = new BusinessItemRecord();
             businessItemRecord.setId(business.getId());
 
@@ -121,15 +121,7 @@ public class UserRecords {
                     businessItemRecord.setDontLikeClickDate(time); // Use "-1" for "Like"
             }
 
-            // Store data
             updateStores(businessItemRecord);
-
-            // Check
-            Log.d(LOG_TAG, "businessItemRecord.  Id = " + businessItemRecord.getId() +
-                    " tooSoonClickDate = " + businessItemRecord.getTooSoonClickDate()
-                    + " dontlikeClickDate = " + businessItemRecord.getDontLikeClickDate()
-                    + " dismissedDate = " + businessItemRecord.getDismissedDate());
-
 
         } else {
             Log.d(LOG_TAG, "Item does exist.");
@@ -150,12 +142,6 @@ public class UserRecords {
             }
 
             updateStores(record);
-
-            // Check
-            Log.d(LOG_TAG, record.getId() + " tooSoonClickDate = " + record.getTooSoonClickDate()
-                    + " dontlikeClickDate = " + record.getDontLikeClickDate());
-
-
         }
     }
 

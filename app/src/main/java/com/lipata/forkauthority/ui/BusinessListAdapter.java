@@ -179,13 +179,13 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                     mBusinessList.remove(position);
 
                     // Update RecyclerView item (triggers animation)
-                    notifyItemRemoved(position);
+                    //notifyItemRemoved(position);
 
                     // Add business to top of list
                     mBusinessList.add(0, business);
 
                     // Update other items in RecyclerView (this updates the item numbers in each CardView)
-                    notifyItemRangeChanged(0, getItemCount());
+                    notifyItemRangeChanged(0, position+1);
                 } else {
                     notifyItemChanged(0);
                 }
