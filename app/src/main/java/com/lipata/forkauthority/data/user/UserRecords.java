@@ -5,124 +5,109 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.forkauthority.R;
-import com.lipata.forkauthority.api.yelp.model.Business;
+import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.ui.BusinessListAdapter;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
-/**
- * Created by jlipata on 2/22/16.
- */
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class UserRecords {
     private static String LOG_TAG = UserRecords.class.getSimpleName();
 
-    Context mContext;
+    private Context mContext;
+    private SharedPreferences sharedPrefs;
+    private Type collectionType;
+    private Gson gson;
 
-    //TODO Replace this inefficient list implementation with a HashMap
-    List<BusinessItemRecord> mList;
+    private HashMap<String, BusinessItemRecord> map;
 
-    public UserRecords(Context context) {
-        this.mContext=context;
+    @Inject
+    UserRecords(final Context context, final SharedPreferences sharedPrefs) {
+        this.mContext = context;
+        this.sharedPrefs = sharedPrefs;
 
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences(mContext.getString(R.string.SharedPrefsFile),
-                Context.MODE_PRIVATE);
+        gson = new Gson();
+        collectionType = new TypeToken<HashMap<String, BusinessItemRecord>>(){}.getType();
 
         // If there's an existing list of records, load it
-        if (sharedPreferences.contains(mContext.getString(R.string.UserRecordList))){
-            Gson gson = new Gson();
-            Type collectionType = new TypeToken<ArrayList<BusinessItemRecord>>(){}.getType();
-            ArrayList<BusinessItemRecord> userRecordList = gson.fromJson(sharedPreferences
-                    .getString(mContext.getString(R.string.UserRecordList), null), collectionType );
-            mList=userRecordList;
+        if (sharedPrefs.contains(mContext.getString(R.string.key_user_records_v2))) {
+            try {
+                HashMap<String, BusinessItemRecord> userRecordMap = gson.fromJson(sharedPrefs
+                        .getString(mContext.getString(R.string.key_user_records_v2), null), collectionType);
+                map = userRecordMap;
+            } catch (JsonSyntaxException e) {
+                map = new HashMap<>();
+            }
         }
         // If there's no existing UserRecords
         else {
-            mList = new ArrayList<BusinessItemRecord>();
+            map = new HashMap<>();
         }
     }
 
-    public List<BusinessItemRecord> getList(){
-        return mList;
-    }
-
-    public void addRecord(BusinessItemRecord businessItemRecord){
-        mList.add(businessItemRecord);
-        Log.d(LOG_TAG, "BusinessItemRecord added");
+    public HashMap<String, BusinessItemRecord> getUserRecords() {
+        return map;
     }
 
     /**
-     * `commit()` must be called afterwards to save changes
-     * @param business Business Object to update
+     *
+     * @param businessId Business to update
      */
-    public void incrementDismissedCount(Business business){
+    public void incrementDismissedCount(String businessId) {
         Log.d(LOG_TAG, "incrementDismissedCount()");
 
-        // Check for item
-        int itemIndex = getItemIndex(business.getId());
-        Log.d(LOG_TAG, "getItemIndex() "+itemIndex);
-
-        // -1 means item does not exist
-        if(itemIndex==-1){
+        if (!map.containsKey(businessId)) {
             Log.d(LOG_TAG, "Item does not exist");
-            // if the item doesn't exist:
+
             BusinessItemRecord businessItemRecord = new BusinessItemRecord();
-            businessItemRecord.setId(business.getId());
+            businessItemRecord.setId(businessId);
 
             // Increment
             businessItemRecord.incrementDismissedCount();
 
-            // Check
-            Log.d(LOG_TAG, "businessItemRecord.  Id = " + businessItemRecord.getId() +
-                    " tooSoonClickDate = " + businessItemRecord.getTooSoonClickDate()
-                    + " dontlikeClickDate = " + businessItemRecord.getDontLikeClickDate()
-                    + " dismissedDate = " + businessItemRecord.getDismissedDate()
-                    + " dismissedCount = "+businessItemRecord.getDismissedCount());
             // Store data
-            addRecord(businessItemRecord);
+            updateStores(businessItemRecord);
 
         } else {
-            Log.d(LOG_TAG, "Item does exist.  Index = "+itemIndex);
+            Log.d(LOG_TAG, "Item does exist.");
 
             // Update dismissedCount
-            BusinessItemRecord record = mList.get(itemIndex);
+            BusinessItemRecord record = map.get(businessId);
             record.incrementDismissedCount();
 
-            Log.d(LOG_TAG, "Item at index "+itemIndex+" updated");
+            // Store data
+            updateStores(record);
 
-            // Check
-            Log.d(LOG_TAG, record.getId()+" tooSoonClickDate = "+record.getTooSoonClickDate()
-                    + "dontlikeClickDate = " + record.getDontLikeClickDate()
-                    + "dismissedCount = "+record.getDismissedCount());
+            Log.d(LOG_TAG, "Item " + businessId + " updated");
         }
 
     }
 
     /**
-     * `commit()` must be called afterwards to save changes
+     * To un-"Don't Like", set `time` to 0
+     *
      * @param business
      * @param time
      * @param buttonId
      */
-    public void updateClickDate(Business business, long time, int buttonId){
+    public void updateClickDate(Business business, long time, int buttonId) {
         Log.d(LOG_TAG, "updateClickDate()");
 
-        // Check for item
-        int itemIndex = getItemIndex(business.getId());
-        Log.d(LOG_TAG, "getItemIndex() "+itemIndex);
+        if (!map.containsKey(business.getId())) {
+            Log.d(LOG_TAG, business.getId() + " - Item does not exist");
 
-        // -1 means item does not exist
-        if(itemIndex==-1){
-            Log.d(LOG_TAG, "Item does not exist");
-            // if the item doesn't exist:
             BusinessItemRecord businessItemRecord = new BusinessItemRecord();
             businessItemRecord.setId(business.getId());
 
             // Assign based on button type
-            switch(buttonId){
+            switch (buttonId) {
                 case BusinessListAdapter.TOOSOON:
                     businessItemRecord.setTooSoonClickDate(time);
                     break;
@@ -136,20 +121,14 @@ public class UserRecords {
                     businessItemRecord.setDontLikeClickDate(time); // Use "-1" for "Like"
             }
 
-            // Check
-            Log.d(LOG_TAG, "businessItemRecord.  Id = " + businessItemRecord.getId() +
-                    " tooSoonClickDate = " + businessItemRecord.getTooSoonClickDate()
-                    + " dontlikeClickDate = " + businessItemRecord.getDontLikeClickDate()
-                    + " dismissedDate = " + businessItemRecord.getDismissedDate());
-            // Store data
-            addRecord(businessItemRecord);
+            updateStores(businessItemRecord);
 
         } else {
-            Log.d(LOG_TAG, "Item does exist.  Index = "+itemIndex);
+            Log.d(LOG_TAG, "Item does exist.");
 
-            // Update ClickDate
-            BusinessItemRecord record = mList.get(itemIndex);
-            switch (buttonId){
+            // Update record ClickDate
+            BusinessItemRecord record = map.get(business.getId());
+            switch (buttonId) {
                 case BusinessListAdapter.TOOSOON:
                     record.setTooSoonClickDate(time);
                     break;
@@ -161,49 +140,33 @@ public class UserRecords {
                 case BusinessListAdapter.LIKE:
                     record.setDontLikeClickDate(time); // Use "-1" for "Like"
             }
-            Log.d(LOG_TAG, "Item at index "+itemIndex+" updated");
 
-            // Check
-            Log.d(LOG_TAG, record.getId()+" tooSoonClickDate = "+record.getTooSoonClickDate()
-                    + "dontlikeClickDate = " + record.getDontLikeClickDate());
+            updateStores(record);
         }
     }
 
-    /**
-     *
-     * @param id Business ID to search for
-     * @return Returns -1 if item does not exist, otherwise returns index of item
-     */
-    int getItemIndex(String id){
-        int result = -1;
+    private void insertUserRecord(BusinessItemRecord businessItemRecord) {
+        map.put(businessItemRecord.getId(), businessItemRecord);
 
-        //TODO Terrible O(n) implementation!  This could be O(1) with HashMap
-        for (int i=0 ; i<mList.size(); i++){
-            if(mList.get(i).getId().equals(id)){
-                result = i;
-            }
-        }
-        return result;
+        Log.d(LOG_TAG, "BusinessItemRecord " + businessItemRecord.getId() + " updated " + map.get(businessItemRecord));
     }
 
-    public void commit(){
+    private void updateStores(BusinessItemRecord businessItemRecord) {
+        insertUserRecord(businessItemRecord);
+        updateSharedPrefs();
+    }
+
+    private void updateSharedPrefs() {
         // Convert UserRecords to JSON
-        Gson gson = new Gson();
-        String jsonString = gson.toJson(mList);
+        String jsonString = gson.toJson(map, collectionType);
 
         // Check
         Log.d(LOG_TAG, jsonString);
 
         // Store data
         Log.d(LOG_TAG, "Writing to SharedPreferences...");
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences(mContext.getString(R.string.SharedPrefsFile),
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(mContext.getString(R.string.UserRecordList), jsonString);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putString(mContext.getString(R.string.key_user_records_v2), jsonString);
         editor.apply();
-
-        // Check
-        String check = sharedPreferences.getString(mContext.getString(R.string.UserRecordList), null);
-        Log.d(LOG_TAG, "Checking SharedPrefs... "+check);
     }
 }

@@ -32,14 +32,13 @@ The design similarity to Yelp is intentional.  Since this is basically a custom 
 - More sophisticated suggestion logic, such as looking for patterns in categories for recommendations (e.g. if a user tends to like Japanese, businesses with category = Japanese will get sorted to top of list
 
 ###### Code Quality
-- Refactor: Overall architecture needs to be improved, implement e.g. MVP pattern.
-- Replace iterative List approach to UserRecords/BusinessListManager with hashmap
 - Replace findViewById with something better, e.g. Butterknife or Data Binding Library
+- Better testing
 
 License
 --------
 
-    Copyright 2016 tenprint
+    Copyright 2017 tenprint
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
