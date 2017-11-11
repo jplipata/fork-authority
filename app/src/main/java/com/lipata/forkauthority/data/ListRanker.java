@@ -2,7 +2,7 @@ package com.lipata.forkauthority.data;
 
 import android.util.Log;
 
-import com.lipata.forkauthority.Util.Utility;
+import com.lipata.forkauthority.util.Utility;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.user.BusinessItemRecord;
 import com.lipata.forkauthority.data.user.UserRecords;

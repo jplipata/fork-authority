@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.lipata.forkauthority.Util.Utility;
+import com.lipata.forkauthority.util.Utility;
 import com.lipata.forkauthority.data.AppSettings;
 
 import java.util.List;

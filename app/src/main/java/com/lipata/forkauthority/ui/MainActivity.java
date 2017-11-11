@@ -36,7 +36,7 @@ import com.lipata.forkauthority.AppComponent;
 import com.lipata.forkauthority.AppModule;
 import com.lipata.forkauthority.DaggerAppComponent;
 import com.lipata.forkauthority.R;
-import com.lipata.forkauthority.Util.Utility;
+import com.lipata.forkauthority.util.Utility;
 import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
