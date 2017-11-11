@@ -11,9 +11,11 @@ import com.lipata.forkauthority.api.yelp3.entities.TokenResponse;
 import com.lipata.forkauthority.util.Utility;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.schedulers.Schedulers;
 
+@Singleton
 public class TokenManager {
     private static final String LOG_TAG = "TokenManager";
     private static final String AUTH_FORMAT = "Bearer %s";
@@ -23,7 +25,7 @@ public class TokenManager {
     private final Yelp3ApiClient api;
 
     @Inject
-    public TokenManager(final Context context, final Yelp3ApiClient api) {
+    TokenManager(final Context context, final Yelp3ApiClient api) {
         this.api = api;
         Resources resources = context.getResources();
         sharedPrefs = context.getSharedPreferences(resources.getString(R.string.shared_prefs_file), Context.MODE_PRIVATE);
@@ -57,7 +59,7 @@ public class TokenManager {
         }
     }
 
-    private void setSharedPrefToken(TokenResponse tokenResponse) {
+    private void setSharedPrefToken(final TokenResponse tokenResponse) {
         sharedPrefs
                 .edit()
                 .putString(tokenKey, tokenResponse.getAccessToken())
