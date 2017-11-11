@@ -7,8 +7,8 @@ import android.util.Log;
 
 import com.lipata.forkauthority.BuildConfig;
 import com.lipata.forkauthority.R;
-import com.lipata.forkauthority.Util.Utility;
 import com.lipata.forkauthority.api.yelp3.entities.TokenResponse;
+import com.lipata.forkauthority.util.Utility;
 
 import javax.inject.Inject;
 
@@ -35,11 +35,12 @@ public class TokenManager {
      * If the existing token turns out to be invalid, you should clear sharedPrefs so that a new
      * token will be fetched
      */
-    public String getToken() {
+    public synchronized String getToken() {
+        long startTime = System.nanoTime();
         final String cachedToken = sharedPrefs.getString(tokenKey, "null");
         Log.d(LOG_TAG, String.format("SharedPrefs YelpV3Token %s", cachedToken));
         if (cachedToken.equals("null")) {
-            return api
+            String tokenString = api
                     .token(
                             Yelp3Api.GrantType.CLIENT_CREDENTIALS,
                             BuildConfig.YELPFUSION_CLIENT_ID,
@@ -48,6 +49,8 @@ public class TokenManager {
                     .doOnSuccess(this::setSharedPrefToken)
                     .map(tokenResponse -> String.format(AUTH_FORMAT, tokenResponse.getAccessToken()))
                     .blockingGet();
+            Utility.reportExecutionTime(this, "getToken()", startTime);
+            return tokenString;
         } else {
             Log.d(LOG_TAG, "YelpV3Token found in SharedPrefs");
             return String.format(AUTH_FORMAT, cachedToken);

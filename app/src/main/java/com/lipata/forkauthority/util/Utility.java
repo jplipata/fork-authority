@@ -1,4 +1,4 @@
-package com.lipata.forkauthority.Util;
+package com.lipata.forkauthority.util;
 
 import android.location.Address;
 import android.util.Log;

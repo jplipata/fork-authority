@@ -1,7 +1,5 @@
 package com.lipata.forkauthority.api.yelp3;
 
-import android.util.Log;
-
 import com.lipata.forkauthority.api.yelp3.entities.SearchResponse;
 import com.lipata.forkauthority.api.yelp3.entities.TokenResponse;
 
