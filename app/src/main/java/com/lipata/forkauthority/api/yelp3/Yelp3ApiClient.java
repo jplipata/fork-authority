@@ -22,11 +22,15 @@ public class Yelp3ApiClient implements Yelp3Api {
     private final Yelp3Api api;
 
     @Inject
-    public Yelp3ApiClient() {
+    public Yelp3ApiClient(
+            final Yelp3ApiAuthInterceptor authInterceptor,
+            final Yelp3ApiAuthenticator authenticator) {
         final HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         final OkHttpClient client = new OkHttpClient.Builder()
+                .authenticator(authenticator)
+                .addInterceptor(authInterceptor)
                 .addInterceptor(logging)
                 .build();
 
@@ -50,24 +54,22 @@ public class Yelp3ApiClient implements Yelp3Api {
 
     @Override
     public Single<SearchResponse> search(
-            String authorization,
             String term,
             String latitude,
             String longitude,
             int radius,
             int limit) {
-        return api.search(authorization, term, latitude, longitude, radius, limit);
+        return api.search(term, latitude, longitude, radius, limit);
     }
 
     @Override
     public Single<SearchResponse> search(
-            String authorization,
             String term,
             String latitude,
             String longitude,
             int radius,
             int limit,
             int offset) {
-        return api.search(authorization, term, latitude, longitude, radius, limit, offset);
+        return api.search(term, latitude, longitude, radius, limit, offset);
     }
 }

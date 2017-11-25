@@ -6,14 +6,15 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.util.Log;
 
+import com.lipata.forkauthority.di.PerApp;
+
 import java.io.IOException;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import io.reactivex.Single;
 
-@Singleton
+@PerApp
 public class GeocoderApi {
 
     static private final String LOG_TAG = GeocoderApi.class.getSimpleName();

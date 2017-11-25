@@ -25,7 +25,6 @@ public interface Yelp3Api {
 
     @GET("v3/businesses/search")
     Single<SearchResponse> search(
-            @Header("Authorization") String authorization,
             @Query("term") String term,
             @Query("latitude") String latitude,
             @Query("longitude") String longitude,
@@ -36,7 +35,6 @@ public interface Yelp3Api {
 
     @GET("v3/businesses/search")
     Single<SearchResponse> search(
-            @Header("Authorization") String authorization,
             @Query("term") String term,
             @Query("latitude") String latitude,
             @Query("longitude") String longitude,
@@ -46,7 +44,13 @@ public interface Yelp3Api {
             @Query("offset") int offset
     );
 
-    public interface GrantType {
+    public interface GrantTypes {
         String CLIENT_CREDENTIALS = "client_credentials";
+    }
+
+    public interface AuthParams {
+        String GRANT_TYPE = "grant_type";
+        String CLIENT_ID = "client_id";
+        String CLIENT_SECRET = "client_secret";
     }
 }
