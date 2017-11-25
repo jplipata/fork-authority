@@ -36,6 +36,7 @@ import com.lipata.forkauthority.AppComponent;
 import com.lipata.forkauthority.AppModule;
 import com.lipata.forkauthority.DaggerAppComponent;
 import com.lipata.forkauthority.R;
+import com.lipata.forkauthority.api.yelp3.YelpModule;
 import com.lipata.forkauthority.util.Utility;
 import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
@@ -99,7 +100,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
         super.onCreate(savedInstanceState);
         component = DaggerAppComponent
                 .builder()
-                .appModule(new AppModule(getApplication())).build();
+                .appModule(new AppModule(getApplication()))
+                .yelpModule(new YelpModule())
+                .build();
         component.inject(this);
 
         Fabric.with(this, new Crashlytics());

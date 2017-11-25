@@ -2,12 +2,11 @@ package com.lipata.forkauthority.data;
 
 import android.util.Log;
 
-import com.lipata.forkauthority.util.Utility;
-import com.lipata.forkauthority.api.yelp3.TokenManager;
 import com.lipata.forkauthority.api.yelp3.Yelp3Api;
 import com.lipata.forkauthority.api.yelp3.Yelp3ApiClient;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.api.yelp3.entities.SearchResponse;
+import com.lipata.forkauthority.util.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +22,10 @@ public class ListFetcher {
     private static final String LOG_TAG = ListFetcher.class.getSimpleName();
 
     private final Yelp3ApiClient api;
-    private final TokenManager tokenManager;
 
     @Inject
-    ListFetcher(final Yelp3ApiClient api, final TokenManager tokenManager) {
+    ListFetcher(final Yelp3ApiClient api) {
         this.api = api;
-        this.tokenManager = tokenManager;
     }
 
     /**
@@ -43,7 +40,6 @@ public class ListFetcher {
         Log.d(LOG_TAG, "getList() ");
         return api
                 .search(
-                        tokenManager.getToken(),
                         AppSettings.SEARCH_TERM,
                         latitude,
                         longitude,
@@ -82,7 +78,6 @@ public class ListFetcher {
                 .map(integer -> integer * Yelp3Api.SEARCH_LIMIT)
                 .flatMap(integer -> api
                         .search(
-                                tokenManager.getToken(),
                                 AppSettings.SEARCH_TERM,
                                 latitude,
                                 longitude,
