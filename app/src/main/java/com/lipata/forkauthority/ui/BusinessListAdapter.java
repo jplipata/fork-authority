@@ -180,20 +180,15 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                     mBusinessList.remove(position);
 
-                    // Update RecyclerView item (triggers animation)
-                    notifyItemRemoved(position);
-
                     // Add business to top of list
                     mBusinessList.add(0, business);
 
-                    // Offset 2 to maintain desired scroll position, except when at top of list
-                    Log.d(LOG_TAG, "mLayoutManager.findFirstVisibleItemPosition()"
-                            + mLayoutManager.findFirstVisibleItemPosition());
-                    if (mLayoutManager.findFirstVisibleItemPosition() > 0) {
-                        mLayoutManager.scrollToPosition(position + 2);
-                    }
+                    // Update RecyclerView item (triggers animation)
+                    notifyItemMoved(position, 0);
 
                     // Update other items in RecyclerView (this updates the item numbers in each CardView)
+                    // notifyItemRangeChanged() works with animations, as notifyDataSetChanged()
+                    // does not.
                     notifyItemRangeChanged(0, getItemCount());
 
                 } else {
