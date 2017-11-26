@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,7 +42,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     private List<Business> mBusinessList;
     private MainActivity mMainActivity;
     private CoordinatorLayout mCoordinatorLayout;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private LinearLayoutManager mLayoutManager;
     private UserRecords mUserRecords;
 
     BusinessListAdapter(MainActivity mainActivity,
@@ -171,25 +172,30 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 // Update object field
                 business.setDontLikeClickDate(BusinessItemRecord.LIKE_FLAG);
-                Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + business.getDontLikeClickDate());
+                Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to "
+                        + business.getDontLikeClickDate() + " position " + position);
 
                 // UI stuff
                 if (position != 0) {
 
                     mBusinessList.remove(position);
 
-                    // Update RecyclerView item (triggers animation)
-                    //notifyItemRemoved(position);
-
                     // Add business to top of list
                     mBusinessList.add(0, business);
 
+                    // Update RecyclerView item (triggers animation)
+                    notifyItemMoved(position, 0);
+
                     // Update other items in RecyclerView (this updates the item numbers in each CardView)
-                    notifyItemRangeChanged(0, position+1);
+                    // notifyItemRangeChanged() works with animations, as notifyDataSetChanged()
+                    // does not.
+                    notifyItemRangeChanged(0, getItemCount());
+
                 } else {
                     notifyItemChanged(0);
                 }
 
+                //TODO Move this to the view
                 Snackbar.make(mCoordinatorLayout,
                         "Noted. You like " + business.getName() + ". I have moved this to the top of the list.",
                         Snackbar.LENGTH_LONG).show();
@@ -354,11 +360,6 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
         // Update RecyclerView item (triggers animation)
         notifyItemRemoved(position);
-
-        // Add business to bottom of list
-
-        // Temporarily changing functionality.  Trying out removing the card completely instead of moving to bottom
-        // mBusinessList.add(business);
 
         // Update other items in RecyclerView (this updates the item numbers in each CardView)
         notifyItemRangeChanged(position, getItemCount());

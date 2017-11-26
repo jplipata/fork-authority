@@ -14,6 +14,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
@@ -134,6 +135,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
         mRecyclerView_suggestionList.setHasFixedSize(true);
         mSuggestionListLayoutManager = new LinearLayoutManager(this);
         mRecyclerView_suggestionList.setLayoutManager(mSuggestionListLayoutManager);
+        RecyclerView.ItemAnimator animator = mRecyclerView_suggestionList.getItemAnimator();
+        if (animator instanceof SimpleItemAnimator) {
+            ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
+        }
 
         mSuggestionListAdapter = new BusinessListAdapter(this, mUserRecords);
         mRecyclerView_suggestionList.setAdapter(mSuggestionListAdapter);
@@ -411,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     // Getters
 
     @Override
-    public RecyclerView.LayoutManager getRecyclerViewLayoutManager() {
+    public LinearLayoutManager getRecyclerViewLayoutManager() {
         return mSuggestionListLayoutManager;
     }
 
