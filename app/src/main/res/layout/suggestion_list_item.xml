@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     android:layout_margin="2dp"
+    android:animateLayoutChanges="true"
     card_view:cardUseCompatPadding="true">
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    >
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/business_header_layout"
-        android:clickable="true"
-        android:paddingTop="@dimen/layout_topbottom_padding"
-        android:paddingBottom="@dimen/layout_topbottom_padding"
-        android:paddingLeft="@dimen/layout_side_padding"
-        android:paddingRight="@dimen/layout_side_padding"
+        android:orientation="vertical">
 
-        android:background="?attr/selectableItemBackground">
+        <LinearLayout
+            android:id="@+id/business_header_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/layout_topbottom_padding"
+            android:paddingLeft="@dimen/layout_side_padding"
+            android:paddingRight="@dimen/layout_side_padding"
+            android:paddingTop="@dimen/layout_topbottom_padding">
 
-        <ImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:id="@+id/business_image"/>
+            <ImageView
+                android:id="@+id/business_image"
+                android:layout_width="80dp"
+                android:layout_height="80dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -38,180 +38,112 @@
                 android:paddingLeft="8dp">
 
                 <TextView
+                    android:id="@+id/business_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/business_name"
-                    android:textSize="16sp"
                     android:text="Business Name"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
                     <ImageView
+                        android:id="@+id/business_rating"
                         android:layout_width="wrap_content"
                         android:layout_height="19dp"
-                        android:contentDescription="rating"
-                        android:id="@+id/business_rating"/>
+                        android:contentDescription="rating" />
+
                     <TextView
-                        android:paddingLeft="8dp"
+                        android:id="@+id/business_review_count"
+                        style="@style/Base.TextAppearance.AppCompat.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:id="@+id/business_review_count"
-                        style="@style/Base.TextAppearance.AppCompat.Caption"
-                        android:text="x Reviews"/>
+                        android:paddingLeft="8dp"
+                        android:text="x Reviews" />
                 </LinearLayout>
 
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:id="@+id/business_address"
-                    android:text="Address"/>
-                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="Address" />
+
+                <TextView
                     android:id="@+id/business_categories"
                     style="@style/Base.TextAppearance.AppCompat.Caption"
-                    android:text="Categories"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Categories" />
 
             </LinearLayout>
 
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/business_descriptive_text"
-        android:textSize="11sp"
-        android:textColor="@color/material_text_gray"
-        android:textStyle="italic"
-        android:paddingLeft="@dimen/layout_side_padding"
-        android:paddingBottom="@dimen/layout_topbottom_padding"
-        android:text="debug-justatehere"
-        />
-
-    <!--
-    <LinearLayout
-        android:id="@+id/descriptive_text_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="@dimen/layout_topbottom_padding"
-        android:paddingBottom="@dimen/layout_topbottom_padding"
-        android:paddingLeft="@dimen/layout_side_padding"
-        android:paddingRight="@dimen/layout_side_padding"     >
-
-    </LinearLayout>
-    -->
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#EEEEEE"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingTop="14dp"
-        android:paddingBottom="6dp"
-        >
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:id="@+id/button_like"
-            android:foreground="?android:attr/selectableItemBackground"
-            style="?android:attr/borderlessButtonStyle"
-            android:text="LIKE"
-            android:background="@color/cardview_light_background"
-            android:textSize="@dimen/cardview_buttons_textsize"
-            android:textColor="@color/material_text_gray"
-            />
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:id="@+id/button_toosoon"
-            android:foreground="?android:attr/selectableItemBackground"
-            style="?android:attr/borderlessButtonStyle"
-            android:text="JUST ATE HERE"
-            android:background="@color/cardview_light_background"
-            android:textSize="@dimen/cardview_buttons_textsize"
-            android:textColor="@color/material_text_gray"
-            android:drawableTop="@drawable/ic_schedule_black_24px"/>
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:id="@+id/button_dontlike"
-            android:foreground="?android:attr/selectableItemBackground"
-            style="?android:attr/borderlessButtonStyle"
-            android:text="DON'T LIKE"
-            android:background="@color/cardview_light_background"
-            android:textSize="@dimen/cardview_buttons_textsize"
-            android:textColor="@color/material_text_gray"
-            />
-
-    </LinearLayout>
-
-
-
-
-    <!-- 1/18/16 We could provide a summary of net likes to the user.
+        </LinearLayout>
 
         <TextView
+            android:id="@+id/business_descriptive_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/net_likes"
-            android:layout_gravity="center"
-            android:paddingTop="4dp"
-            android:textStyle="italic"
-            android:text="+2 likes"/>
+            android:paddingBottom="@dimen/layout_topbottom_padding"
+            android:paddingLeft="@dimen/layout_side_padding"
+            android:text="debug-justatehere"
+            android:textColor="@color/material_text_gray"
+            android:textSize="11sp"
+            android:textStyle="italic" />
 
-            -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#EEEEEE" />
 
-    <!-- 1/17/16 Possible action buttons.  Open in Yelp. Reserve. Eat24. Map. Call.
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="4dp"
-        android:paddingTop="4dp"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_weight="1"
-            android:id="@+id/yelp"
-            />
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_weight="1"
-            />
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_weight="1"
-            />
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_weight="1"
-           />
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_weight="1"
-            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="6dp"
+            android:paddingTop="14dp">
+
+            <Button
+                android:id="@+id/button_like"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/cardview_light_background"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:text="LIKE"
+                android:textColor="@color/material_text_gray"
+                android:textSize="@dimen/cardview_buttons_textsize" />
+
+            <Button
+                android:id="@+id/button_toosoon"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/cardview_light_background"
+                android:drawableTop="@drawable/ic_schedule_black_24px"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:text="JUST ATE HERE"
+                android:textColor="@color/material_text_gray"
+                android:textSize="@dimen/cardview_buttons_textsize" />
+
+            <Button
+                android:id="@+id/button_dontlike"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/cardview_light_background"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:text="DON'T LIKE"
+                android:textColor="@color/material_text_gray"
+                android:textSize="@dimen/cardview_buttons_textsize" />
+
+        </LinearLayout>
     </LinearLayout>
-    -->
-</LinearLayout>
-
-    </android.support.v7.widget.CardView>
+</android.support.v7.widget.CardView>
