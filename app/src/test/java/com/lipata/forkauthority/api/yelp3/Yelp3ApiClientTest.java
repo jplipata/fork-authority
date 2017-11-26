@@ -10,6 +10,7 @@ import com.lipata.forkauthority.data.AppSettings;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import io.reactivex.observers.TestObserver;
 
@@ -23,11 +24,16 @@ public class Yelp3ApiClientTest {
     private static final String LATITUDE = "40.722091";
     private static final String LONGITUDE = "-73.843692";
 
-    Yelp3ApiClient api;
+    private Yelp3ApiClient api;
+    private TokenManager tokenManager;
 
     @Before
     public void setUp() throws Exception {
-        api = new Yelp3ApiClient();
+        tokenManager = Mockito.mock(TokenManager.class);
+        Mockito.when(tokenManager.getToken()).thenReturn(TEST_TOKEN_STRING);
+        api = new Yelp3ApiClient(
+                new Yelp3ApiAuthInterceptor(tokenManager),
+                new Yelp3ApiAuthenticator(tokenManager));
     }
 
     @After
@@ -40,7 +46,7 @@ public class Yelp3ApiClientTest {
         TestObserver<TokenResponse> testObserver = TestObserver.create();
         api
                 .token(
-                        Yelp3Api.GrantType.CLIENT_CREDENTIALS,
+                        Yelp3Api.GrantTypes.CLIENT_CREDENTIALS,
                         BuildConfig.YELPFUSION_CLIENT_ID,
                         BuildConfig.YELPFUSION_CLIENT_SECRET)
                 .doOnSuccess(tokenResponse ->
@@ -51,12 +57,13 @@ public class Yelp3ApiClientTest {
         testObserver.assertSubscribed();
     }
 
+
+
     @Test
     public void search() throws Exception {
         TestObserver<SearchResponse> testObserver = TestObserver.create();
         api
                 .search(
-                        TEST_TOKEN_STRING,
                         "food",
                         LATITUDE,
                         LONGITUDE,

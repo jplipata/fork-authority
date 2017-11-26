@@ -3,6 +3,8 @@ package com.lipata.forkauthority.data;
 import com.lipata.forkauthority.BuildConfig;
 import com.lipata.forkauthority.api.yelp3.TokenManager;
 import com.lipata.forkauthority.api.yelp3.Yelp3Api;
+import com.lipata.forkauthority.api.yelp3.Yelp3ApiAuthInterceptor;
+import com.lipata.forkauthority.api.yelp3.Yelp3ApiAuthenticator;
 import com.lipata.forkauthority.api.yelp3.Yelp3ApiClient;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 
@@ -27,9 +29,11 @@ public class ListFetcherTest {
 
     @Before
     public void setUp() throws Exception {
-        api = new Yelp3ApiClient();
         tokenManager = Mockito.mock(TokenManager.class);
         Mockito.when(tokenManager.getToken()).thenReturn(TEST_TOKEN_STRING);
+        api = new Yelp3ApiClient(
+                new Yelp3ApiAuthInterceptor(tokenManager),
+                new Yelp3ApiAuthenticator(tokenManager));
     }
 
     @After
@@ -40,7 +44,7 @@ public class ListFetcherTest {
     public void getList() throws Exception {
         TestObserver<List<Business>> testObserver = TestObserver.create();
 
-        ListFetcher listFetcher = new ListFetcher(api, tokenManager);
+        ListFetcher listFetcher = new ListFetcher(api);
         listFetcher
                 .getList(LATITUDE, LONGITUDE)
                 .subscribe(testObserver);

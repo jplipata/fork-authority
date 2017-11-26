@@ -6,21 +6,24 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.util.Log;
 
+import com.lipata.forkauthority.di.PerApp;
+
 import java.io.IOException;
 
 import javax.inject.Inject;
 
 import io.reactivex.Single;
 
+@PerApp
 public class GeocoderApi {
 
     static private final String LOG_TAG = GeocoderApi.class.getSimpleName();
 
-    private Context mContext;
+    private final Geocoder geocoder;
 
     @Inject
-    public GeocoderApi(Context context) {
-        this.mContext = context;
+    GeocoderApi(final Context context) {
+        geocoder = new Geocoder(context);
     }
 
     public Single<Address> getAddressObservable(final Location location) {
@@ -33,9 +36,8 @@ public class GeocoderApi {
     }
 
 
-    private Address fetchAddress(Location location) throws IOException {
+    private Address fetchAddress(final Location location) throws IOException {
         Log.d(LOG_TAG, "fetchAddress()");
-        Geocoder geocoder = new Geocoder(mContext);
         return geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
     }
 
