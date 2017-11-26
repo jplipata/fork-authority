@@ -47,7 +47,8 @@ public class Yelp3ApiAuthenticator implements Authenticator {
 
     @Nullable
     @Override
-    public Request authenticate(final Route route, final Response response) throws IOException {
+    public synchronized Request authenticate(final Route route, final Response response)
+            throws IOException {
         Log.e(LOG_TAG, "Status 401");
 
         TokenResponse tokenResponse = requestToken(response);
