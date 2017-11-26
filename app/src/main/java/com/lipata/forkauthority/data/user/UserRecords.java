@@ -9,15 +9,15 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.forkauthority.R;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
+import com.lipata.forkauthority.di.PerApp;
 import com.lipata.forkauthority.ui.BusinessListAdapter;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerApp
 public class UserRecords {
     private static String LOG_TAG = UserRecords.class.getSimpleName();
 

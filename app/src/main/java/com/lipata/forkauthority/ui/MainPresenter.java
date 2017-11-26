@@ -4,7 +4,7 @@ import android.location.Address;
 import android.location.Location;
 import android.util.Log;
 
-import com.lipata.forkauthority.Util.Utility;
+import com.lipata.forkauthority.util.Utility;
 import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
