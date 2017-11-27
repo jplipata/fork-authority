@@ -1,6 +1,7 @@
 package com.lipata.forkauthority.api;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -114,7 +115,9 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     public void onConnected(Bundle connectionHint) {
         Log.d(LOG_TAG, "onConnected()");
 
+        @SuppressLint("MissingPermission")
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
         if (location != null && location.getAccuracy() < ACCURACY_TOLERANCE) {
             Log.d(LOG_TAG, "LastLocation not null and within ACCURACY_TOLERANCE");
 
@@ -235,6 +238,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     /**
      * Public method called by onRequestPermissionsResult in MainActivity
      */
+    @SuppressLint("MissingPermission")
     public void requestLocationUpdates() {
         // We want to get a few locations from the API and pick the best one
         // We'll store them in an array
@@ -243,7 +247,6 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         // Timestamp for individual location updates { onLocationChanged() }
         mLastLocationChangeTime = System.nanoTime();
 
-        //TODO Suppress this warning
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, mLocationRequest, this);
     }

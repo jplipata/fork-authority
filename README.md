@@ -36,6 +36,8 @@ Fork Authority will remember your preferences for next time
 ###### Code Quality
 - Unit test for list ranking
 - Kotlin
+- Clean up entities/models
+- Clean up adapter
 - Replace findViewById with something better, e.g. Butterknife 
 
 License
