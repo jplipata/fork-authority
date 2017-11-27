@@ -27,12 +27,7 @@ public class GeocoderApi {
     }
 
     public Single<Address> getAddressObservable(final Location location) {
-        try {
-            return Single.just(fetchAddress(location));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Single.error(e);
-        }
+        return Single.fromCallable(() -> fetchAddress(location));
     }
 
 
