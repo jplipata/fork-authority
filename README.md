@@ -23,23 +23,25 @@ Click the Refresh button to start over
 Fork Authority will remember your preferences for next time
 
 #### Developer Notes
-The design similarity to Yelp is intentional.  Since this is basically a custom front-end for Yelp data, I wanted it to have a seemless UI feel. I also thought it would be a good exercise to try to replicate the Yelp UI from scratch ("great artists steal").
 
 ##### Enhancement Backlog
 ###### UI/Functionality
+- Bug fix: Some list item images appear distorted
+- List headers for preference groups and/or tabbed view
+- Social features
 - User definable settings/search query
 - "Just ate here" active state icon and dynamic text based on state
 - More sophisticated suggestion logic, such as looking for patterns in categories for recommendations (e.g. if a user tends to like Japanese, businesses with category = Japanese will get sorted to top of list
 
 ###### Code Quality
-- Refactor: Overall architecture needs to be improved, implement e.g. MVP pattern.
-- Replace iterative List approach to UserRecords/BusinessListManager with hashmap
-- Replace findViewById with something better, e.g. Butterknife or Data Binding Library
+- Unit test for list ranking
+- Kotlin
+- Replace findViewById with something better, e.g. Butterknife 
 
 License
 --------
 
-    Copyright 2016 tenprint
+    Copyright 2017 tenprint
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

@@ -6,42 +6,38 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.util.Log;
 
+import com.lipata.forkauthority.di.PerApp;
+
 import java.io.IOException;
 
-import rx.Observable;
-import rx.functions.Func0;
+import javax.inject.Inject;
 
-/**
- * Created by jlipata on 6/14/16.
- */
+import io.reactivex.Single;
+
+@PerApp
 public class GeocoderApi {
 
     static private final String LOG_TAG = GeocoderApi.class.getSimpleName();
 
-    Context mContext;
+    private final Geocoder geocoder;
 
-    public GeocoderApi(Context context) {
-        this.mContext = context;
+    @Inject
+    GeocoderApi(final Context context) {
+        geocoder = new Geocoder(context);
     }
 
-    public Observable<Address> getAddressObservable(final Location location){
-
-        return Observable.defer(new Func0<Observable<Address>>() {
-            @Override
-            public Observable<Address> call() {
-                try {
-                    return Observable.just(fetchAddress(location));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return Observable.error(e);
-                }
-            }
-        });
+    public Single<Address> getAddressObservable(final Location location) {
+        try {
+            return Single.just(fetchAddress(location));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Single.error(e);
+        }
     }
 
-    Address fetchAddress(Location location) throws IOException {
+
+    private Address fetchAddress(final Location location) throws IOException {
         Log.d(LOG_TAG, "fetchAddress()");
-        Geocoder geocoder = new Geocoder(mContext);
         return geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
     }
 
