@@ -1,6 +1,5 @@
 package com.lipata.forkauthority.util;
 
-import android.location.Address;
 import android.util.Log;
 
 import java.util.Calendar;
@@ -10,11 +9,7 @@ import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-/**
- * Created by jlipata on 6/21/16.
- */
 public class Utility {
-
     private static final String LOG_TAG = Utility.class.getSimpleName();
 
     public static String formatDate(long date) {
@@ -55,32 +50,5 @@ public class Utility {
         return observable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    /**
-     *
-     * @param address
-     * @return String parsed from Address if all fields are available, otherwise null
-     */
-    public static String parseLocAddress(Address address) {
-        if (address.getSubLocality() != null &&
-                address.getAdminArea() != null &&
-                address.getPostalCode() != null &&
-                !address.getSubLocality().isEmpty() &&
-                !address.getAdminArea().isEmpty() &&
-                !address.getPostalCode().isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            sb
-                    .append(address.getSubLocality())
-                    .append(", ")
-                    .append(address.getAdminArea())
-                    .append(" ")
-                    .append(address.getPostalCode());
-            return sb.toString();
-
-        } else {
-            return null;
-        }
-
     }
 }

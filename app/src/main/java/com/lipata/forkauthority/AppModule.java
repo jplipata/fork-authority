@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.lipata.forkauthority.di.PerApp;
+import com.lipata.forkauthority.util.AddressParser;
 
 import dagger.Module;
 import dagger.Provides;
@@ -35,4 +36,11 @@ public class AppModule {
     Application providesApplication(){
         return application;
     }
+
+    @Provides
+    @PerApp
+    AddressParser providesAddressParser(){
+        return new AddressParser();
+    }
+
 }

@@ -10,6 +10,7 @@ import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.AppSettings;
 import com.lipata.forkauthority.data.ListFetcher;
 import com.lipata.forkauthority.data.ListRanker;
+import com.lipata.forkauthority.util.AddressParser;
 import com.lipata.forkauthority.util.Utility;
 
 import java.util.List;
@@ -26,17 +27,20 @@ public class MainPresenter implements Presenter {
     private final GooglePlayApi googlePlayApi;
     private final GeocoderApi geocoderApi;
     private final ListRanker listRanker;
+    private final AddressParser addressParser;
 
     @Inject
     MainPresenter(
             final ListFetcher fetcher,
             final GooglePlayApi googlePlayApi,
             final GeocoderApi geocoderApi,
-            final ListRanker listRanker) {
+            final ListRanker listRanker,
+            final AddressParser addressParser) {
         this.fetcher = fetcher;
         this.googlePlayApi = googlePlayApi;
         this.geocoderApi = geocoderApi;
         this.listRanker = listRanker;
+        this.addressParser = addressParser;
     }
 
     @Override
@@ -101,10 +105,8 @@ public class MainPresenter implements Presenter {
     private void onAddressReceived(Address address) {
         Log.d(LOG_TAG, "onAddressReceived() " + address.toString());
 
-        // Check for parsed Address for completeness, if it's missing fields, don't update LocationText
-        // LocationText should previously display latlong
-        String text = Utility.parseLocAddress(address);
-        if (text != null) {
+        String text = addressParser.getFormattedAddress(address);
+        if (!text.isEmpty()) {
             view.setLocationText(text);
         }
     }
