@@ -4,13 +4,13 @@ import android.location.Address;
 import android.location.Location;
 import android.util.Log;
 
-import com.lipata.forkauthority.util.Utility;
 import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.AppSettings;
-import com.lipata.forkauthority.data.ListRanker;
 import com.lipata.forkauthority.data.ListFetcher;
+import com.lipata.forkauthority.data.ListRanker;
+import com.lipata.forkauthority.util.Utility;
 
 import java.util.List;
 
@@ -112,13 +112,17 @@ public class MainPresenter implements Presenter {
     private void onListReceived(List<Business> businesses) {
         Log.d(LOG_TAG, "Total results received " + businesses.size());
 
-        // Pass list to ListRanker to be processed
-        List<Business> filteredBusinesses = listRanker.filter(businesses);
+        if (businesses.size() > 0) {
+            // Pass list to ListRanker to be processed
+            List<Business> filteredBusinesses = listRanker.filter(businesses);
 
-        // Update UI
-        BusinessListAdapter businessListAdapter = view.getSuggestionListAdapter();
-        businessListAdapter.setBusinessList(filteredBusinesses);
-        businessListAdapter.notifyDataSetChanged();
+            // Update UI
+            BusinessListAdapter businessListAdapter = view.getSuggestionListAdapter();
+            businessListAdapter.setBusinessList(filteredBusinesses);
+            businessListAdapter.notifyDataSetChanged();
+        } else {
+            view.onNoResults();
+        }
 
         // Analytics
         Utility.reportExecutionTime(this, "callYelpApi sequence, time to get " + businesses.size() + " businesses", callYelpApiStartTime);

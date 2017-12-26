@@ -17,4 +17,5 @@
     <string name="key_user_records">UserRecordList</string> <!-- Deprecated -->
     <string name="key_user_records_v2">UserRecordMap</string>
     <string name="key_yelp3_token">YelpV3token</string>
+    <string name="sorry_no_results_found">Sorry! No results found.</string>
 </resources>

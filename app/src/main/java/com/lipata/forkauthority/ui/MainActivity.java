@@ -22,7 +22,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -54,18 +53,15 @@ import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
 
-/**
- * This Android app gets device location, queries the Yelp API for restaurant recommendations,
- * and uses GSON to parse and display the response.
- */
-
 public class MainActivity extends AppCompatActivity implements MainView {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     // Constants
-    final static String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
-    final static String SUGGESTIONLIST_KEY = "suggestionList";
-    final static String LOCATION_QUALITY_KEY = "locationQuality";
+    static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
+    static final String SUGGESTIONLIST_KEY = "suggestionList";
+    static final String LOCATION_QUALITY_KEY = "locationQuality";
+    static final String NO_RESULTS_TEXT_KEY = "noResultsText";
+    static final String PROGRESS_BAR_BUSINESSES_KEY = "progressBarBusinesses";
     final static int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
     // App modules
@@ -90,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     RelativeLayout mLayout_LocationViews;
     ProgressBar mProgressBar_Location;
     ProgressBar mProgressBar_Businesses;
+    TextView mNoResultsTextView;
 
     // Analytics
     long mStartTime_Fetch;
@@ -115,23 +112,24 @@ public class MainActivity extends AppCompatActivity implements MainView {
         Fabric.with(fabric);
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         presenter.setView(this);
 
-        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.layout_coordinator);
-        mTextView_ApproxLocation = (TextView) findViewById(R.id.location_text);
-        mLocationQualityView = new LocationQualityView(this, (ImageView) findViewById(R.id.accuracy_indicator));
-        mLayout_LocationViews = (RelativeLayout) findViewById(R.id.layout_location);
+        mCoordinatorLayout = findViewById(R.id.layout_coordinator);
+        mTextView_ApproxLocation = findViewById(R.id.location_text);
+        mLocationQualityView = new LocationQualityView(this, findViewById(R.id.accuracy_indicator));
+        mLayout_LocationViews = findViewById(R.id.layout_location);
+        mNoResultsTextView = findViewById(R.id.no_results);
 
         // Progress bar views
-        mProgressBar_Location = (ProgressBar) findViewById(R.id.progress_bar_location);
-        mProgressBar_Businesses = (ProgressBar) findViewById(R.id.progress_bar_businesses);
-        mLayout_ProgressBar_Location = (FrameLayout) findViewById(R.id.layout_progress_bar_location);
+        mProgressBar_Location = findViewById(R.id.progress_bar_location);
+        mProgressBar_Businesses = findViewById(R.id.progress_bar_businesses);
+        mLayout_ProgressBar_Location = findViewById(R.id.layout_progress_bar_location);
 
         // RecyclerView
-        mRecyclerView_suggestionList = (RecyclerView) findViewById(R.id.suggestion_list);
+        mRecyclerView_suggestionList = findViewById(R.id.suggestion_list);
         mRecyclerView_suggestionList.setHasFixedSize(true);
         mSuggestionListLayoutManager = new LinearLayoutManager(this);
         mRecyclerView_suggestionList.setLayoutManager(mSuggestionListLayoutManager);
@@ -148,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
         itemTouchHelper.attachToRecyclerView(mRecyclerView_suggestionList);
 
         // Set up FAB and refresh animation
-        mFAB_refresh = (FloatingActionButton) findViewById(R.id.fab);
+        mFAB_refresh = findViewById(R.id.fab);
         mFAB_refresh.setOnClickListener(view -> {
             if (mGooglePlayApi.isLocationStale()) {
                 fetchBusinessList();
@@ -168,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
         if (savedInstanceState != null) {
             mGooglePlayApi.setLocationUpdateTimestamp(savedInstanceState.getLong(LOCATION_UPDATE_TIMESTAMP_KEY));
             mLocationQualityView.setAccuracyCircleStatus(savedInstanceState.getInt(LOCATION_QUALITY_KEY));
+            mNoResultsTextView.setVisibility(savedInstanceState.getInt(NO_RESULTS_TEXT_KEY));
+            mProgressBar_Businesses.setVisibility(savedInstanceState.getInt(PROGRESS_BAR_BUSINESSES_KEY));
 
             String storedSuggestionList = savedInstanceState.getString(SUGGESTIONLIST_KEY, null);
             if (storedSuggestionList != null) {
@@ -183,7 +183,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
         super.onStart();
 
         // Check whether there are suggestion items in the RecyclerView.  If not, load some.
-        if (mSuggestionListAdapter.getItemCount() == 0) {
+        if (mSuggestionListAdapter.getItemCount() == 0
+                && mNoResultsTextView.getVisibility() != View.VISIBLE) {
             fetchBusinessList();
         }
     }
@@ -351,6 +352,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
         mSuggestionListAdapter.setBusinessList(null);
         mSuggestionListAdapter.notifyDataSetChanged();
 
+        mNoResultsTextView.setVisibility(View.GONE);
+
         startRefreshAnimation();
 
         presenter.onFetchBusinessList();
@@ -377,6 +380,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putLong(LOCATION_UPDATE_TIMESTAMP_KEY, mGooglePlayApi.getLocationUpdateTimestamp());
         savedInstanceState.putInt(LOCATION_QUALITY_KEY, mLocationQualityView.getStatus());
+        savedInstanceState.putInt(NO_RESULTS_TEXT_KEY, mNoResultsTextView.getVisibility());
+        savedInstanceState.putInt(PROGRESS_BAR_BUSINESSES_KEY, mProgressBar_Businesses.getVisibility());
 
         // TODO There must be a better way to do this
         String suggestionListStr = new Gson().toJson(mSuggestionListAdapter.getBusinessList());
@@ -411,6 +416,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    @Override
+    public void onNoResults() {
+        mRecyclerView_suggestionList.setVisibility(View.GONE);
+        mProgressBar_Businesses.setVisibility(View.GONE);
+        mNoResultsTextView.setVisibility(View.VISIBLE);
     }
 
     // Getters

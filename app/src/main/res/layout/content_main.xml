@@ -112,6 +112,15 @@
             android:layout_gravity="center"
             />
 
+        <TextView
+            android:id="@+id/no_results"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sorry_no_results_found"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/suggestion_list"
             android:layout_width="match_parent"
