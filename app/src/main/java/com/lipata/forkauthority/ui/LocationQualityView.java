@@ -48,7 +48,7 @@ public class LocationQualityView {
         return mStatus;
     }
 
-    public class Status {
+    public static class Status {
         // Status codes
         public static final int HIDDEN = 0;
         public static final int BEST = 10;

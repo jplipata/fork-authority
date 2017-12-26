@@ -42,4 +42,6 @@ public interface MainView {
     ListRanker getListRanker();
 
     boolean isNetworkConnected();
+
+    void onNoResults();
 }
