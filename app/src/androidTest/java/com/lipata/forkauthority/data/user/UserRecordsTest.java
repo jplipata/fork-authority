@@ -22,8 +22,6 @@ import static org.hamcrest.Matchers.*;
 
 public class UserRecordsTest {
 
-    private static final String LOG_TAG = UserRecordsTest.class.getSimpleName();
-
     private UserRecords userRecords;
 
     @Before

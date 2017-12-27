@@ -4,14 +4,14 @@ package com.lipata.forkauthority.api.yelp3.entities;
  * Created by jlipata on 6/4/17.
  */
 
-import android.util.Log;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.lipata.forkauthority.util.Utility;
 import com.lipata.forkauthority.data.AppSettings;
+import com.lipata.forkauthority.util.Utility;
 
 import java.util.List;
+
+import timber.log.Timber;
 
 public class Business {
 
@@ -226,7 +226,7 @@ public class Business {
     }
 
     public String getRating() {
-        Log.v("Business", "getRating() " + rating);
+        Timber.v("getRating() %s", rating);
         return rating;
     }
 }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.util.Log;
 
 import com.lipata.forkauthority.di.PerApp;
 
@@ -13,11 +12,10 @@ import java.io.IOException;
 import javax.inject.Inject;
 
 import io.reactivex.Single;
+import timber.log.Timber;
 
 @PerApp
 public class GeocoderApi {
-
-    static private final String LOG_TAG = GeocoderApi.class.getSimpleName();
 
     private final Geocoder geocoder;
 
@@ -32,7 +30,7 @@ public class GeocoderApi {
 
 
     private Address fetchAddress(final Location location) throws IOException {
-        Log.d(LOG_TAG, "fetchAddress()");
+        Timber.d("fetchAddress()");
         return geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
     }
 

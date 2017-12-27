@@ -15,7 +15,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Singleton
 public class Yelp3ApiClient implements Yelp3Api {
-    private static final String LOG_TAG = Yelp3ApiClient.class.getSimpleName();
 
     private static final String BASE_URL = "https://api.yelp.com/";
 

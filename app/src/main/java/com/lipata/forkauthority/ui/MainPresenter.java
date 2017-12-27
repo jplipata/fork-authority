@@ -2,7 +2,6 @@ package com.lipata.forkauthority.ui;
 
 import android.location.Address;
 import android.location.Location;
-import android.util.Log;
 
 import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
@@ -17,8 +16,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 public class MainPresenter implements Presenter {
-    private final static String LOG_TAG = MainPresenter.class.getSimpleName();
 
     private MainView view;
     private long callYelpApiStartTime;
@@ -49,14 +49,14 @@ public class MainPresenter implements Presenter {
                 .getAddressObservable(location)
                 .compose(Utility::applySchedulers)
                 .subscribe(this::onAddressReceived, throwable -> {
-                    Log.e(LOG_TAG, throwable.getMessage(), throwable);
+                    Timber.e(throwable.getMessage(), throwable);
                 });
     }
 
     public void checkNetworkPermissionAndCallYelpApi(Location location) {
         // If connected to network make Yelp API call, if no network, notify user
         if (view.isNetworkConnected()) {
-            Log.d(LOG_TAG, "Querying YelpV3api... Search term: " + AppSettings.SEARCH_TERM + " | Location: " + location.toString());
+            Timber.d("Querying YelpV3api... Search term: " + AppSettings.SEARCH_TERM + " | Location: " + location.toString());
             callYelpApiStartTime = System.nanoTime();
             //get list
             fetcher
@@ -99,11 +99,11 @@ public class MainPresenter implements Presenter {
     void onError(Throwable e) {
         view.stopRefreshAnimation();
         view.showSnackBarIndefinite(e.getMessage());
-        Log.e(LOG_TAG, e.getMessage(), e);
+        Timber.e(e.getMessage(), e);
     }
 
     private void onAddressReceived(Address address) {
-        Log.d(LOG_TAG, "onAddressReceived() " + address.toString());
+        Timber.d("onAddressReceived() " + address.toString());
 
         String text = addressParser.getFormattedAddress(address);
         if (!text.isEmpty()) {
@@ -112,7 +112,7 @@ public class MainPresenter implements Presenter {
     }
 
     private void onListReceived(List<Business> businesses) {
-        Log.d(LOG_TAG, "Total results received " + businesses.size());
+        Timber.d("Total results received " + businesses.size());
 
         if (businesses.size() > 0) {
             // Pass list to ListRanker to be processed
