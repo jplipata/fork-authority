@@ -11,7 +11,6 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -32,7 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import timber.log.Timber;
 
 import static com.lipata.forkauthority.ui.LocationQualityView.Status.BAD;
 import static com.lipata.forkauthority.ui.LocationQualityView.Status.BEST;
@@ -51,7 +51,6 @@ import static com.lipata.forkauthority.ui.LocationQualityView.Status.OK;
 @PerApp
 public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, ResultCallback<LocationSettingsResult> {
-    private static final String LOG_TAG = GooglePlayApi.class.getSimpleName();
 
     public static final float LOCATION_QUALITY_THRESHOLD_BEST = 100f;
     public static final float LOCATION_QUALITY_THRESHOLD_BAD = 499f;
@@ -113,13 +112,13 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
      */
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.d(LOG_TAG, "onConnected()");
+        Timber.d("onConnected()");
 
         @SuppressLint("MissingPermission")
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
         if (location != null && location.getAccuracy() < ACCURACY_TOLERANCE) {
-            Log.d(LOG_TAG, "LastLocation not null and within ACCURACY_TOLERANCE");
+            Timber.d("LastLocation not null and within ACCURACY_TOLERANCE");
 
             onBestLocationDetermined(location);
         } else {
@@ -135,7 +134,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
         int errorCode = result.getErrorCode();
 
-        Log.i(LOG_TAG, "GoogleApiClient Connection failed: ConnectionResult.getErrorCode() = " + errorCode);
+        Timber.i("GoogleApiClient Connection failed: ConnectionResult.getErrorCode() = " + errorCode);
 
         switch (errorCode) {
             case 1:
@@ -154,7 +153,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     public void onConnectionSuspended(int cause) {
         // The connection to Google Play services was lost for some reason. We call connect() to
         // attempt to re-establish the connection.
-        Log.i(LOG_TAG, "Connection suspended");
+        Timber.i("Connection suspended");
         //mGoogleApiClient.connect();
         mMainActivity.showSnackBarIndefinite("GooglePlayApi connection suspended.");
     }
@@ -162,7 +161,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     // Callback method for LocationRequest
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(LOG_TAG, "onLocationChanged() Execution analytics: Time since last update " + ((System.nanoTime() - mLastLocationChangeTime) / 1000000) + " ms");
+        Timber.d("onLocationChanged() Execution analytics: Time since last update " + ((System.nanoTime() - mLastLocationChangeTime) / 1000000) + " ms");
         mLastLocationChangeTime = System.nanoTime();
         mLocationArray.add(location);
         areAllLocationsReceived();
@@ -173,17 +172,17 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
     public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
         final Status status = locationSettingsResult.getStatus();
 
-        Log.d(LOG_TAG, "Location Settings result received. Code = " + status.getStatusCode());
+        Timber.d("Location Settings result received. Code = " + status.getStatusCode());
 
         switch (status.getStatusCode()) {
             case LocationSettingsStatusCodes.SUCCESS:
-                Log.i(LOG_TAG, "SUCCESS All location settings are satisfied.  Checking Location Permission and requesting location...");
+                Timber.i("SUCCESS All location settings are satisfied.  Checking Location Permission and requesting location...");
 
                 checkLocationPermissionAndRequestLocation();
 
                 break;
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                Log.i(LOG_TAG, "RESOLUTION_REQUIRED Location settings are not satisfied. Show the user a dialog to" +
+                Timber.i("RESOLUTION_REQUIRED Location settings are not satisfied. Show the user a dialog to" +
                         "upgrade location settings ");
 
                 try {
@@ -191,11 +190,11 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
                     // in onActivityResult().
                     status.startResolutionForResult(mMainActivity, REQUEST_CHECK_SETTINGS);
                 } catch (IntentSender.SendIntentException e) {
-                    Log.i(LOG_TAG, "PendingIntent unable to execute request.");
+                    Timber.i("PendingIntent unable to execute request.");
                 }
                 break;
             case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                Log.i(LOG_TAG, "SETTINGS_CHANGE_UNAVAILABLE Location settings are inadequate, and cannot be fixed here. Dialog " +
+                Timber.i("SETTINGS_CHANGE_UNAVAILABLE Location settings are inadequate, and cannot be fixed here. Dialog " +
                         "not created.");
                 mMainActivity.stopRefreshAnimation();
                 mMainActivity.showSnackBarIndefinite("There was an error.  Please check your settings.");
@@ -207,7 +206,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     public void checkDeviceLocationEnabled() {
 
-        Log.d(LOG_TAG, "Checking that Location is enabled on device...");
+        Timber.d("Checking that Location is enabled on device...");
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(mLocationRequest)
                 .setAlwaysShow(true);
@@ -223,8 +222,8 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     public boolean isLocationStale() {
         long currentTime = SystemClock.elapsedRealtime();
-        Log.d(LOG_TAG, "currentTime = " + currentTime);
-        Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
+        Timber.d("currentTime = " + currentTime);
+        Timber.d("mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
 
         if (getLastLocation() == null) {
             return true;
@@ -259,9 +258,9 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
             // For our purposes, once we have the location, we no longer need the client, so disconnect
             mGoogleApiClient.disconnect();
 
-            Log.d(LOG_TAG, "Location updates stopped and client disconnected");
+            Timber.d("Location updates stopped and client disconnected");
         } else {
-            Log.d(LOG_TAG, "stopLocationUpdates() Google Api Client already disconnected");
+            Timber.d("stopLocationUpdates() Google Api Client already disconnected");
         }
     }
 
@@ -273,7 +272,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
      * and triggers to proceed with the best location.  If no, it does nothing and waits for the next location
      */
     private void areAllLocationsReceived() {
-        Log.d(LOG_TAG, String.format("Location request #%d", mLocationArray.size()));
+        Timber.d(String.format("Location request #%d", mLocationArray.size()));
         if (mLocationArray.size() >= LOCATION_REQUEST_SAMPLE_SIZE) {
             stopLocationUpdates();
             onBestLocationDetermined(getBestLocation());
@@ -282,16 +281,16 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     private Location getBestLocation() {
         Location bestLocation = mLocationArray.get(0); // Get the first one, we'll compare next
-        Log.d(LOG_TAG, String.format("Location #0: Accuracy %f", mLocationArray.get(0).getAccuracy()));
+        Timber.d(String.format("Location #0: Accuracy %f", mLocationArray.get(0).getAccuracy()));
 
         for (int i = 1 /* Start with the second one */; i < mLocationArray.size(); i++) {
             float accuracy = mLocationArray.get(i).getAccuracy();
-            Log.d(LOG_TAG, String.format("Location #%d: Accuracy %f", i, accuracy));
+            Timber.d(String.format("Location #%d: Accuracy %f", i, accuracy));
             if (accuracy < bestLocation.getAccuracy()) {
                 bestLocation = mLocationArray.get(i);
             }
         }
-        Log.d(LOG_TAG, String.format("Best location: Accuracy %f", bestLocation.getAccuracy()));
+        Timber.d(String.format("Best location: Accuracy %f", bestLocation.getAccuracy()));
         return bestLocation;
     }
 
@@ -305,7 +304,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         // Check for Location permission
         boolean isPermissionMissing = ContextCompat.checkSelfPermission(mMainActivity, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED;
-        Log.d(LOG_TAG, "isPermissionMissing = " + isPermissionMissing);
+        Timber.d("isPermissionMissing = " + isPermissionMissing);
 
         if (isPermissionMissing) {
             // If permission is missing, we need to ask for it.  See onRequestPermissionResult() callback
@@ -316,39 +315,39 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
             // Else, permission has already been granted.  Proceed with requestLocationUpdates...
             if (mGoogleApiClient.isConnected()) {
-                Log.d(LOG_TAG, "Google API is connected.  Requesting Location Updates...");
+                Timber.d("Google API is connected.  Requesting Location Updates...");
                 requestLocationUpdates();
             } else {
-                Log.d(LOG_TAG, "Google API not connected.  Reconnecting...");
+                Timber.d("Google API not connected.  Reconnecting...");
                 mGoogleApiClient.connect();
             }
         }
     }
 
     private void updateLastLocationAndUpdateUI(Location location) {
-        Log.d(LOG_TAG, "updateLastLocationAndUpdateUI()...");
+        Timber.d("updateLastLocationAndUpdateUI()...");
 
         // Get last location & update timestamp
         mLastLocation = location;
         mLocationUpdateTimestamp = SystemClock.elapsedRealtime();
-        Log.d(LOG_TAG, "mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
+        Timber.d("mLocationUpdateTimestamp = " + mLocationUpdateTimestamp);
 
         // If LastLocation is not null, pass to MainActivity to be displayed
         if (mLastLocation != null) {
             double latitude = mLastLocation.getLatitude();
             double longitude = mLastLocation.getLongitude();
             float accuracy = mLastLocation.getAccuracy();
-            Log.d(LOG_TAG, "Success " + latitude + ", " + longitude + ", " + accuracy);
+            Timber.d("Success " + latitude + ", " + longitude + ", " + accuracy);
 
             mMainActivity.updateLocationViews(latitude, longitude, getLocationQuality(accuracy));
             mMainActivity.onDeviceLocationRetrieved();
         } else {
-            Log.d(LOG_TAG, "mLastLocation = null");
+            Timber.d("mLastLocation = null");
         }
     }
 
     private int getLocationQuality(float accuracy) {
-        Log.d(LOG_TAG, "getLocationQuality() accuracy " + accuracy);
+        Timber.d("getLocationQuality() accuracy " + accuracy);
         if (accuracy < LOCATION_QUALITY_THRESHOLD_BEST) {
             return BEST;
         } else if (accuracy > LOCATION_QUALITY_THRESHOLD_BAD) {

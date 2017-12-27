@@ -3,12 +3,12 @@ package com.lipata.forkauthority.api.yelp3;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.util.Log;
 
 import com.lipata.forkauthority.R;
 
+import timber.log.Timber;
+
 public class TokenManager {
-    private static final String LOG_TAG = "TokenManager";
     private static final String AUTH_FORMAT = "Bearer %s";
 
     private final SharedPreferences sharedPrefs;
@@ -25,7 +25,7 @@ public class TokenManager {
      */
     public synchronized String getToken() {
         final String cachedToken = sharedPrefs.getString(tokenKey, "null");
-        Log.d(LOG_TAG, String.format("SharedPrefs YelpV3Token %s", cachedToken));
+        Timber.d(String.format("SharedPrefs YelpV3Token %s", cachedToken));
         return String.format(AUTH_FORMAT, cachedToken);
     }
 

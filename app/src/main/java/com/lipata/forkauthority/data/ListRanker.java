@@ -1,7 +1,5 @@
 package com.lipata.forkauthority.data;
 
-import android.util.Log;
-
 import com.lipata.forkauthority.util.Utility;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.user.BusinessItemRecord;
@@ -14,6 +12,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 import static com.lipata.forkauthority.ui.BusinessListAdapter.DONTLIKE;
 
 /**
@@ -22,7 +22,6 @@ import static com.lipata.forkauthority.ui.BusinessListAdapter.DONTLIKE;
  * 1-2 secs for getting the device location plus 3-6 seconds to load Yelp data, this seems insignificant.
  */
 public class ListRanker {
-    private static String LOG_TAG = ListRanker.class.getSimpleName();
 
     private UserRecords mUserRecords;
 
@@ -69,7 +68,7 @@ public class ListRanker {
                 long dontLikeDelta = System.currentTimeMillis() - dontLikeClickDate;
                 long dontLikeDelta_days = dontLikeDelta / 1000 / 60 / 60 / 24; // Convert to days
 
-                Log.d(LOG_TAG, "Match found! Id = " + businessId + " tooSoonClickDate = "
+                Timber.d("Match found! Id = " + businessId + " tooSoonClickDate = "
                         + tooSoonClickDate + " dontLikeClickDate = "+ dontLikeClickDate +
                         " dismissedDate = "+dismissedDate
                         + " dismissedCount = "+dismissedCount);
@@ -91,8 +90,8 @@ public class ListRanker {
 
                         preferredList.add(business);
                         businessList_temp.set(i, null); // Remove business from original list
-                        Log.v(LOG_TAG, "filter() deemed PREFERRED");
-                    } else Log.v(LOG_TAG, "filter() deemed LIKED BUT TOO SOON, not assigned to the PREFERRED LIST");
+                        Timber.v("filter() deemed PREFERRED");
+                    } else Timber.v("filter() deemed LIKED BUT TOO SOON, not assigned to the PREFERRED LIST");
                 }
 
                 // Handle Dont Like case
@@ -102,15 +101,15 @@ public class ListRanker {
                     // Add to DontLike list, unless expired
                     if (dontLikeDelta_days < AppSettings.DONTLIKE_THRESHOLD_INDAYS) {
                         // Not expired
-                        Log.v(LOG_TAG, "filter() Deemed DON'T LIKE!");
+                        Timber.v("filter() Deemed DON'T LIKE!");
                         dontLikeList.add(business);
                         businessList_temp.set(i, null); // Remove business from original list
                     } else {
                         // Expired
-                        Log.v(LOG_TAG, "filter() DontLike EXPIRED, not assigned to DONTLIKE list");
+                        Timber.v("filter() DontLike EXPIRED, not assigned to DONTLIKE list");
 
                         // Update SharedPrefs
-                        Log.d(LOG_TAG, String.format("filter() DontLike EXPIRED, resetting %s in UserRecords", business.getName()));
+                        Timber.d(String.format("filter() DontLike EXPIRED, resetting %s in UserRecords", business.getName()));
                         mUserRecords.updateClickDate(business, 0, DONTLIKE);
 
                         // Update in-memory object
@@ -122,10 +121,10 @@ public class ListRanker {
 
                 if(tooSoonClickDate!=0) {
                     if (!business.isTooSoonClickDateExpired()) {
-                        Log.v(LOG_TAG, "filter() Deemed too soon!");
+                        Timber.v("filter() Deemed too soon!");
                         tooSoonList.add(business);
                         businessList_temp.set(i, null); // Remove business from original list
-                    } else Log.v(LOG_TAG, "filter() TooSoon EXPIRED");
+                    } else Timber.v("filter() TooSoon EXPIRED");
                 }
             }
         }
@@ -136,7 +135,7 @@ public class ListRanker {
         // from the backend, you want to fetch a higher number to make sure you don't miss any
         // businesses the user likes
         if(businessList_temp.size() > AppSettings.RESULTS_TO_DISPLAY_MAX){
-            Log.d(LOG_TAG, "Paring down businessList_temp. Original size "+businessList_temp.size()+
+            Timber.d("Paring down businessList_temp. Original size "+businessList_temp.size()+
                     ". "+(businessList_temp.size()- AppSettings.RESULTS_TO_DISPLAY_MAX)+" items removed");
             businessList_temp = businessList_temp.subList(0, AppSettings.RESULTS_TO_DISPLAY_MAX);
         }
@@ -150,7 +149,7 @@ public class ListRanker {
         newList.addAll(tooSoonList);
         newList.addAll(businessList_temp);
         newList.addAll(dontLikeList);
-        Log.d(LOG_TAG, "Final list size "+newList.size());
+        Timber.d("Final list size "+newList.size());
 
         // That's it! Return the filtered list.
         Utility.reportExecutionTime(this, "BusinessList filter()",startTime);

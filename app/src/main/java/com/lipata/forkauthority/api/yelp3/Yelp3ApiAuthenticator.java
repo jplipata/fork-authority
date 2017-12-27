@@ -1,7 +1,5 @@
 package com.lipata.forkauthority.api.yelp3;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.lipata.forkauthority.BuildConfig;
 import com.lipata.forkauthority.api.yelp3.entities.TokenResponse;
@@ -17,6 +15,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
 import okhttp3.logging.HttpLoggingInterceptor;
+import timber.log.Timber;
 
 import static com.lipata.forkauthority.api.yelp3.Yelp3Api.AuthParams.CLIENT_ID;
 import static com.lipata.forkauthority.api.yelp3.Yelp3Api.AuthParams.CLIENT_SECRET;
@@ -27,7 +26,6 @@ import static com.lipata.forkauthority.api.yelp3.Yelp3Api.AuthParams.GRANT_TYPE;
  */
 
 public class Yelp3ApiAuthenticator implements Authenticator {
-    private final String LOG_TAG = Yelp3ApiAuthenticator.class.getSimpleName();
 
     private final OkHttpClient client;
     private TokenManager tokenManager;
@@ -49,7 +47,7 @@ public class Yelp3ApiAuthenticator implements Authenticator {
     @Override
     public synchronized Request authenticate(final Route route, final Response response)
             throws IOException {
-        Log.e(LOG_TAG, "Status 401");
+        Timber.e("Status 401");
 
         TokenResponse tokenResponse = requestToken(response);
 

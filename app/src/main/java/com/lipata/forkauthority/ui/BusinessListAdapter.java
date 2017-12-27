@@ -9,7 +9,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,12 +25,13 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import timber.log.Timber;
+
 /**
  * Created by jlipata on 1/1/16.
  * TODO There's a lot of stuff in this class that should be in the model or data classes. Clean it up!
  */
 public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapter.ViewHolder> {
-    private static final String LOG_TAG = BusinessListAdapter.class.getSimpleName();
 
     // Button IDs
     public static final int LIKE = 0;
@@ -172,7 +172,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 // Update object field
                 business.setDontLikeClickDate(BusinessItemRecord.LIKE_FLAG);
-                Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to "
+                Timber.d("Updated dontLikeClickDate for " + business.getName() + " to "
                         + business.getDontLikeClickDate() + " position " + position);
 
                 // UI stuff
@@ -207,7 +207,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 // Update object field
                 business.setDontLikeClickDate(0);
-                Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + business.getDontLikeClickDate());
+                Timber.d("Updated dontLikeClickDate for " + business.getName() + " to " + business.getDontLikeClickDate());
 
                 notifyItemChanged(position);
             }
@@ -243,7 +243,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
             // Update object field
             business1.setTooSoonClickDate(systemTime_ms);
-            Log.d(LOG_TAG, "Updated tooSoonClickDate for " + business1.getName() + " to " + systemTime_ms);
+            Timber.d("Updated tooSoonClickDate for " + business1.getName() + " to " + systemTime_ms);
 
         });
 
@@ -279,7 +279,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 // Update object field
                 business12.setDontLikeClickDate(systemTime_ms);
-                Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business12.getName() + " to " + systemTime_ms);
+                Timber.d("Updated dontLikeClickDate for " + business12.getName() + " to " + systemTime_ms);
 
             } else {
                 // Un-Don't Like
@@ -289,7 +289,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
 
                 // Update object field
                 business.setDontLikeClickDate(0);
-                Log.d(LOG_TAG, "Updated dontLikeClickDate for " + business.getName() + " to " + business.getDontLikeClickDate());
+                Timber.d("Updated dontLikeClickDate for " + business.getName() + " to " + business.getDontLikeClickDate());
 
                 notifyItemChanged(position);
             }
@@ -304,7 +304,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
      * @return
      */
     private Drawable getRatingDrawable(String rating) {
-        Log.v(LOG_TAG, "getRatingDrawable: " + rating);
+        Timber.v("getRatingDrawable: " + rating);
 
         Resources resources = mMainActivity.getResources();
 

@@ -7,7 +7,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
  * Created by jlipata on 2/23/16.
  */
 public class ListItemTouchHelper extends ItemTouchHelper.SimpleCallback {
-    private static final String LOG_TAG = ListItemTouchHelper.class.getSimpleName();
+
     private BusinessListAdapter mBusinessListAdapter;
 
     public ListItemTouchHelper(BusinessListAdapter adapter){

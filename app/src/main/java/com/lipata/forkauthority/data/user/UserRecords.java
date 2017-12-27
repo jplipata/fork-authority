@@ -2,7 +2,6 @@ package com.lipata.forkauthority.data.user;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -17,9 +16,10 @@ import java.util.HashMap;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 @PerApp
 public class UserRecords {
-    private static String LOG_TAG = UserRecords.class.getSimpleName();
 
     private Context mContext;
     private SharedPreferences sharedPrefs;
@@ -61,10 +61,10 @@ public class UserRecords {
      * @param businessId Business to update
      */
     public void incrementDismissedCount(String businessId) {
-        Log.d(LOG_TAG, "incrementDismissedCount()");
+        Timber.d("incrementDismissedCount()");
 
         if (!map.containsKey(businessId)) {
-            Log.d(LOG_TAG, "Item does not exist");
+            Timber.d("Item does not exist");
 
             BusinessItemRecord businessItemRecord = new BusinessItemRecord();
             businessItemRecord.setId(businessId);
@@ -76,7 +76,7 @@ public class UserRecords {
             updateStores(businessItemRecord);
 
         } else {
-            Log.d(LOG_TAG, "Item does exist.");
+            Timber.d("Item does exist.");
 
             // Update dismissedCount
             BusinessItemRecord record = map.get(businessId);
@@ -85,7 +85,7 @@ public class UserRecords {
             // Store data
             updateStores(record);
 
-            Log.d(LOG_TAG, "Item " + businessId + " updated");
+            Timber.d("Item " + businessId + " updated");
         }
 
     }
@@ -98,10 +98,10 @@ public class UserRecords {
      * @param buttonId
      */
     public void updateClickDate(Business business, long time, int buttonId) {
-        Log.d(LOG_TAG, "updateClickDate()");
+        Timber.d("updateClickDate()");
 
         if (!map.containsKey(business.getId())) {
-            Log.d(LOG_TAG, business.getId() + " - Item does not exist");
+            Timber.d(business.getId() + " - Item does not exist");
 
             BusinessItemRecord businessItemRecord = new BusinessItemRecord();
             businessItemRecord.setId(business.getId());
@@ -124,7 +124,7 @@ public class UserRecords {
             updateStores(businessItemRecord);
 
         } else {
-            Log.d(LOG_TAG, "Item does exist.");
+            Timber.d("Item does exist.");
 
             // Update record ClickDate
             BusinessItemRecord record = map.get(business.getId());
@@ -148,7 +148,7 @@ public class UserRecords {
     private void insertUserRecord(BusinessItemRecord businessItemRecord) {
         map.put(businessItemRecord.getId(), businessItemRecord);
 
-        Log.d(LOG_TAG, "BusinessItemRecord " + businessItemRecord.getId() + " updated " + map.get(businessItemRecord));
+        Timber.d("BusinessItemRecord " + businessItemRecord.getId() + " updated " + map.get(businessItemRecord));
     }
 
     private void updateStores(BusinessItemRecord businessItemRecord) {
@@ -161,10 +161,10 @@ public class UserRecords {
         String jsonString = gson.toJson(map, collectionType);
 
         // Check
-        Log.d(LOG_TAG, jsonString);
+        Timber.d(jsonString);
 
         // Store data
-        Log.d(LOG_TAG, "Writing to SharedPreferences...");
+        Timber.d("Writing to SharedPreferences...");
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putString(mContext.getString(R.string.key_user_records_v2), jsonString);
         editor.apply();

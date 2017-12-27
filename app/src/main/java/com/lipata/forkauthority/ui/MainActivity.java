@@ -17,7 +17,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,9 +51,9 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
+import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements MainView {
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     // Constants
     static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
@@ -191,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     protected void onStop() {
-        Log.d(LOG_TAG, "onStop()");
+        Timber.d("onStop()");
         super.onStop();
         if (mGooglePlayApi.getClient().isConnected()) {
             mGooglePlayApi.stopLocationUpdates();
@@ -212,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void startRefreshAnimation() {
-        Log.d(LOG_TAG, "Starting animation");
+        Timber.d("Starting animation");
 
         mProgressBar_Businesses.setVisibility(View.VISIBLE);
 
@@ -223,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void stopRefreshAnimation() {
-        Log.d(LOG_TAG, "Stop animation");
+        Timber.d("Stop animation");
 
         mProgressBar_Businesses.setVisibility(View.GONE);
 
@@ -315,14 +314,14 @@ public class MainActivity extends AppCompatActivity implements MainView {
                     case Activity.RESULT_OK:
                         // All required changes were successfully made
 
-                        Log.d(LOG_TAG, "onActivityResult() RESULT_OK");
+                        Timber.d("onActivityResult() RESULT_OK");
                         presenter.executeGooglePlayApiLocation();
 
                         break;
                     case Activity.RESULT_CANCELED:
                         // The user was asked to change settings, but chose not to
 
-                        Log.d(LOG_TAG, "onActivityResult() RESULT_CANCELED");
+                        Timber.d("onActivityResult() RESULT_CANCELED");
 
                         stopRefreshAnimation();
                         showSnackBarIndefinite("Location settings error");

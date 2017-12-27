@@ -1,16 +1,14 @@
 package com.lipata.forkauthority.util;
 
-import android.util.Log;
-
 import java.util.Calendar;
 
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class Utility {
-    private static final String LOG_TAG = Utility.class.getSimpleName();
 
     public static String formatDate(long date) {
         Calendar calendar = Calendar.getInstance();
@@ -42,7 +40,7 @@ public class Utility {
         String LOG_TAG = object.getClass().getSimpleName();
         long executionTime = System.nanoTime() - startTime;
         long executionTime_ms = executionTime / 1000000;
-        Log.d(LOG_TAG, "Execution time: " + metricName + " = " + executionTime +
+        Timber.tag(LOG_TAG).d("Execution time: " + metricName + " = " + executionTime +
                 " nanoseconds or " + executionTime_ms + " ms");
     }
 

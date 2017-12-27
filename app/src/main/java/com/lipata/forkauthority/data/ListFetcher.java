@@ -1,7 +1,5 @@
 package com.lipata.forkauthority.data;
 
-import android.util.Log;
-
 import com.lipata.forkauthority.api.yelp3.Yelp3Api;
 import com.lipata.forkauthority.api.yelp3.Yelp3ApiClient;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
@@ -15,11 +13,11 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import timber.log.Timber;
 
 import static com.lipata.forkauthority.data.AppSettings.MAX_API_CALLS;
 
 public class ListFetcher {
-    private static final String LOG_TAG = ListFetcher.class.getSimpleName();
 
     private final Yelp3ApiClient api;
 
@@ -37,7 +35,7 @@ public class ListFetcher {
      * @return
      */
     public Single<List<Business>> getList(final String latitude, final String longitude) {
-        Log.d(LOG_TAG, "getList() ");
+        Timber.d("getList() ");
         return api
                 .search(
                         AppSettings.SEARCH_TERM,
@@ -68,9 +66,9 @@ public class ListFetcher {
         double numberOfCalls =
                 (double) (searchResponse.getTotal() - searchResponse.getBusinesses().size()) / Yelp3Api.SEARCH_LIMIT;
 
-        Log.d(LOG_TAG, "searchResponse.getTotal() " + searchResponse.getTotal());
-        Log.d(LOG_TAG, "searchResponse.getBusinesses().size() " + searchResponse.getBusinesses().size());
-        Log.d(LOG_TAG, "numberOfCalls " + (int) Math.ceil(numberOfCalls));
+        Timber.d("searchResponse.getTotal() " + searchResponse.getTotal());
+        Timber.d("searchResponse.getBusinesses().size() " + searchResponse.getBusinesses().size());
+        Timber.d("numberOfCalls " + (int) Math.ceil(numberOfCalls));
 
         return Observable
                 .range(1, (int) Math.ceil(numberOfCalls)) // call offset, always round up
