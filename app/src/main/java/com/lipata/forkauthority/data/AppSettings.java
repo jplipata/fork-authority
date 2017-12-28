@@ -10,6 +10,7 @@ public class AppSettings {
     public static int SEARCH_RADIUS = 1000; // Search radius in meters. If the value is too large, a AREA_TOO_LARGE error may be returned. The max value is 40000 meters (25 miles).
 
     /**
+     * @deprecated
      * Deprecated. Replaced with MAX_API_CALLS
      *
      * Max number of businesses that will be fetched from Yelp.  We were previously fetching all available

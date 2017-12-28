@@ -1,19 +1,19 @@
 package com.lipata.forkauthority.api.yelp3.entities;
 
-/**
- * Created by jlipata on 6/4/17.
- */
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.lipata.forkauthority.data.AppSettings;
+import com.lipata.forkauthority.ui.BusinessListBaseItem;
+import com.lipata.forkauthority.ui.ListItemTypes;
 import com.lipata.forkauthority.util.Utility;
 
 import java.util.List;
 
 import timber.log.Timber;
 
-public class Business {
+import static com.lipata.forkauthority.data.user.BusinessItemRecord.LIKED;
+
+public class Business extends BusinessListBaseItem {
 
     public static final String YOU_LIKE_THIS = "You like this";
     public static final String DONT_LIKE_THIS = "Don't like";
@@ -21,7 +21,6 @@ public class Business {
     public static final String ATE_HERE_PLURAL_APPENDED_ = ".  You ate here roughly %d days ago";
     public static final String ATE_HERE_SINGULAR_SOLO_ = "You ate here very recently";
     public static final String ATE_HERE_SINGULAR_APPENDED = ".  You ate here very recently";
-
 
     @SerializedName("rating")
     @Expose
@@ -89,7 +88,8 @@ public class Business {
      * Field used to track Like or Don't Like state.
      * Initializes as 0 when converted by GSON
      * -1 means "Like"
-     * A positive number means "Don't Like", expressed as a date when it was clicked (so that it can expire after a certain amount of time)
+     * A positive number means "Don't Like", expressed as a date when it was clicked (so that it
+     * can expire after a certain amount of time)
      */
     private long dontLikeClickDate;
 
@@ -105,6 +105,14 @@ public class Business {
         long now = System.currentTimeMillis();
         if (now - AppSettings.TOOSOON_THRESHOLD > tooSoonClickDate) return true;
         else return false;
+    }
+
+    public boolean isDontLike() {
+        return getDontLikeClickDate() > 0;
+    }
+
+    public boolean isLiked(){
+        return getDontLikeClickDate() == LIKED;
     }
 
     public long getTooSoonClickDate() {
@@ -142,27 +150,27 @@ public class Business {
     /**
      * @return Returns supplementary text that explains the user's preferences for this business.  Returns `null` if the preferences haven't been set.
      */
-    public String getDescriptiveText(){
+    public String getDescriptiveText() {
         StringBuilder stringBuilder = new StringBuilder();
 
         // Case where neither field has been set
-        if(dontLikeClickDate==0 && tooSoonClickDate==0){
+        if (dontLikeClickDate == 0 && tooSoonClickDate == 0) {
             return null;
         }
 
         // Case where Like/Don't Like has been set.
-        if(dontLikeClickDate==-1){
+        if (dontLikeClickDate == -1) {
             stringBuilder.append(YOU_LIKE_THIS);
-        } else if(dontLikeClickDate!=0){
+        } else if (dontLikeClickDate != 0) {
             stringBuilder.append(DONT_LIKE_THIS);
         }
 
 
         // Case for Just Ate Here (Expired and Not Expired)
         String monthDayYear = Utility.formatDate(tooSoonClickDate);
-        int days = (int) ((System.currentTimeMillis()-tooSoonClickDate) / 86400000); // Number of milliseconds in a day
-        if(tooSoonClickDate!=0) {
-            if(days>1) {
+        int days = (int) ((System.currentTimeMillis() - tooSoonClickDate) / 86400000); // Number of milliseconds in a day
+        if (tooSoonClickDate != 0) {
+            if (days > 1) {
                 if (dontLikeClickDate == 0) {
                     String string = String.format(ATE_HERE_PLURAL_SOLO, days);
                     stringBuilder.append(string);
@@ -187,10 +195,10 @@ public class Business {
      */
     public String getFormattedCategories() {
         StringBuilder stringBuilder = new StringBuilder();
-        for(int i=0; i<categories.size(); i++){
+        for (int i = 0; i < categories.size(); i++) {
             String category = categories.get(i).getTitle();
             stringBuilder.append(category);
-            if(i<(categories.size()-1)){
+            if (i < (categories.size() - 1)) {
                 stringBuilder.append(", ");
             }
         }
@@ -228,5 +236,10 @@ public class Business {
     public String getRating() {
         Timber.v("getRating() %s", rating);
         return rating;
+    }
+
+    @Override
+    public int getViewType() {
+        return ListItemTypes.BUSINESS;
     }
 }

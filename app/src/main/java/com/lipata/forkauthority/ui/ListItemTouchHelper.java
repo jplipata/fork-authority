@@ -1,18 +1,16 @@
 package com.lipata.forkauthority.ui;
 
+import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
-/**
- * Created by jlipata on 2/23/16.
- */
 public class ListItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     private BusinessListAdapter mBusinessListAdapter;
 
-    public ListItemTouchHelper(BusinessListAdapter adapter){
+    public ListItemTouchHelper(BusinessListAdapter adapter) {
         super(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
-        this.mBusinessListAdapter=adapter;
+        this.mBusinessListAdapter = adapter;
     }
 
     @Override
@@ -22,7 +20,18 @@ public class ListItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        int position = viewHolder.getAdapterPosition();
-        mBusinessListAdapter.dismiss(position);
+        // Only do this for a Business, not for a Header
+        if (viewHolder.getItemViewType() == ListItemTypes.BUSINESS) {
+            int position = viewHolder.getAdapterPosition();
+            mBusinessListAdapter.dismiss(position);
+        }
+    }
+
+    @Override
+    public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+        // Only do this for a Business, not for a Header
+        if (viewHolder.getItemViewType() == ListItemTypes.BUSINESS) {
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        }
     }
 }

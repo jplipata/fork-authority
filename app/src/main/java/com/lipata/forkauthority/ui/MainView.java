@@ -3,11 +3,8 @@ package com.lipata.forkauthority.ui;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.RecyclerView;
 
-import com.lipata.forkauthority.data.ListRanker;
-
-/**
- * Created by jlipata on 3/19/17.
- */
+import com.lipata.forkauthority.api.yelp3.entities.Business;
+import com.lipata.forkauthority.data.ListComposer;
 
 public interface MainView {
     void updateLocationViews(double latitude, double longitude, int accuracyQuality);
@@ -17,6 +14,10 @@ public interface MainView {
     void stopRefreshAnimation();
 
     void showSnackBarIndefinite(String text);
+
+    void showSnackBarLong(String text);
+
+    void showSnackBarLongWithAction(String message, String actionLabel, int position, Business business);
 
     void showToast(String text);
 
@@ -33,15 +34,10 @@ public interface MainView {
 
     void logFabricAnswersMetric(String metricName, long startTime);
 
-    RecyclerView.LayoutManager getRecyclerViewLayoutManager();
-
-    CoordinatorLayout getCoordinatorLayout();
-
     BusinessListAdapter getSuggestionListAdapter();
-
-    ListRanker getListRanker();
 
     boolean isNetworkConnected();
 
     void onNoResults();
+
 }

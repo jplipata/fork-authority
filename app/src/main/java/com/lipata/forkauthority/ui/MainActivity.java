@@ -5,9 +5,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -30,30 +33,29 @@ import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.lipata.forkauthority.AppComponent;
 import com.lipata.forkauthority.AppModule;
 import com.lipata.forkauthority.DaggerAppComponent;
 import com.lipata.forkauthority.R;
-import com.lipata.forkauthority.api.yelp3.YelpModule;
-import com.lipata.forkauthority.util.Utility;
 import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
+import com.lipata.forkauthority.api.yelp3.YelpModule;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.AppSettings;
-import com.lipata.forkauthority.data.ListRanker;
+import com.lipata.forkauthority.data.ListComposer;
 import com.lipata.forkauthority.data.user.UserRecords;
+import com.lipata.forkauthority.util.Utility;
 
-import java.lang.reflect.Type;
+import org.jetbrains.annotations.NotNull;
+
 import java.text.DecimalFormat;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements MainView {
+public class MainActivity extends AppCompatActivity implements MainView, BusinessListParentView {
 
     // Constants
     static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
@@ -69,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Inject MainPresenter presenter;
     @Inject GooglePlayApi mGooglePlayApi;
     @Inject UserRecords mUserRecords;
-    @Inject ListRanker listRanker;
+    @Inject ListComposer listComposer;
 
     // Views
     protected CoordinatorLayout mCoordinatorLayout;
@@ -168,12 +170,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
             mNoResultsTextView.setVisibility(savedInstanceState.getInt(NO_RESULTS_TEXT_KEY));
             mProgressBar_Businesses.setVisibility(savedInstanceState.getInt(PROGRESS_BAR_BUSINESSES_KEY));
 
-            String storedSuggestionList = savedInstanceState.getString(SUGGESTIONLIST_KEY, null);
-            if (storedSuggestionList != null) {
-                Type listType = new TypeToken<List<Business>>(){}.getType();
-                List<Business> retrievedBusinessList = new Gson().fromJson(storedSuggestionList, listType);
-                mSuggestionListAdapter.setBusinessList(retrievedBusinessList);
-            }
+            //TODO Cache the list
+//            String storedSuggestionList = savedInstanceState.getString(SUGGESTIONLIST_KEY, null);
+//            if (storedSuggestionList != null) {
+//                Type listType = new TypeToken<List<Business>>(){}.getType();
+//                List<Business> retrievedBusinessList = new Gson().fromJson(storedSuggestionList, listType);
+//                mSuggestionListAdapter.setListItems(retrievedBusinessList);
+//            }
         }
     }
 
@@ -424,6 +427,25 @@ public class MainActivity extends AppCompatActivity implements MainView {
         mNoResultsTextView.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public void showSnackBarLongWithAction(
+            final String message,
+            final String actionLabel,
+            final int position,
+            final Business business) {
+
+        mSnackbar = Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG)
+                .setAction(actionLabel, v -> mSuggestionListAdapter.undoDismiss(position, business))
+                .setActionTextColor(getResources().getColor(R.color.text_white));
+        mSnackbar.show();
+    }
+
+    @Override
+    public void showSnackBarLong(String text) {
+        mSnackbar = Snackbar.make(mCoordinatorLayout, text, Snackbar.LENGTH_LONG);
+        mSnackbar.show();
+    }
+
     // Getters
 
     @Override
@@ -432,21 +454,82 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
-    public CoordinatorLayout getCoordinatorLayout() {
-        return mCoordinatorLayout;
-    }
-
-    @Override
     public BusinessListAdapter getSuggestionListAdapter() {
         return mSuggestionListAdapter;
     }
 
-    @Override
-    public ListRanker getListRanker() {
-        return listRanker;
-    }
-
     public MainPresenter getPresenter() {
         return presenter;
+    }
+
+    @Override
+    public void notifyUserTooSoon(String businessName) {
+        showSnackBarLong("Noted. You just ate at "
+                + businessName
+                + getString(R.string.moved_to_toosoon));
+    }
+
+    @Override
+    public void notifyUserBusinessLiked(@NotNull String businessName) {
+        showSnackBarLong("Noted. You like " + businessName
+                + ". I have moved this to the top of the list."); // TODO Extract resource
+    }
+
+    @Override
+    public void notifyUserBusinessDismissed(int position, @NotNull Business business) {
+        showSnackBarLongWithAction(business.getName() + " dismissed.",
+                "UNDO",
+                position,
+                business);
+    }
+
+    @Override
+    public void notifyUserBusinessDontLiked(@NotNull String businessName) {
+        showSnackBarLong("Noted. You don't like "
+                + businessName
+                + getString(R.string.moved_to_bottom));
+    }
+
+    @Override
+    public void notifyNotAllowedOnDontLike() {
+        showToast("Not allowed on a restaurant that you don't like.");
+    }
+
+    @Override
+    public void launchBusinessUrl(@NotNull String url) {
+        final Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(browserIntent);
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public Drawable getRatingDrawable(@NotNull String rating) {
+        switch (rating) {
+            case "5.0":
+                return getResources().getDrawable(R.drawable.stars_small_5);
+            case "4.5":
+                return getResources().getDrawable(R.drawable.stars_small_4_half);
+            case "4.0":
+                return getResources().getDrawable(R.drawable.stars_small_4);
+            case "3.5":
+                return getResources().getDrawable(R.drawable.stars_small_3_half);
+            case "3.0":
+                return getResources().getDrawable(R.drawable.stars_small_3);
+            case "2.5":
+                return getResources().getDrawable(R.drawable.stars_small_2_half);
+            case "2.0":
+                return getResources().getDrawable(R.drawable.stars_small_2);
+            case "1.5":
+                return getResources().getDrawable(R.drawable.stars_small_1_half);
+            case "1.0":
+                return getResources().getDrawable(R.drawable.stars_small_1);
+            default:
+                return getResources().getDrawable(R.drawable.stars_small_0);
+        }
     }
 }

@@ -66,9 +66,9 @@ public class ListFetcher {
         double numberOfCalls =
                 (double) (searchResponse.getTotal() - searchResponse.getBusinesses().size()) / Yelp3Api.SEARCH_LIMIT;
 
-        Timber.d("searchResponse.getTotal() " + searchResponse.getTotal());
-        Timber.d("searchResponse.getBusinesses().size() " + searchResponse.getBusinesses().size());
-        Timber.d("numberOfCalls " + (int) Math.ceil(numberOfCalls));
+        Timber.d("searchResponse.getTotal() %s", searchResponse.getTotal());
+        Timber.d("searchResponse.getBusinesses().size() %s", searchResponse.getBusinesses().size());
+        Timber.d("numberOfCalls %s", (int) Math.ceil(numberOfCalls));
 
         return Observable
                 .range(1, (int) Math.ceil(numberOfCalls)) // call offset, always round up
