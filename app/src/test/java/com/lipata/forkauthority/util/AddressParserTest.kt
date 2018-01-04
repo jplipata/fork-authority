@@ -8,7 +8,7 @@ class AddressParserTest {
     // TODO Create one more test for Address with sublocality
 
     /**
-     * Test case for Addres with locality instead of sublocality
+     * Test case for Address with locality instead of sublocality
      */
     @Test
     fun getFormattedAddress() {

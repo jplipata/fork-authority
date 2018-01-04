@@ -2,20 +2,22 @@ package com.lipata.forkauthority.data.user;
 
 public class BusinessItemRecord {
 
-    public static final int LIKE_FLAG = -1; // I'm using the dontLikeClickDate field for "Like" status.  "-1" means "Like"
+    // Status flags
+    public static final int LIKED = -1; // I'm using the dontLikeClickDate field for "Like" status.  "-1" means "Like"
+    public static final int UNSORTED = 0;
 
-    String Id;
+    private String Id;
 
     /**
      * tooSoonClickDate
      * Unit: milliseconds
      */
-    long tooSoonClickDate;
+    private long tooSoonClickDate;
 
-    long dontLikeClickDate; // A value of "-1" means "Like"
-    long dismissedClickDate;
+    private long dontLikeClickDate; // A value of "-1" means "Like"
+    private long dismissedClickDate;
 
-    int dismissedCount;
+    private int dismissedCount;
 
     public String getId() {
         return Id;

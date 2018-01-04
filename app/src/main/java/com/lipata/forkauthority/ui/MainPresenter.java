@@ -8,7 +8,8 @@ import com.lipata.forkauthority.api.GooglePlayApi;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.AppSettings;
 import com.lipata.forkauthority.data.ListFetcher;
-import com.lipata.forkauthority.data.ListRanker;
+import com.lipata.forkauthority.data.ListComposer;
+import com.lipata.forkauthority.data.CombinedList;
 import com.lipata.forkauthority.util.AddressParser;
 import com.lipata.forkauthority.util.Utility;
 
@@ -18,6 +19,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
+// TODO Dispose subscriptions!!
 public class MainPresenter implements Presenter {
 
     private MainView view;
@@ -26,7 +28,7 @@ public class MainPresenter implements Presenter {
     private final ListFetcher fetcher;
     private final GooglePlayApi googlePlayApi;
     private final GeocoderApi geocoderApi;
-    private final ListRanker listRanker;
+    private final ListComposer listComposer;
     private final AddressParser addressParser;
 
     @Inject
@@ -34,12 +36,12 @@ public class MainPresenter implements Presenter {
             final ListFetcher fetcher,
             final GooglePlayApi googlePlayApi,
             final GeocoderApi geocoderApi,
-            final ListRanker listRanker,
+            final ListComposer listComposer,
             final AddressParser addressParser) {
         this.fetcher = fetcher;
         this.googlePlayApi = googlePlayApi;
         this.geocoderApi = geocoderApi;
-        this.listRanker = listRanker;
+        this.listComposer = listComposer;
         this.addressParser = addressParser;
     }
 
@@ -112,11 +114,11 @@ public class MainPresenter implements Presenter {
     }
 
     private void onListReceived(List<Business> businesses) {
-        Timber.d("Total results received " + businesses.size());
+        Timber.d("Total results received %s", businesses.size());
 
         if (businesses.size() > 0) {
-            // Pass list to ListRanker to be processed
-            List<Business> filteredBusinesses = listRanker.filter(businesses);
+            // Pass list to ListComposer to be processed
+            CombinedList filteredBusinesses = listComposer.filter(businesses);
 
             // Update UI
             BusinessListAdapter businessListAdapter = view.getSuggestionListAdapter();
@@ -127,7 +129,8 @@ public class MainPresenter implements Presenter {
         }
 
         // Analytics
-        Utility.reportExecutionTime(this, "callYelpApi sequence, time to get " + businesses.size() + " businesses", callYelpApiStartTime);
+        Utility.reportExecutionTime(this, "callYelpApi sequence, time to get "
+                + businesses.size() + " businesses", callYelpApiStartTime);
         view.logFabricAnswersMetric(AppSettings.FABRIC_METRIC_YELPAPI, callYelpApiStartTime);
 
         // UI

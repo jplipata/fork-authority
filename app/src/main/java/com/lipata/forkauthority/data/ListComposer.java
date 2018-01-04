@@ -1,9 +1,11 @@
 package com.lipata.forkauthority.data;
 
-import com.lipata.forkauthority.util.Utility;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.user.BusinessItemRecord;
 import com.lipata.forkauthority.data.user.UserRecords;
+import com.lipata.forkauthority.ui.BusinessListBaseItem;
+import com.lipata.forkauthority.ui.BusinessListHeader;
+import com.lipata.forkauthority.util.Utility;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,46 +18,43 @@ import timber.log.Timber;
 
 import static com.lipata.forkauthority.ui.BusinessListAdapter.DONTLIKE;
 
-/**
- * I was concerned that some of the iterative O(n) implementations in this class would result in
- * poor performance, however as of 2016/9/8 execution times for this module are approx 20 ms.  Compared to
- * 1-2 secs for getting the device location plus 3-6 seconds to load Yelp data, this seems insignificant.
- */
-public class ListRanker {
+public class ListComposer {
 
     private UserRecords mUserRecords;
 
     @Inject
-    public ListRanker(final UserRecords userRecords) {
+    public ListComposer(final UserRecords userRecords) {
         this.mUserRecords = userRecords;
     }
 
     /**
      * Takes a list of `Business`s and sorts them according to user preferences stored in `UserRecords`
+     *
      * @param businessList_Source List to be sorted.
-     * @return Returns sorted list in order of "Preferred", "Neutral", "Too Soon", then "Don't Like"
+     * @return Returns separate, sorted lists
      */
-    public List<Business> filter(List<Business> businessList_Source){
+    public CombinedList filter(List<Business> businessList_Source) {
         long startTime = System.nanoTime();
 
         // 3 categories that each business can be filtered to
-        List<Business> preferredList = new ArrayList<>();
-        List<Business> tooSoonList = new ArrayList<>();
-        List<Business> dontLikeList = new ArrayList<>();
+        List<BusinessListBaseItem> likesList = new ArrayList<>();
+        List<BusinessListBaseItem> likedButTooSoonList = new ArrayList<>();
+        List<BusinessListBaseItem> unsortedTooSoonList = new ArrayList<>();
+        List<BusinessListBaseItem> dontLikeList = new ArrayList<>();
 
         // Make a copy of the source list
-        List<Business> businessList_temp = new ArrayList<>();
+        List<BusinessListBaseItem> businessList_temp = new ArrayList<>();
         businessList_temp.addAll(businessList_Source);
 
         // Get user data
         HashMap<String, BusinessItemRecord> userRecordMap = mUserRecords.getUserRecords();
 
         // Iterate through API results, adjust order according to user records
-        for(int i=0; i<businessList_Source.size(); i++){
+        for (int i = 0; i < businessList_Source.size(); i++) {
             Business business = businessList_Source.get(i);
             String businessId = business.getId();
 
-            if(userRecordMap.containsKey(businessId)){
+            if (userRecordMap.containsKey(businessId)) {
 
                 BusinessItemRecord businessItemRecord = userRecordMap.get(businessId);
 
@@ -69,9 +68,9 @@ public class ListRanker {
                 long dontLikeDelta_days = dontLikeDelta / 1000 / 60 / 60 / 24; // Convert to days
 
                 Timber.d("Match found! Id = " + businessId + " tooSoonClickDate = "
-                        + tooSoonClickDate + " dontLikeClickDate = "+ dontLikeClickDate +
-                        " dismissedDate = "+dismissedDate
-                        + " dismissedCount = "+dismissedCount);
+                        + tooSoonClickDate + " dontLikeClickDate = " + dontLikeClickDate +
+                        " dismissedDate = " + dismissedDate
+                        + " dismissedCount = " + dismissedCount);
 
                 // On match found, do:
 
@@ -82,16 +81,20 @@ public class ListRanker {
 
                 // Handle Like case
 
-                if(dontLikeClickDate==-1){
+                if (dontLikeClickDate == -1) {
 
-                    // Assign it to the "Preferred" list, but only if it's not "too soon"
+                    // Assign it to the "Liked" list, or the "Liked, but too soon" list
 
-                    if(business.getTooSoonClickDate()==0 || business.isTooSoonClickDateExpired()){
+                    if (business.getTooSoonClickDate() == 0 || business.isTooSoonClickDateExpired()) {
 
-                        preferredList.add(business);
+                        likesList.add(business);
                         businessList_temp.set(i, null); // Remove business from original list
-                        Timber.v("filter() deemed PREFERRED");
-                    } else Timber.v("filter() deemed LIKED BUT TOO SOON, not assigned to the PREFERRED LIST");
+                        Timber.v("filter() deemed LIKED");
+                    } else {
+                        Timber.v("filter() deemed LIKED BUT TOO SOON");
+                        likedButTooSoonList.add(business);
+                        businessList_temp.set(i, null); // Remove business from original list
+                    }
                 }
 
                 // Handle Dont Like case
@@ -109,7 +112,7 @@ public class ListRanker {
                         Timber.v("filter() DontLike EXPIRED, not assigned to DONTLIKE list");
 
                         // Update SharedPrefs
-                        Timber.d(String.format("filter() DontLike EXPIRED, resetting %s in UserRecords", business.getName()));
+                        Timber.d("filter() DontLike EXPIRED, resetting %s in UserRecords", business.getName());
                         mUserRecords.updateClickDate(business, 0, DONTLIKE);
 
                         // Update in-memory object
@@ -119,10 +122,10 @@ public class ListRanker {
 
                 // Handle the "Too Soon" case:
 
-                if(tooSoonClickDate!=0) {
+                if (tooSoonClickDate != 0 && dontLikeClickDate != -1) {
                     if (!business.isTooSoonClickDateExpired()) {
-                        Timber.v("filter() Deemed too soon!");
-                        tooSoonList.add(business);
+                        Timber.v("filter() Deemed too soon, unsorted!");
+                        unsortedTooSoonList.add(business);
                         businessList_temp.set(i, null); // Remove business from original list
                     } else Timber.v("filter() TooSoon EXPIRED");
                 }
@@ -134,25 +137,45 @@ public class ListRanker {
         // Note: This is separate from fetching results from the backend. When fetching results
         // from the backend, you want to fetch a higher number to make sure you don't miss any
         // businesses the user likes
-        if(businessList_temp.size() > AppSettings.RESULTS_TO_DISPLAY_MAX){
-            Timber.d("Paring down businessList_temp. Original size "+businessList_temp.size()+
-                    ". "+(businessList_temp.size()- AppSettings.RESULTS_TO_DISPLAY_MAX)+" items removed");
+        if (businessList_temp.size() > AppSettings.RESULTS_TO_DISPLAY_MAX) {
+            Timber.d("Paring down businessList_temp. Original size " + businessList_temp.size() +
+                    ". " + (businessList_temp.size() - AppSettings.RESULTS_TO_DISPLAY_MAX) + " items removed");
             businessList_temp = businessList_temp.subList(0, AppSettings.RESULTS_TO_DISPLAY_MAX);
         }
 
         // Remove null elements
         businessList_temp.removeAll(Collections.singleton(null));
 
-        // Combine the lists for display
-        List<Business> newList = new ArrayList<>();
-        newList.addAll(preferredList);
-        newList.addAll(tooSoonList);
-        newList.addAll(businessList_temp);
-        newList.addAll(dontLikeList);
-        Timber.d("Final list size "+newList.size());
+        // Add headers
 
-        // That's it! Return the filtered list.
-        Utility.reportExecutionTime(this, "BusinessList filter()",startTime);
-        return newList;
+        if (likesList.size() > 0) {
+            likesList.add(0, new BusinessListHeader(Categories.Companion.getLIKES()));
+        }
+        if (likedButTooSoonList.size() > 0) {
+            likedButTooSoonList.add(0, new BusinessListHeader(Categories.Companion.getLIKES_TOO_SOON()));
+        }
+        if (businessList_temp.size() > 0) {
+            businessList_temp.add(0, new BusinessListHeader(Categories.Companion.getUNSORTED()));
+        }
+        if (unsortedTooSoonList.size() > 0) {
+            unsortedTooSoonList.add(0, new BusinessListHeader(Categories.Companion.getUNSORTED_TOO_SOON()));
+        }
+        if (dontLikeList.size() > 0) {
+            dontLikeList.add(0, new BusinessListHeader(Categories.Companion.getDONT_LIKE()));
+        }
+
+        List<List<BusinessListBaseItem>> lists = new ArrayList<>();
+        lists.add(likesList);
+        lists.add(likedButTooSoonList);
+        lists.add(businessList_temp);
+        lists.add(unsortedTooSoonList);
+        lists.add(dontLikeList);
+
+        CombinedList combinedList = new CombinedList();
+        combinedList.setSublists(lists);
+
+        // That's it! Return the filtered lists.
+        Utility.reportExecutionTime(this, "BusinessList filter()", startTime);
+        return combinedList;
     }
 }

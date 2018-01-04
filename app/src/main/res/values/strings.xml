@@ -8,6 +8,7 @@
 
     <!-- UI - Suggestion List Strings -->
     <string name="moved_to_bottom">. I have moved this to the bottom of the list.</string>
+    <string name="moved_to_toosoon">. I have moved this to the Too Soon list below.</string>
     <string name="getting_your_location">Getting your location...</string>
     <string name="loading_businesses">Loading stuff to eat...</string>
 
