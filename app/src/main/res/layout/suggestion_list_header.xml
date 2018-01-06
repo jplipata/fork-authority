@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/text_white"
         android:textStyle="bold"
+        android:textSize="12sp"
         android:background="@drawable/shape_oval_rounded"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
