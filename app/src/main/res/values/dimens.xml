@@ -18,7 +18,6 @@
     <dimen name="label_location_textsize">12sp</dimen>
     <dimen name="layout_location_height">30dp</dimen>
 
-    <dimen name="header_line_width">48dp</dimen>
-
+    <dimen name="header_line_width">32dp</dimen>
 
 </resources>
