@@ -22,23 +22,7 @@ Click the Refresh button to start over
 
 Fork Authority will remember your preferences for next time
 
-#### Developer Notes
 
-##### Enhancement Backlog
-###### UI/Functionality
-- Bug fix: Some list item images appear distorted
-- List headers for preference groups and/or tabbed view
-- Social features
-- User definable settings/search query
-- "Just ate here" active state icon and dynamic text based on state
-- More sophisticated suggestion logic, such as looking for patterns in categories for recommendations (e.g. if a user tends to like Japanese, businesses with category = Japanese will get sorted to top of list
-
-###### Code Quality
-- Unit test for list ranking
-- Kotlin
-- Clean up entities/models
-- Clean up adapter
-- Replace findViewById with something better, e.g. Butterknife 
 
 License
 --------
