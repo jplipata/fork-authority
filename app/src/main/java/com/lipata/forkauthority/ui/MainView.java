@@ -1,10 +1,6 @@
 package com.lipata.forkauthority.ui;
 
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v7.widget.RecyclerView;
-
 import com.lipata.forkauthority.api.yelp3.entities.Business;
-import com.lipata.forkauthority.data.ListComposer;
 
 public interface MainView {
     void updateLocationViews(double latitude, double longitude, int accuracyQuality);

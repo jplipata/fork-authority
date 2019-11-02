@@ -1,8 +1,9 @@
 package com.lipata.forkauthority.data.user;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.lipata.forkauthority.R;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
@@ -26,7 +27,7 @@ public class UserRecordsTest {
 
     @Before
     public void setUp() throws Exception {
-        Context context = InstrumentationRegistry.getTargetContext();
+        Context context = ApplicationProvider.getApplicationContext();
 
         userRecords = new UserRecords(
                 context,
