@@ -88,6 +88,7 @@
             android:textStyle="italic"
             android:layout_gravity="center_vertical"/>
         <ImageView
+            android:id="@+id/yelp_logo"
             android:src="@drawable/yelp_logo_xsmall_2"
             android:layout_gravity="center_vertical"
             android:layout_width="40dp"

@@ -64,9 +64,4 @@ public class UserRecordsTest {
         assertThat(newDismissedCount, is(initialDismissedCount + 1));
     }
 
-    @Test
-    public void updateClickDate() throws Exception {
-
-    }
-
 }

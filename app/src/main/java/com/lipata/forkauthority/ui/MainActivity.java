@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements MainView, Busines
     ProgressBar mProgressBar_Location;
     ProgressBar mProgressBar_Businesses;
     TextView mNoResultsTextView;
+    ImageView mYelpLogo;
 
     // Analytics
     long mStartTime_Fetch;
@@ -159,6 +161,11 @@ public class MainActivity extends AppCompatActivity implements MainView, Busines
         mFAB_refreshAnimation.setDuration(1500);
         mFAB_refreshAnimation.setRepeatCount(ObjectAnimator.INFINITE);
         mFAB_refreshAnimation.setInterpolator(null);
+
+        // Clickable Yelp logo in compliance with Terms of Use
+        // https://www.yelp.com/developers/display_requirements
+        mYelpLogo = findViewById(R.id.yelp_logo);
+        mYelpLogo.setOnClickListener(v -> openYelpDotCom());
 
         // Location API
         mGooglePlayApi.setActivity(this);
@@ -444,6 +451,15 @@ public class MainActivity extends AppCompatActivity implements MainView, Busines
     public void showSnackBarLong(String text) {
         mSnackbar = Snackbar.make(mCoordinatorLayout, text, Snackbar.LENGTH_LONG);
         mSnackbar.show();
+    }
+
+
+    private void openYelpDotCom() {
+        Uri webpage = Uri.parse("http://yelp.com");
+        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
     // Getters

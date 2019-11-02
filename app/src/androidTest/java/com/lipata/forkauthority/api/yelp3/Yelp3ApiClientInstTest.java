@@ -36,9 +36,7 @@ public class Yelp3ApiClientInstTest {
                         Context.MODE_PRIVATE)
         );
 
-        api = new Yelp3ApiClient(
-                new Yelp3ApiAuthInterceptor(tokenManager),
-                new Yelp3ApiAuthenticator(tokenManager));
+        api = new Yelp3ApiClient(new Yelp3ApiAuthInterceptor());
     }
 
     @After
