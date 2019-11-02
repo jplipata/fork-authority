@@ -1,6 +1,7 @@
+# Fork Authority
+
 <img src="https://cloud.githubusercontent.com/assets/11450465/18818300/b78559a6-8343-11e6-8869-e0a2d0266eaa.gif" align="right">
 
-# Fork Authority
 Can't decide what to eat? Let us help you!
 
 #### Background
