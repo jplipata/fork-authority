@@ -22,13 +22,11 @@ public class Yelp3ApiClient implements Yelp3Api {
 
     @Inject
     public Yelp3ApiClient(
-            final Yelp3ApiAuthInterceptor authInterceptor,
-            final Yelp3ApiAuthenticator authenticator) {
+            final Yelp3ApiAuthInterceptor authInterceptor) {
         final HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         final OkHttpClient client = new OkHttpClient.Builder()
-                .authenticator(authenticator)
                 .addInterceptor(authInterceptor)
                 .addInterceptor(logging)
                 .build();
@@ -41,14 +39,6 @@ public class Yelp3ApiClient implements Yelp3Api {
                 .build();
 
         api = retrofit.create(Yelp3Api.class);
-    }
-
-    @Override
-    public Single<TokenResponse> token(
-            final String grantType,
-            final String clientId,
-            final String clientSecret) {
-        return api.token(grantType, clientId, clientSecret);
     }
 
     @Override

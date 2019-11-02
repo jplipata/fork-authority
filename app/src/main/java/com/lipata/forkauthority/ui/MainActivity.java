@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements MainView, Busines
         Timber.d("Stop animation");
 
         mProgressBar_Businesses.setVisibility(View.GONE);
-
+        mProgressBar_Location.setVisibility(View.GONE);
         mFAB_refreshAnimation.cancel();
     }
 

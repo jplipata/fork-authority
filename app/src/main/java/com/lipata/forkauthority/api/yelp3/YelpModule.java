@@ -16,27 +16,19 @@ import dagger.Provides;
 public class YelpModule {
     @Provides
     @PerApp
-    Yelp3ApiClient providesYelp3ApiClient(
-            Yelp3ApiAuthInterceptor authInterceptor,
-            Yelp3ApiAuthenticator authenticator){
-        return new Yelp3ApiClient(authInterceptor, authenticator);
+    Yelp3ApiClient providesYelp3ApiClient(Yelp3ApiAuthInterceptor authInterceptor) {
+        return new Yelp3ApiClient(authInterceptor);
     }
 
     @Provides
     @PerApp
-    Yelp3ApiAuthenticator providesYelp3ApiAuthenticator(TokenManager tokenManager){
-        return new Yelp3ApiAuthenticator(tokenManager);
+    Yelp3ApiAuthInterceptor providesYelp3ApiAuthInterceptor() {
+        return new Yelp3ApiAuthInterceptor();
     }
 
     @Provides
     @PerApp
-    Yelp3ApiAuthInterceptor providesYelp3ApiAuthInterceptor(TokenManager tokenManager){
-        return new Yelp3ApiAuthInterceptor(tokenManager);
-    }
-
-    @Provides
-    @PerApp
-    TokenManager provideTokenManager(Application application, SharedPreferences sharedPrefs){
+    TokenManager provideTokenManager(Application application, SharedPreferences sharedPrefs) {
         return new TokenManager(application, sharedPrefs);
     }
 }

@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.25.0'
+        classpath 'io.fabric.tools:gradle:1.25.4'
     }
 }
 apply plugin: 'com.android.application'
@@ -32,8 +32,7 @@ android {
         Properties properties = new Properties()
         properties.load(project.rootProject.file('apikeys').newDataInputStream())
         buildConfigField "String", "YELPFUSION_CLIENT_ID", properties.getProperty('YELPFUSION_CLIENT_ID')
-        buildConfigField "String", "YELPFUSION_CLIENT_SECRET", properties.getProperty('YELPFUSION_CLIENT_SECRET')
-        buildConfigField "String", "YELPFUSION_TEST_TOKEN", properties.getProperty('YELPFUSION_TEST_TOKEN')
+        buildConfigField "String", "YELPFUSION_API_KEY", properties.getProperty('YELPFUSION_API_KEY')
 
         manifestPlaceholders = [ crashlytics:properties.getProperty('crashlytics') ]
 

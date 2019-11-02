@@ -1,5 +1,7 @@
 package com.lipata.forkauthority.api.yelp3;
 
+import com.lipata.forkauthority.BuildConfig;
+
 import java.io.IOException;
 
 import okhttp3.Interceptor;
@@ -11,18 +13,13 @@ import okhttp3.Response;
  */
 
 public class Yelp3ApiAuthInterceptor implements Interceptor {
-    private TokenManager tokenManager;
-
-    public Yelp3ApiAuthInterceptor(TokenManager tokenManager) {
-        this.tokenManager = tokenManager;
-    }
 
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain
                 .request()
                 .newBuilder()
-                .addHeader("Authorization", tokenManager.getToken())
+                .addHeader("Authorization", "Bearer "+ BuildConfig.YELPFUSION_API_KEY)
                 .build();
 
         return chain.proceed(request);
