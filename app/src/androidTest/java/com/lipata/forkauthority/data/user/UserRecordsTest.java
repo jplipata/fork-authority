@@ -20,7 +20,6 @@ import static org.hamcrest.Matchers.*;
  */
 
 @RunWith(AndroidJUnit4.class)
-
 public class UserRecordsTest {
 
     private UserRecords userRecords;

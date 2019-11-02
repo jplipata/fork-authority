@@ -24,7 +24,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.lipata.forkauthority.data.AppSettings;
-import com.lipata.forkauthority.di.PerApp;
+import com.lipata.forkauthority.di.ApplicationScope;
 import com.lipata.forkauthority.ui.MainActivity;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ import static com.lipata.forkauthority.ui.LocationQualityView.Status.OK;
  *
  * I almost wonder if it would be better to just include this as part of the activity class...
  */
-@PerApp
+@ApplicationScope
 public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, ResultCallback<LocationSettingsResult> {
 

@@ -5,7 +5,7 @@ import com.lipata.forkauthority.ui.MainActivity;
 
 import dagger.Component;
 
-@PerApp
+@ApplicationScope
 @Component(modules = {AppModule.class, YelpModule.class})
 public interface AppComponent {
     void inject(MainActivity target);
