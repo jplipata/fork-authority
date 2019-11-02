@@ -1,7 +1,6 @@
 package com.lipata.forkauthority.api.yelp3;
 
 import com.lipata.forkauthority.api.yelp3.entities.SearchResponse;
-import com.lipata.forkauthority.api.yelp3.entities.TokenResponse;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
