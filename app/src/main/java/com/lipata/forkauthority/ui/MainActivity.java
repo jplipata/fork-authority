@@ -10,15 +10,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,17 +20,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.lipata.forkauthority.AppComponent;
-import com.lipata.forkauthority.AppModule;
-import com.lipata.forkauthority.DaggerAppComponent;
+import com.lipata.forkauthority.ForkAuthorityApp;
 import com.lipata.forkauthority.R;
 import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
-import com.lipata.forkauthority.api.yelp3.YelpModule;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.AppSettings;
 import com.lipata.forkauthority.data.ListComposer;
@@ -52,7 +42,13 @@ import java.text.DecimalFormat;
 
 import javax.inject.Inject;
 
-import io.fabric.sdk.android.Fabric;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements MainView, BusinessListParentView {
@@ -98,20 +94,8 @@ public class MainActivity extends AppCompatActivity implements MainView, Busines
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        component = DaggerAppComponent
-                .builder()
-                .appModule(new AppModule(getApplication()))
-                .yelpModule(new YelpModule())
-                .build();
-        component.inject(this);
 
-        Fabric.with(this, new Crashlytics());
-
-        final Fabric fabric = new Fabric.Builder(this)
-                .kits(new Answers())
-                .debuggable(true)
-                .build();
-        Fabric.with(fabric);
+        ((ForkAuthorityApp) getApplication()).appComponent.inject(this);
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);

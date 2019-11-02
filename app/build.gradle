@@ -9,6 +9,7 @@ buildscript {
 }
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 apply plugin: 'com.android.application'
 
@@ -25,7 +26,7 @@ android {
 
     defaultConfig {
         applicationId "com.lipata.forkauthority"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 6
         versionName "1.1.0"
@@ -65,10 +66,11 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.google.android.material:material:1.0.0'
-    implementation 'com.google.android.gms:play-services-location:17.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
 
     implementation 'com.jakewharton.timber:timber:4.6.0'
 
@@ -76,7 +78,7 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.5'
 
-    provided 'org.glassfish:javax.annotation:10.0-b28'
+    compileOnly 'org.glassfish:javax.annotation:10.0-b28'
 
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
@@ -89,12 +91,12 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:2.1.7"
 
     // Dagger core dependencies
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.13'
     implementation 'com.google.dagger:dagger:2.13'
+    kapt 'com.google.dagger:dagger-compiler:2.13'
 
     // Dagger Android dependencies
-    annotationProcessor 'com.google.dagger:dagger-android-processor:2.13'
     implementation 'com.google.dagger:dagger-android-support:2.13'
+    kapt 'com.google.dagger:dagger-android-processor:2.13'
 
     implementation('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
         transitive = true;
@@ -105,6 +107,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation 'com.google.firebase:firebase-analytics:17.2.1'
+    implementation 'com.google.firebase:firebase-firestore:21.2.1'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.12.0'
