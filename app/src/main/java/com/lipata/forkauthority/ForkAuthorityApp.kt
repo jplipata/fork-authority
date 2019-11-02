@@ -4,6 +4,9 @@ import android.app.Application
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.lipata.forkauthority.api.yelp3.YelpModule
+import com.lipata.forkauthority.di.AppComponent
+import com.lipata.forkauthority.di.AppModule
+import com.lipata.forkauthority.di.DaggerAppComponent
 import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 

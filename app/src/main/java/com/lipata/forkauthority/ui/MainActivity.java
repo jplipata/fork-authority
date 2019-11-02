@@ -25,7 +25,7 @@ import com.crashlytics.android.answers.CustomEvent;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
-import com.lipata.forkauthority.AppComponent;
+import com.lipata.forkauthority.di.AppComponent;
 import com.lipata.forkauthority.ForkAuthorityApp;
 import com.lipata.forkauthority.R;
 import com.lipata.forkauthority.api.GeocoderApi;

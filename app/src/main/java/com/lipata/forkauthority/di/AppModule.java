@@ -1,10 +1,10 @@
-package com.lipata.forkauthority;
+package com.lipata.forkauthority.di;
 
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.lipata.forkauthority.di.PerApp;
+import com.lipata.forkauthority.R;
 import com.lipata.forkauthority.util.AddressParser;
 
 import dagger.Module;
