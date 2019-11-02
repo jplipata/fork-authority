@@ -1,8 +1,5 @@
 package com.lipata.forkauthority.api.yelp3;
 
-import android.app.Application;
-import android.content.SharedPreferences;
-
 import com.lipata.forkauthority.di.ApplicationScope;
 
 import dagger.Module;
