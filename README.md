@@ -24,12 +24,13 @@ Click the Refresh button to start over
 
 Fork Authority will remember your preferences for next time
 
-## Contributing
+## Project Set Up
 
 1. Clone the repo
 2. Add the key files:
-  * apikeys in root project dir
-  * google-services.json in `app/` directory
+    * apikeys in root project dir
+    * google-services.json in `app/` directory
+3. Run the app
 
 License
 --------
