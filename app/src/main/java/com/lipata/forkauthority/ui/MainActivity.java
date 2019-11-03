@@ -78,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements MainView, Busines
     FloatingActionButton mFAB_refresh;
     ObjectAnimator mFAB_refreshAnimation;
     Snackbar mSnackbar;
-    FrameLayout mLayout_ProgressBar_Location;
     LocationQualityView mLocationQualityView;
     RelativeLayout mLayout_LocationViews;
     ProgressBar mProgressBar_Location;
@@ -112,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements MainView, Busines
         // Progress bar views
         mProgressBar_Location = findViewById(R.id.progress_bar_location);
         mProgressBar_Businesses = findViewById(R.id.progress_bar_businesses);
-        mLayout_ProgressBar_Location = findViewById(R.id.layout_progress_bar_location);
 
         // RecyclerView
         mRecyclerView_suggestionList = findViewById(R.id.suggestion_list);
@@ -247,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements MainView, Busines
         mStartTime_Location = System.nanoTime();
 
         mLayout_LocationViews.setVisibility(View.GONE);
-        mLayout_ProgressBar_Location.setVisibility(View.VISIBLE);
+        mProgressBar_Location.setVisibility(View.VISIBLE);
 
         // Reset progress text for both business list and location
         mTextView_ApproxLocation.setText(getResources().getText(R.string.getting_your_location));
@@ -257,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements MainView, Busines
 
     @Override
     public void onDeviceLocationRetrieved() {
-        mLayout_ProgressBar_Location.setVisibility(View.GONE);
+        mProgressBar_Location.setVisibility(View.GONE);
         mLayout_LocationViews.setVisibility(View.VISIBLE);
 
         Utility.reportExecutionTime(this, AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mStartTime_Location);
@@ -301,6 +299,7 @@ public class MainActivity extends AppCompatActivity implements MainView, Busines
     // This must live in the Activity class
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case GooglePlayApi.REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
