@@ -38,9 +38,7 @@
                     android:id="@+id/layout_progress_bar_location"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/layout_location_height"
-                    android:background="@color/material_gray_100"
-                    android:paddingLeft="@dimen/general_padding"
-                    android:paddingRight="@dimen/general_padding">
+                    android:background="@color/material_gray_100">
 
                     <RelativeLayout
                         android:id="@+id/layout_location"
@@ -56,9 +54,9 @@
                             android:id="@+id/location_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginLeft="16dp"
                             android:ellipsize="marquee"
                             android:freezesText="true"
-                            android:paddingLeft="@dimen/general_padding"
                             android:scrollHorizontally="true"
                             android:singleLine="true"
                             android:text="location"
@@ -70,7 +68,7 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentRight="true"
                             android:layout_centerVertical="true"
-                            android:paddingRight="@dimen/general_padding"
+                            android:layout_marginRight="8dp"
                             android:scaleType="center"
                             android:src="@drawable/circle" />
                     </RelativeLayout>
@@ -81,7 +79,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:indeterminate="true" />
+                        android:indeterminate="true"
+                        android:paddingLeft="@dimen/general_padding"
+                        android:paddingRight="@dimen/general_padding" />
+
                 </FrameLayout>
 
                 <TextView
