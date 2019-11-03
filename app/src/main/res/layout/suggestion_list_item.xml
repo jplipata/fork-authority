@@ -7,6 +7,7 @@
     android:layout_gravity="center"
     android:layout_margin="2dp"
     android:animateLayoutChanges="true"
+    card_view:cardCornerRadius="@dimen/cardview_corner_radius"
     card_view:cardUseCompatPadding="true">
 
     <LinearLayout
@@ -20,11 +21,12 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
+            android:focusable="true"
             android:orientation="horizontal"
-            android:paddingBottom="@dimen/layout_topbottom_padding"
-            android:paddingLeft="@dimen/layout_side_padding"
-            android:paddingRight="@dimen/layout_side_padding"
-            android:paddingTop="@dimen/layout_topbottom_padding">
+            android:paddingLeft="8dp"
+            android:paddingTop="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="@dimen/layout_topbottom_padding">
 
             <ImageView
                 android:id="@+id/business_image"
@@ -87,8 +89,8 @@
             android:id="@+id/business_descriptive_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/layout_topbottom_padding"
             android:paddingLeft="@dimen/layout_side_padding"
+            android:paddingBottom="@dimen/layout_topbottom_padding"
             android:text="debug-justatehere"
             android:textColor="@color/material_text_gray"
             android:textSize="11sp"
@@ -104,8 +106,8 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="horizontal"
-            android:paddingBottom="6dp"
-            android:paddingTop="14dp">
+            android:paddingTop="14dp"
+            android:paddingBottom="6dp">
 
             <Button
                 android:id="@+id/button_like"

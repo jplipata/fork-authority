@@ -19,5 +19,6 @@
     <dimen name="layout_location_height">30dp</dimen>
 
     <dimen name="header_line_width">32dp</dimen>
+    <dimen name="cardview_corner_radius">8dp</dimen>
 
 </resources>
