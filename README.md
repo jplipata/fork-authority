@@ -4,6 +4,8 @@
 
 Can't decide what to eat? Let us help you!
 
+[Download for Android on Google Play](https://play.google.com/store/apps/details?id=com.lipata.forkauthority)
+
 #### Background
 
 No matter how many stars a restaurant has on Yelp, you'll get sick of it if you eat there everyday.  Fork Authority let's you specify things like "just ate here", "like", or "don't like".  The app will store your preferences and provide you with a personalized list of search results.  You can also "swipe to dismiss" to help narrow down your options.
@@ -24,6 +26,13 @@ Click the Refresh button to start over
 
 Fork Authority will remember your preferences for next time
 
+## Project Set Up
+
+1. Clone the repo
+2. Add the key files:
+    * apikeys in root project dir
+    * google-services.json in `app/` directory
+3. Run the app
 
 License
 --------

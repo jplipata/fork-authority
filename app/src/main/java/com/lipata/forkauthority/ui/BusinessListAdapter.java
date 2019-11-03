@@ -1,8 +1,8 @@
 package com.lipata.forkauthority.ui;
 
-import android.support.annotation.NonNull;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +81,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             mLayout_BusinessHeader = v.findViewById(R.id.business_header_layout);
             mCardView_CardView = v.findViewById(R.id.card_view);
             mImageView_BusinessImage = v.findViewById(R.id.business_image);
+            mImageView_BusinessImage.setClipToOutline(true); // for rounded corners.  See https://stackoverflow.com/questions/31675420/set-round-corner-image-in-imageview
             mTextView_BusinessName = v.findViewById(R.id.business_name);
             mTextView_BusinessCategories = v.findViewById(R.id.business_categories);
             mTextView_BusinessAddress = v.findViewById(R.id.business_address);

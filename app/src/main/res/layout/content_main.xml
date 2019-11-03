@@ -1,137 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/progressbar_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".ui.MainActivity"
-    tools:showIn="@layout/activity_main"
+    android:animateLayoutChanges="false"
     android:background="@color/material_gray_100"
-    android:orientation="vertical">
-
-    <FrameLayout
-        android:id="@+id/layout_progress_bar_location"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/layout_location_height"
-        android:paddingLeft="@dimen/general_padding"
-        android:paddingRight="@dimen/general_padding"
-        android:visibility="gone">
-        <ProgressBar
-            android:id="@+id/progress_bar_location"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:indeterminate="true"/>
-    </FrameLayout>
-
-    <RelativeLayout
-        android:id="@+id/layout_location"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/layout_location_height"
-        android:paddingTop="6dp"
-        android:paddingBottom="6dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:animateLayoutChanges="true">
-
-        <TextView
-            android:id="@+id/location_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:scrollHorizontally="true"
-            android:ellipsize="marquee"
-            android:paddingLeft="@dimen/general_padding"
-            android:freezesText="true"
-            android:text="location" />
-
-        <ImageView
-            android:id="@+id/accuracy_indicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/circle"
-            android:scaleType="center"
-            android:paddingRight="@dimen/general_padding"
-            android:layout_centerVertical="true" />
-
-    </RelativeLayout>
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <TextView
-        android:paddingTop="4dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/material_gray_100"
-        android:gravity="center_horizontal"
-        style="@style/TextAppearance.AppCompat.Medium"
-        android:text="F O O D   O P T I O N S"/>
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:background="@color/material_gray_100"
-        android:paddingBottom="1dp">
-
-        <LinearLayout
+        android:id="@+id/no_results"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/material_gray_100"
         android:layout_gravity="center"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="powered by"
-            android:textSize="11sp"
-            android:textStyle="italic"
-            android:layout_gravity="center_vertical"/>
-        <ImageView
-            android:id="@+id/yelp_logo"
-            android:src="@drawable/yelp_logo_xsmall_2"
-            android:layout_gravity="center_vertical"
-            android:layout_width="40dp"
-            android:layout_height="20dp"
-            />
-        </LinearLayout>
-    </FrameLayout>
+        android:text="@string/sorry_no_results_found"
+        android:visibility="gone" />
 
-    <FrameLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/suggestion_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:id="@+id/progressbar_layout"
+        android:layout_height="wrap_content"
         android:background="@color/material_gray_100"
-        android:animateLayoutChanges="false"
-        >
+        android:scrollbars="vertical" />
 
-        <ProgressBar
-            android:id="@+id/progress_bar_businesses"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            />
+</FrameLayout>
 
-        <TextView
-            android:id="@+id/no_results"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/sorry_no_results_found"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/suggestion_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/activity_horizontal_margin_thin"
-            android:paddingRight="@dimen/activity_horizontal_margin_thin"
-            android:scrollbars="vertical"
-            android:background="@color/material_gray_100"
-            />
-
-    </FrameLayout>
-
-</LinearLayout>

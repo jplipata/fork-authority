@@ -8,7 +8,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.lipata.forkauthority.R;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
-import com.lipata.forkauthority.di.PerApp;
+import com.lipata.forkauthority.di.ApplicationScope;
 import com.lipata.forkauthority.ui.BusinessListAdapter;
 
 import java.lang.reflect.Type;
@@ -18,7 +18,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-@PerApp
+@ApplicationScope
 public class UserRecords {
 
     private Context mContext;

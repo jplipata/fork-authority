@@ -5,7 +5,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 
-import com.lipata.forkauthority.di.PerApp;
+import com.lipata.forkauthority.di.ApplicationScope;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ import javax.inject.Inject;
 import io.reactivex.Single;
 import timber.log.Timber;
 
-@PerApp
+@ApplicationScope
 public class GeocoderApi {
 
     private final Geocoder geocoder;

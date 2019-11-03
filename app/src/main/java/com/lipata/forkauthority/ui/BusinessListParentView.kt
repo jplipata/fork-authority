@@ -2,7 +2,7 @@ package com.lipata.forkauthority.ui
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import com.lipata.forkauthority.api.yelp3.entities.Business
 
 /**

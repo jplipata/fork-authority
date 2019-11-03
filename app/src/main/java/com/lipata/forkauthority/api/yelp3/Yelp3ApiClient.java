@@ -1,7 +1,7 @@
 package com.lipata.forkauthority.api.yelp3;
 
+import com.lipata.forkauthority.BuildConfig;
 import com.lipata.forkauthority.api.yelp3.entities.SearchResponse;
-import com.lipata.forkauthority.api.yelp3.entities.TokenResponse;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -23,8 +23,13 @@ public class Yelp3ApiClient implements Yelp3Api {
     @Inject
     public Yelp3ApiClient(
             final Yelp3ApiAuthInterceptor authInterceptor) {
+
         final HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        if (BuildConfig.DEBUG) {
+            logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+        } else {
+            logging.setLevel(HttpLoggingInterceptor.Level.NONE);
+        }
 
         final OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(authInterceptor)
