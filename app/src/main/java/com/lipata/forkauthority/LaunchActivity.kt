@@ -20,10 +20,10 @@ class LaunchActivity : AppCompatActivity() {
 
     private fun showDebugActivity() {
         setContentView(R.layout.activity_debug)
-        activityDebugTvMealChooser.setOnClickListener {
+        textViewRestaurantList.setOnClickListener {
             launchRestaurantListFeature()
         }
-        activityDebugTvPoll.setOnClickListener {
+        textViewPoll.setOnClickListener {
 
         }
 

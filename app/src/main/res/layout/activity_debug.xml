@@ -6,12 +6,12 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/activityDebugTvMealChooser"
+        android:id="@+id/textViewRestaurantList"
         style="@style/DebugTextButtons"
-        android:text="Meal Chooser / Main Experience" />
+        android:text="Restaurant List / Main Experience" />
 
     <TextView
-        android:id="@+id/activityDebugTvPoll"
+        android:id="@+id/textViewPoll"
         style="@style/DebugTextButtons"
         android:text="Poll" />
 
