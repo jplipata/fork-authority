@@ -30,9 +30,9 @@
 
             <ImageView
                 android:id="@+id/business_image"
-                android:background="@drawable/shape_rounded_rectangle"
                 android:layout_width="80dp"
-                android:layout_height="80dp" />
+                android:layout_height="80dp"
+                android:background="@drawable/shape_rounded_rectangle" />
 
             <LinearLayout
                 android:layout_width="match_parent"
