@@ -81,6 +81,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             mLayout_BusinessHeader = v.findViewById(R.id.business_header_layout);
             mCardView_CardView = v.findViewById(R.id.card_view);
             mImageView_BusinessImage = v.findViewById(R.id.business_image);
+            mImageView_BusinessImage.setClipToOutline(true); // for rounded corners.  See https://stackoverflow.com/questions/31675420/set-round-corner-image-in-imageview
             mTextView_BusinessName = v.findViewById(R.id.business_name);
             mTextView_BusinessCategories = v.findViewById(R.id.business_categories);
             mTextView_BusinessAddress = v.findViewById(R.id.business_address);
