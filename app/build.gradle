@@ -28,8 +28,8 @@ android {
         applicationId "com.lipata.forkauthority"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 6
-        versionName "1.1.0"
+        versionCode 8
+        versionName "1.2.1"
 
         Properties properties = new Properties()
         properties.load(project.rootProject.file('apikeys').newDataInputStream())
@@ -43,7 +43,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
@@ -106,8 +106,9 @@ dependencies {
     }
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    implementation 'com.google.firebase:firebase-analytics:17.2.1'
-    implementation 'com.google.firebase:firebase-firestore:21.2.1'
+    // still in testing
+    //implementation 'com.google.firebase:firebase-analytics:17.2.1'
+    //implementation 'com.google.firebase:firebase-firestore:21.2.1'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.12.0'
@@ -118,4 +119,5 @@ dependencies {
 }
 
 // Add to the bottom of the file
-apply plugin: 'com.google.gms.google-services'
+// still testing
+//apply plugin: 'com.google.gms.google-services'
