@@ -3,6 +3,7 @@ package com.lipata.forkauthority
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.lipata.forkauthority.poll.PollActivity
 import com.lipata.forkauthority.ui.RestaurantListActivity
 import kotlinx.android.synthetic.main.activity_debug.*
 
@@ -20,16 +21,21 @@ class LaunchActivity : AppCompatActivity() {
 
     private fun showDebugActivity() {
         setContentView(R.layout.activity_debug)
+
         textViewRestaurantList.setOnClickListener {
             launchRestaurantListFeature()
         }
+
         textViewPoll.setOnClickListener {
-
+            launchPollActivity()
         }
-
     }
 
     private fun launchRestaurantListFeature() {
         startActivity(Intent(this, RestaurantListActivity::class.java))
+    }
+
+    private fun launchPollActivity() {
+        startActivity(Intent(this, PollActivity::class.java))
     }
 }
