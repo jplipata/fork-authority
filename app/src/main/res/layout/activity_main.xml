@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/material_gray_100"
-        tools:context=".ui.MainActivity">
+        tools:context=".ui.RestaurantListActivity">
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"

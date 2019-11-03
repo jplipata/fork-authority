@@ -25,7 +25,7 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.lipata.forkauthority.data.AppSettings;
 import com.lipata.forkauthority.di.ApplicationScope;
-import com.lipata.forkauthority.ui.MainActivity;
+import com.lipata.forkauthority.ui.RestaurantListActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
      */
     private final int LOCATION_REQUEST_SAMPLE_SIZE = 2;
 
-    private MainActivity mMainActivity;
+    private RestaurantListActivity mMainActivity;
     private GoogleApiClient mGoogleApiClient;
 
     private Location mLastLocation;
@@ -374,7 +374,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         mLocationUpdateTimestamp = timestamp;
     }
 
-    public void setActivity(MainActivity mainActivity) {
+    public void setActivity(RestaurantListActivity mainActivity) {
         this.mMainActivity = mainActivity;
     }
 }

@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -51,7 +50,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements MainView, BusinessListParentView {
+public class RestaurantListActivity extends AppCompatActivity implements MainView, BusinessListParentView {
 
     // Constants
     static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
@@ -135,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements MainView, Busines
             if (mGooglePlayApi.isLocationStale()) {
                 fetchBusinessList();
             } else {
-                Toast.makeText(MainActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RestaurantListActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
             }
         });
         mFAB_refreshAnimation = ObjectAnimator.ofFloat(mFAB_refresh, View.ROTATION, 360);
@@ -228,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements MainView, Busines
 
     @Override
     public void showToast(String text) {
-        Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+        Toast.makeText(RestaurantListActivity.this, text, Toast.LENGTH_SHORT).show();
     }
 
     @Override

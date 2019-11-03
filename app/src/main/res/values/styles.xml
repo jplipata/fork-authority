@@ -23,4 +23,13 @@
         <item name="android:background">@color/colorPrimaryFaded</item>
     </style>
 
+    <style name="DebugTextButtons">
+        <item name="android:textSize">20sp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
 </resources>

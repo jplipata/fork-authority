@@ -11,13 +11,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
+apply plugin: 'kotlin-android-extensions'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
     google()
     mavenCentral()
 }
-
 
 android {
     compileSdkVersion 28
@@ -59,6 +59,10 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+}
+
+androidExtensions {
+    experimental = true
 }
 
 dependencies {
