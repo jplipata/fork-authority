@@ -109,9 +109,8 @@ dependencies {
     }
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    // still in testing
-    //implementation 'com.google.firebase:firebase-analytics:17.2.1'
-    //implementation 'com.google.firebase:firebase-firestore:21.2.1'
+    implementation 'com.google.firebase:firebase-analytics:17.2.1'
+    implementation 'com.google.firebase:firebase-firestore:21.2.1'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.12.0'
@@ -121,6 +120,5 @@ dependencies {
     androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'
 }
 
-// Add to the bottom of the file
-// still testing
-//apply plugin: 'com.google.gms.google-services'
+// Add to the bottom of the file as per Firebase docs
+apply plugin: 'com.google.gms.google-services'
