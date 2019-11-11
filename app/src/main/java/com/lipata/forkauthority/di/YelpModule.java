@@ -1,6 +1,7 @@
-package com.lipata.forkauthority.api.yelp3;
+package com.lipata.forkauthority.di;
 
-import com.lipata.forkauthority.di.ApplicationScope;
+import com.lipata.forkauthority.api.yelp3.Yelp3ApiAuthInterceptor;
+import com.lipata.forkauthority.api.yelp3.Yelp3ApiClient;
 
 import dagger.Module;
 import dagger.Provides;
