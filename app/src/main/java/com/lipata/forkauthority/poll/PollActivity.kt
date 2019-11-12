@@ -2,7 +2,6 @@ package com.lipata.forkauthority.poll
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -13,6 +12,7 @@ import kotlinx.android.synthetic.main.activity_poll.*
 import javax.inject.Inject
 
 class PollActivity : AppCompatActivity() {
+
     private val adapter = PollAdapter()
 
     @Inject
@@ -41,7 +41,11 @@ class PollActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        userIdentityManager.checkUserIdentity()
+        userIdentityManager.checkUserIdentity(this)
+
+        tvEmail.text = userIdentityManager.email.orEmpty()
+
+
 
         //subscribeToPoll(db)
 

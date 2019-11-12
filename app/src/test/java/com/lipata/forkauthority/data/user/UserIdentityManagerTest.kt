@@ -2,8 +2,7 @@ package com.lipata.forkauthority.data.user
 
 import android.content.SharedPreferences
 import com.lipata.forkauthority.data.SharedPreferencesKeys.USER_EMAIL_KEY
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Test
@@ -15,7 +14,7 @@ class UserIdentityManagerTest {
         val sharedPrefs: SharedPreferences = mock()
         whenever(sharedPrefs.getString(USER_EMAIL_KEY, null)).thenReturn("asdf@email.com")
 
-        val sut = UserIdentityManager(sharedPrefs)
+        val sut = UserIdentityManager(sharedPrefs, mock())
 
         // When
         val result = sut.hasIdentity()
@@ -30,12 +29,24 @@ class UserIdentityManagerTest {
         val sharedPrefs: SharedPreferences = mock()
         whenever(sharedPrefs.getString(USER_EMAIL_KEY, null)).thenReturn(null)
 
-        val sut = UserIdentityManager(sharedPrefs)
+        val sut = UserIdentityManager(sharedPrefs, mock())
 
         // When
         val result = sut.hasIdentity()
 
         // Then
         assertThat(result, equalTo(false))
+    }
+
+    @Test
+    fun checkUserIdentity() {
+        // Given
+        val sut = spy(UserIdentityManager(mock(), mock())) // user email not initialized
+
+        // When
+        sut.checkUserIdentity(mock())
+
+        // Then
+        verify(sut, times(1)).promptUserForEmail(any())
     }
 }

@@ -143,8 +143,6 @@ dependencies {
 
     // Assertions
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.ext:truth:1.2.0'
-    androidTestImplementation 'com.google.truth:truth:0.42'
 }
 
 // Add to the bottom of the file as per Firebase docs
