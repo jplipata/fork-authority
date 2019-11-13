@@ -2,10 +2,11 @@ package com.lipata.forkauthority.poll
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
+import com.google.android.material.snackbar.Snackbar
 import com.lipata.forkauthority.ForkAuthorityApp
+import com.lipata.forkauthority.data.Lce
 import com.lipata.forkauthority.R
 import com.lipata.forkauthority.data.user.UserIdentityManager
 import kotlinx.android.synthetic.main.activity_poll.*
@@ -19,16 +20,15 @@ class PollActivity : AppCompatActivity() {
     lateinit var userIdentityManager: UserIdentityManager
 
     @Inject
-    lateinit var db: FirebaseFirestore
-
-    lateinit var registration: ListenerRegistration
+    lateinit var viewModel: PollViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         (application as ForkAuthorityApp).appComponent.inject(this)
 
-        // viewModel = ViewModelProviders.of(this)[PollViewModel::class.java]
+        lifecycle.addObserver(viewModel)
+        viewModel.observeLiveData(this, Observer { onLce(it) })
 
         setContentView(R.layout.activity_poll)
 
@@ -39,10 +39,29 @@ class PollActivity : AppCompatActivity() {
         }
     }
 
+    private fun onLce(lce: Lce?) {
+        when (lce) {
+            is Lce.Loading -> {
+            } // not used
+
+            is Lce.Error -> {
+                Snackbar.make(pollRecycler, "Error ${lce.error}", Snackbar.LENGTH_LONG).show()
+            }
+
+            is Lce.Content<*> -> {
+                adapter.items = lce.content as? List<VotableRestaurant> ?: emptyList() // TODO these generics are not great
+                adapter.notifyDataSetChanged()
+            }
+
+            null -> {
+            } // do nothing
+        }
+
+    }
+
     override fun onStart() {
         super.onStart()
         userIdentityManager.checkUserIdentity(this)
-
         tvEmail.text = userIdentityManager.email.orEmpty()
 
 
@@ -51,27 +70,4 @@ class PollActivity : AppCompatActivity() {
 
     }
 
-    // TODO Turn this back on
-//    private fun subscribeToPoll(db: FirebaseFirestore) {
-//        val docRef = db.collection("polls").document("4z4zop9XAhkJ0dSeuVXm") // TODO Hardcoded temporary poll
-//        registration = docRef.addSnapshotListener { snapshot, e ->
-//            if (e != null) {
-//                Snackbar.make(pollRecycler, "Listen failed. $e", Snackbar.LENGTH_LONG)
-//                return@addSnapshotListener
-//            }
-//
-//            if (snapshot != null && snapshot.exists()) {
-//                val poll = snapshot.toObject(Poll::class.java)
-//                adapter.items = poll?.restaurants.orEmpty().sortedByDescending { votableRestaurant -> votableRestaurant.totalVotes() }
-//                adapter.notifyDataSetChanged()
-//            } else {
-//                Snackbar.make(pollRecycler, "Current data: null", Snackbar.LENGTH_LONG)
-//            }
-//        }
-//    }
-
-    override fun onStop() {
-        super.onStop()
-        registration.remove()
-    }
 }
