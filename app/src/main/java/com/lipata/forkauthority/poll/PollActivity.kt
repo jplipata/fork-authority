@@ -27,8 +27,10 @@ class PollActivity : AppCompatActivity() {
 
         (application as ForkAuthorityApp).appComponent.inject(this)
 
-        lifecycle.addObserver(viewModel)
-        viewModel.observeLiveData(this, Observer { onLce(it) })
+        viewModel.run {
+            lifecycle.addObserver(this)
+            observeLiveData(this@PollActivity, Observer { onLce(it) })
+        }
 
         setContentView(R.layout.activity_poll)
 
