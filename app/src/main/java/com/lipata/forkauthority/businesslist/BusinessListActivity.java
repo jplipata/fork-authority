@@ -23,14 +23,12 @@ import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.gson.Gson;
 import com.lipata.forkauthority.ForkAuthorityApp;
 import com.lipata.forkauthority.R;
 import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.AppSettings;
-import com.lipata.forkauthority.data.CombinedList;
 import com.lipata.forkauthority.data.ListComposer;
 import com.lipata.forkauthority.data.user.UserRecords;
 import com.lipata.forkauthority.util.Utility;
@@ -55,7 +53,6 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
 
     // Constants
     static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
-    static final String SUGGESTIONLIST_KEY = "suggestionList";
     static final String LOCATION_QUALITY_KEY = "locationQuality";
     static final String NO_RESULTS_TEXT_KEY = "noResultsText";
     static final String PROGRESS_BAR_BUSINESSES_KEY = "progressBarBusinesses";
@@ -94,13 +91,14 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
         super.onCreate(savedInstanceState);
 
         ((ForkAuthorityApp) getApplication()).appComponent.inject(this);
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(BusinessListViewModel.class);
-        viewModel.getListLiveData().observe(this, this::onFetchListState);
-        viewModel.getLocationLiveData().observe(this, this::onLocationState);
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(BusinessListViewModel.class);
+        viewModel.getListLiveData().observe(this, this::onFetchListState);
+        viewModel.getLocationLiveData().observe(this, this::onLocationState);
 
         mCoordinatorLayout = findViewById(R.id.layout_coordinator);
         mTextView_ApproxLocation = findViewById(R.id.location_text);
@@ -133,7 +131,7 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
         mFAB_refresh = findViewById(R.id.fab);
         mFAB_refresh.setOnClickListener(view -> {
             if (mGooglePlayApi.isLocationStale()) {
-                fetchBusinessList();
+                viewModel.fetchBusinessList();
             } else {
                 Toast.makeText(BusinessListActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
             }
@@ -163,12 +161,7 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
     @Override
     protected void onStart() {
         super.onStart();
-
-        // Check whether there are suggestion items in the RecyclerView.  If not, load some.
-        if (mSuggestionListAdapter.getItemCount() == 0
-                && mNoResultsTextView.getVisibility() != View.VISIBLE) {
-            fetchBusinessList();
-        }
+        viewModel.onStart();
     }
 
     @Override
@@ -193,7 +186,6 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
 
     private void onFetchListState(final FetchListState fetchListState) {
         if (fetchListState instanceof FetchListState.Success) {
-            onCombinedList(((FetchListState.Success) fetchListState).getList());
             mSuggestionListAdapter.setBusinessList(((FetchListState.Success) fetchListState).getList());
             mSuggestionListAdapter.notifyDataSetChanged();
             onNewBusinessListReceived();
@@ -201,18 +193,11 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
         } else if (fetchListState instanceof FetchListState.NoResults) {
             onNoResults();
         } else if (fetchListState instanceof FetchListState.Error) {
-            onListError(((FetchListState.Error) fetchListState).getThrowable());
+            stopRefreshAnimation();
+            showSnackBarIndefinite(((FetchListState.Error) fetchListState).getThrowable().getMessage());
+        } else if (fetchListState instanceof FetchListState.Loading) {
+            fetchBusinessListLoading();
         }
-    }
-
-    void onListError(final Throwable throwable) {
-        stopRefreshAnimation();
-        showSnackBarIndefinite(throwable.getMessage());
-    }
-
-    private void onCombinedList(final CombinedList combinedList) {
-        mSuggestionListAdapter.setBusinessList(combinedList);
-        mSuggestionListAdapter.notifyDataSetChanged();
     }
 
     void showNoInternetError() {
@@ -348,8 +333,7 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
     }
 
 
-    // Trigger location + yelp calls
-    public void fetchBusinessList() {
+    public void fetchBusinessListLoading() {
         mStartTime_Fetch = System.nanoTime();
 
         // UI
@@ -366,8 +350,6 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
         mNoResultsTextView.setVisibility(View.GONE);
 
         startRefreshAnimation();
-
-        viewModel.onFetchBusinessList();
     }
 
 
@@ -392,10 +374,6 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
         savedInstanceState.putInt(LOCATION_QUALITY_KEY, mLocationQualityView.getStatus());
         savedInstanceState.putInt(NO_RESULTS_TEXT_KEY, mNoResultsTextView.getVisibility());
         savedInstanceState.putInt(PROGRESS_BAR_BUSINESSES_KEY, mProgressBar_Businesses.getVisibility());
-
-        // TODO There must be a better way to do this
-        String suggestionListStr = new Gson().toJson(mSuggestionListAdapter.getBusinessList());
-        savedInstanceState.putString(SUGGESTIONLIST_KEY, suggestionListStr);
     }
 
     @Override

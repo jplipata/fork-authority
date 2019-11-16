@@ -53,6 +53,13 @@ public class BusinessListViewModel extends ViewModel {
         this.compositeDisposable = new CompositeDisposable();
     }
 
+    void onStart() {
+        boolean hasList = listLiveData.getValue() instanceof FetchListState.Success;
+        if (!hasList) {
+            fetchBusinessList();
+        }
+    }
+
     public void onBestLocation(Location location) {
         compositeDisposable.add(
                 geocoderApi
@@ -75,7 +82,9 @@ public class BusinessListViewModel extends ViewModel {
         );
     }
 
-    void onFetchBusinessList() {
+    void fetchBusinessList() {
+        listLiveData.setValue(new FetchListState.Loading());
+
         if (!googlePlayApi.isLocationStale()) {
             // If the location has already been recently updated, no need to update it, go straight to querying yelp
             checkNetworkPermissionAndCallYelpApi(googlePlayApi.getLastLocation());
@@ -98,7 +107,7 @@ public class BusinessListViewModel extends ViewModel {
         }
     }
 
-    void onError(Throwable e) {
+    private void onError(Throwable e) {
         listLiveData.setValue(new FetchListState.Error(e));
         Timber.e(e.getMessage(), e);
     }
