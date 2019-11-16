@@ -30,6 +30,7 @@ import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.AppSettings;
+import com.lipata.forkauthority.data.CombinedList;
 import com.lipata.forkauthority.data.ListComposer;
 import com.lipata.forkauthority.data.user.UserRecords;
 import com.lipata.forkauthority.util.Utility;
@@ -50,7 +51,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 import timber.log.Timber;
 
-public class BusinessListActivity extends AppCompatActivity implements MainView, BusinessListParentView {
+public class BusinessListActivity extends AppCompatActivity implements BusinessListParentView {
 
     // Constants
     static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
@@ -60,7 +61,7 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
     static final String PROGRESS_BAR_BUSINESSES_KEY = "progressBarBusinesses";
     final static int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
-    BusinessListPresenter presenter;
+    BusinessListViewModel viewModel;
     @Inject BusinessListViewModelFactory viewModelFactory;
     @Inject GeocoderApi mGeocoder;
     @Inject GooglePlayApi mGooglePlayApi;
@@ -93,13 +94,13 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
         super.onCreate(savedInstanceState);
 
         ((ForkAuthorityApp) getApplication()).appComponent.inject(this);
-        presenter = ViewModelProviders.of(this, viewModelFactory).get(BusinessListPresenter.class);
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(BusinessListViewModel.class);
+        viewModel.getListLiveData().observe(this, this::onFetchListState);
+        viewModel.getLocationLiveData().observe(this, this::onLocationState);
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        presenter.setView(this);
 
         mCoordinatorLayout = findViewById(R.id.layout_coordinator);
         mTextView_ApproxLocation = findViewById(R.id.location_text);
@@ -156,14 +157,6 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
             mLocationQualityView.setAccuracyCircleStatus(savedInstanceState.getInt(LOCATION_QUALITY_KEY));
             mNoResultsTextView.setVisibility(savedInstanceState.getInt(NO_RESULTS_TEXT_KEY));
             mProgressBar_Businesses.setVisibility(savedInstanceState.getInt(PROGRESS_BAR_BUSINESSES_KEY));
-
-            //TODO Cache the list
-//            String storedSuggestionList = savedInstanceState.getString(SUGGESTIONLIST_KEY, null);
-//            if (storedSuggestionList != null) {
-//                Type listType = new TypeToken<List<Business>>(){}.getType();
-//                List<Business> retrievedBusinessList = new Gson().fromJson(storedSuggestionList, listType);
-//                mSuggestionListAdapter.setListItems(retrievedBusinessList);
-//            }
         }
     }
 
@@ -189,7 +182,44 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
 
     // UI methods
 
-    @Override
+    private void onLocationState(final LocationState locationState) {
+        if (locationState instanceof LocationState.Loading) {
+            onDeviceLocationRequested();
+        } else if (locationState instanceof LocationState.Success) {
+            setLocationText(((LocationState.Success) locationState).getLocation());
+        }
+
+    }
+
+    private void onFetchListState(final FetchListState fetchListState) {
+        if (fetchListState instanceof FetchListState.Success) {
+            onCombinedList(((FetchListState.Success) fetchListState).getList());
+            mSuggestionListAdapter.setBusinessList(((FetchListState.Success) fetchListState).getList());
+            mSuggestionListAdapter.notifyDataSetChanged();
+            onNewBusinessListReceived();
+            stopRefreshAnimation();
+        } else if (fetchListState instanceof FetchListState.NoResults) {
+            onNoResults();
+        } else if (fetchListState instanceof FetchListState.Error) {
+            onListError(((FetchListState.Error) fetchListState).getThrowable());
+        }
+    }
+
+    void onListError(final Throwable throwable) {
+        stopRefreshAnimation();
+        showSnackBarIndefinite(throwable.getMessage());
+    }
+
+    private void onCombinedList(final CombinedList combinedList) {
+        mSuggestionListAdapter.setBusinessList(combinedList);
+        mSuggestionListAdapter.notifyDataSetChanged();
+    }
+
+    void showNoInternetError() {
+        showSnackBarIndefinite("No network. Try again when you are connected to the internet.");
+        stopRefreshAnimation();
+    }
+
     public void updateLocationViews(double latitude, double longitude, int accuracyQuality) {
         // Latitude range is 0 to +-90.  Longitude is 0 to +-180.
         // 6 decimal places is accurate to 43.496-111.32 mm
@@ -199,7 +229,6 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
         mLocationQualityView.setAccuracyCircleStatus(accuracyQuality);
     }
 
-    @Override
     public void startRefreshAnimation() {
         Timber.d("Starting animation");
 
@@ -210,7 +239,6 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
         }
     }
 
-    @Override
     public void stopRefreshAnimation() {
         Timber.d("Stop animation");
 
@@ -219,18 +247,15 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
         mFAB_refreshAnimation.cancel();
     }
 
-    @Override
     public void showSnackBarIndefinite(String text) {
         mSnackbar = Snackbar.make(mCoordinatorLayout, text, Snackbar.LENGTH_INDEFINITE);
         mSnackbar.show();
     }
 
-    @Override
     public void showToast(String text) {
         Toast.makeText(BusinessListActivity.this, text, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
     public void setLocationText(String text) {
         mTextView_ApproxLocation.setText(text);
     }
@@ -239,7 +264,6 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
     /**
      * This gets called first, newBusinessList next
      */
-    @Override
     public void onDeviceLocationRequested() {
         mStartTime_Location = System.nanoTime();
 
@@ -252,7 +276,6 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
         mLocationQualityView.setAccuracyCircleStatus(LocationQualityView.Status.HIDDEN);
     }
 
-    @Override
     public void onDeviceLocationRetrieved() {
         mProgressBar_Location.setVisibility(View.GONE);
         mLayout_LocationViews.setVisibility(View.VISIBLE);
@@ -261,7 +284,6 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
         logFabricAnswersMetric(AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mStartTime_Location);
     }
 
-    @Override
     public void onNewBusinessListReceived() {
         // Analytics
         Utility.reportExecutionTime(this, "Fetch businesses until displayed", mStartTime_Fetch);
@@ -306,7 +328,7 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
                         // All required changes were successfully made
 
                         Timber.d("onActivityResult() RESULT_OK");
-                        presenter.executeGooglePlayApiLocation();
+                        viewModel.executeGooglePlayApiLocation();
 
                         break;
                     case Activity.RESULT_CANCELED:
@@ -327,7 +349,6 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
 
 
     // Trigger location + yelp calls
-    @Override
     public void fetchBusinessList() {
         mStartTime_Fetch = System.nanoTime();
 
@@ -346,7 +367,7 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
 
         startRefreshAnimation();
 
-        presenter.onFetchBusinessList();
+        viewModel.onFetchBusinessList();
     }
 
 
@@ -356,7 +377,6 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
      * @param metricName
      * @param startTime  In nanoseconds, will be converted to milliseconds
      */
-    @Override
     public void logFabricAnswersMetric(String metricName, long startTime) {
         long executionTime = System.nanoTime() - startTime;
         long executionTime_ms = executionTime / 1000000;
@@ -400,7 +420,6 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
     public boolean isNetworkConnected() {
         // Check for network connectivity
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -408,14 +427,12 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
-    @Override
     public void onNoResults() {
         mRecyclerView_suggestionList.setVisibility(View.GONE);
         mProgressBar_Businesses.setVisibility(View.GONE);
         mNoResultsTextView.setVisibility(View.VISIBLE);
     }
 
-    @Override
     public void showSnackBarLongWithAction(
             final String message,
             final String actionLabel,
@@ -428,7 +445,6 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
         mSnackbar.show();
     }
 
-    @Override
     public void showSnackBarLong(String text) {
         mSnackbar = Snackbar.make(mCoordinatorLayout, text, Snackbar.LENGTH_LONG);
         mSnackbar.show();
@@ -450,13 +466,8 @@ public class BusinessListActivity extends AppCompatActivity implements MainView,
         return mSuggestionListLayoutManager;
     }
 
-    @Override
-    public BusinessListAdapter getSuggestionListAdapter() {
-        return mSuggestionListAdapter;
-    }
-
-    public BusinessListPresenter getPresenter() {
-        return presenter;
+    public BusinessListViewModel getViewModel() {
+        return viewModel;
     }
 
     @Override
