@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.lipata.forkauthority.ForkAuthorityApp;
@@ -67,6 +68,7 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
 
     // Views
     protected CoordinatorLayout mCoordinatorLayout;
+    protected AppBarLayout appBarLayout;
     protected TextView mTextView_ApproxLocation;
     protected RecyclerView mRecyclerView_suggestionList;
     private LinearLayoutManager mSuggestionListLayoutManager;
@@ -92,7 +94,7 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
 
         ((ForkAuthorityApp) getApplication()).appComponent.inject(this);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_business_list);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -141,6 +143,9 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
         mFAB_refreshAnimation.setRepeatCount(ObjectAnimator.INFINITE);
         mFAB_refreshAnimation.setInterpolator(null);
 
+        appBarLayout = findViewById(R.id.app_bar_layout);
+        appBarLayout.addOnOffsetChangedListener(fabScrollAnimation(mFAB_refresh)); // Anchor FAB to AppBarLayout for scroll animation
+
         // Clickable Yelp logo in compliance with Terms of Use
         // https://www.yelp.com/developers/display_requirements
         mYelpLogo = findViewById(R.id.yelp_logo);
@@ -174,6 +179,23 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
     }
 
     // UI methods
+
+    @NotNull private AppBarLayout.OnOffsetChangedListener fabScrollAnimation(final View view) {
+        return (appBarLayout1, i) -> {
+            view.setTranslationY(-(float) i);
+            view.setAlpha(calculateAlpha(i));
+        };
+    }
+
+    /**
+     * Used to calculate fade animation based on AppBarLayout scroll position
+     *
+     * @param i AppBarLayout scroll position
+     * @return
+     */
+    private float calculateAlpha(int i) {
+        return 1 + (i / 100f);
+    }
 
     private void onLocationState(final LocationState locationState) {
         if (locationState instanceof LocationState.Loading) {
