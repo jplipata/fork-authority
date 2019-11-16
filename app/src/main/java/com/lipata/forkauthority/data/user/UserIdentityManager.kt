@@ -2,8 +2,8 @@ package com.lipata.forkauthority.data.user
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.lipata.forkauthority.poll.EmailDialog
 import com.lipata.forkauthority.data.SharedPreferencesKeys.USER_EMAIL_KEY
+import com.lipata.forkauthority.poll.EmailDialog
 import javax.inject.Inject
 
 
@@ -19,18 +19,19 @@ class UserIdentityManager @Inject constructor(val sharedPreferences: SharedPrefe
         return userEmail != null && userEmail.isNotBlank()
     }
 
-    fun checkUserIdentity(context: Context) {
+    fun checkUserIdentity(context: Context, emailUpdatedListener: () -> Unit) {
         if (!hasIdentity()) {
-            promptUserForEmail(context)
+            promptUserForEmail(context, emailUpdatedListener)
         }
     }
 
-    fun promptUserForEmail(context: Context) {
+    fun promptUserForEmail(context: Context, emailUpdatedListener: () -> Unit) {
         // show UI
         emailDialog.showEmailPrompt(context,
             object : EmailDialog.Listener {
                 override fun onSubmit(text: String) {
-                    sharedPreferences.edit().putString(USER_EMAIL_KEY, text).apply()
+                    sharedPreferences.edit().putString(USER_EMAIL_KEY, text).commit()
+                    emailUpdatedListener()
                 }
             }
         )

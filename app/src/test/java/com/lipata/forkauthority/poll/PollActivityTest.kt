@@ -12,7 +12,6 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.android.synthetic.main.activity_poll.view.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
@@ -33,7 +32,7 @@ class PollActivityTest {
         activityScenario.moveToState(Lifecycle.State.STARTED)
 
         // Then
-        verify(userIdentityManager, times(1)).checkUserIdentity(any())
+        verify(userIdentityManager, times(1)).checkUserIdentity(any(), any())
     }
 
     @Test

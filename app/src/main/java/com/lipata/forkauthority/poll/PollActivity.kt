@@ -63,7 +63,15 @@ class PollActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        userIdentityManager.checkUserIdentity(this)
+        userIdentityManager.checkUserIdentity(this) { refreshEmail() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshEmail()
+    }
+
+    fun refreshEmail() {
         tvEmail.text = userIdentityManager.email.orEmpty()
     }
 

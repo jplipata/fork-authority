@@ -42,11 +42,12 @@ class UserIdentityManagerTest {
     fun checkUserIdentity() {
         // Given
         val sut = spy(UserIdentityManager(mock(), mock())) // user email not initialized
+        val listener: () -> Unit = mock()
 
         // When
-        sut.checkUserIdentity(mock())
+        sut.checkUserIdentity(mock(), listener)
 
         // Then
-        verify(sut, times(1)).promptUserForEmail(any())
+        verify(sut, times(1)).promptUserForEmail(any(), eq(listener))
     }
 }
