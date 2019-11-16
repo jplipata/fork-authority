@@ -29,7 +29,7 @@
         </activity>
 
         <activity
-            android:name="com.lipata.forkauthority.ui.RestaurantListActivity"
+            android:name="com.lipata.forkauthority.businesslist.BusinessListActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>

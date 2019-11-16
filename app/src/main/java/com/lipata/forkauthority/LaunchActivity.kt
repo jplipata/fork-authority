@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.lipata.forkauthority.poll.PollActivity
-import com.lipata.forkauthority.ui.RestaurantListActivity
+import com.lipata.forkauthority.businesslist.BusinessListActivity
 import kotlinx.android.synthetic.main.activity_debug.*
 
 class LaunchActivity : AppCompatActivity() {
@@ -32,7 +32,7 @@ class LaunchActivity : AppCompatActivity() {
     }
 
     private fun launchRestaurantListFeature() {
-        startActivity(Intent(this, RestaurantListActivity::class.java))
+        startActivity(Intent(this, BusinessListActivity::class.java))
     }
 
     private fun launchPollActivity() {

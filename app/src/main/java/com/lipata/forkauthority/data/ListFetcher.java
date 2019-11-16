@@ -22,7 +22,7 @@ public class ListFetcher {
     private final Yelp3ApiClient api;
 
     @Inject
-    ListFetcher(final Yelp3ApiClient api) {
+    public ListFetcher(final Yelp3ApiClient api) {
         this.api = api;
     }
 

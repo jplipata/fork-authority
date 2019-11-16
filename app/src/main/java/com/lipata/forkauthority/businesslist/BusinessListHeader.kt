@@ -1,4 +1,4 @@
-package com.lipata.forkauthority.ui
+package com.lipata.forkauthority.businesslist
 
 class BusinessListHeader(val key: String) : BusinessListBaseItem() {
 

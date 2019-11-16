@@ -1,7 +1,6 @@
 package com.lipata.forkauthority.data
 
-import com.lipata.forkauthority.ui.BusinessListBaseItem
-import timber.log.Timber
+import com.lipata.forkauthority.businesslist.BusinessListBaseItem
 
 /**
  * Created by jlipata on 12/31/17.

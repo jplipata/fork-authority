@@ -3,8 +3,8 @@ package com.lipata.forkauthority.data;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.user.BusinessItemRecord;
 import com.lipata.forkauthority.data.user.UserRecords;
-import com.lipata.forkauthority.ui.BusinessListBaseItem;
-import com.lipata.forkauthority.ui.BusinessListHeader;
+import com.lipata.forkauthority.businesslist.BusinessListBaseItem;
+import com.lipata.forkauthority.businesslist.BusinessListHeader;
 import com.lipata.forkauthority.util.Utility;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-import static com.lipata.forkauthority.ui.BusinessListAdapter.DONTLIKE;
+import static com.lipata.forkauthority.businesslist.BusinessListAdapter.DONTLIKE;
 
 public class ListComposer {
 
