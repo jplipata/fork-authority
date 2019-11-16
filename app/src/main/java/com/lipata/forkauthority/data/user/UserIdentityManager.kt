@@ -2,7 +2,7 @@ package com.lipata.forkauthority.data.user
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.lipata.forkauthority.EmailDialog
+import com.lipata.forkauthority.poll.EmailDialog
 import com.lipata.forkauthority.data.SharedPreferencesKeys.USER_EMAIL_KEY
 import javax.inject.Inject
 

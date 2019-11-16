@@ -63,11 +63,6 @@ class PollActivity : AppCompatActivity() {
         super.onStart()
         userIdentityManager.checkUserIdentity(this)
         tvEmail.text = userIdentityManager.email.orEmpty()
-
-
-
-        //subscribeToPoll(db)
-
     }
 
 }

@@ -17,15 +17,7 @@ public class Utility {
         int day = calendar.get(Calendar.DATE);
         int year = calendar.get(Calendar.YEAR);
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder
-                .append(month)
-                .append("/")
-                .append(day)
-                .append("/")
-                .append(year);
-
-        return stringBuilder.toString();
+        return month + "/" + day + "/" + year;
     }
 
     /**

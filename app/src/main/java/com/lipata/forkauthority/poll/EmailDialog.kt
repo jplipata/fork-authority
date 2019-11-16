@@ -1,4 +1,4 @@
-package com.lipata.forkauthority
+package com.lipata.forkauthority.poll
 
 import android.content.Context
 import android.widget.EditText
