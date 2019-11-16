@@ -2,9 +2,9 @@ package com.lipata.forkauthority.api.yelp3;
 
 import com.lipata.forkauthority.BuildConfig;
 import com.lipata.forkauthority.api.yelp3.entities.SearchResponse;
+import com.lipata.forkauthority.di.ApplicationScope;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import io.reactivex.Single;
 import okhttp3.OkHttpClient;
@@ -13,7 +13,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-@Singleton
+@ApplicationScope
 public class Yelp3ApiClient implements Yelp3Api {
 
     private static final String BASE_URL = "https://api.yelp.com/";
