@@ -1,4 +1,4 @@
-package com.lipata.forkauthority.ui;
+package com.lipata.forkauthority.businesslist;
 
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 

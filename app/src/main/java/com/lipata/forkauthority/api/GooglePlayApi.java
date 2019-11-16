@@ -25,7 +25,7 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.lipata.forkauthority.data.AppSettings;
 import com.lipata.forkauthority.di.ApplicationScope;
-import com.lipata.forkauthority.ui.RestaurantListActivity;
+import com.lipata.forkauthority.businesslist.BusinessListActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +34,9 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-import static com.lipata.forkauthority.ui.LocationQualityView.Status.BAD;
-import static com.lipata.forkauthority.ui.LocationQualityView.Status.BEST;
-import static com.lipata.forkauthority.ui.LocationQualityView.Status.OK;
+import static com.lipata.forkauthority.businesslist.LocationQualityView.Status.BAD;
+import static com.lipata.forkauthority.businesslist.LocationQualityView.Status.BEST;
+import static com.lipata.forkauthority.businesslist.LocationQualityView.Status.OK;
 
 /**
  * Created by jlipata on 4/2/16.
@@ -71,7 +71,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
      */
     private final int LOCATION_REQUEST_SAMPLE_SIZE = 2;
 
-    private RestaurantListActivity mMainActivity;
+    private BusinessListActivity mMainActivity;
     private GoogleApiClient mGoogleApiClient;
 
     private Location mLastLocation;
@@ -82,11 +82,12 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     private long mLastLocationChangeTime;
 
-    @Inject GooglePlayApi(final Context context) {
+    @Inject public GooglePlayApi(final Context context) {
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API).build();
+                .addApi(LocationServices.API)
+                .build();
 
         /**
          * Regarding these settings see:
@@ -136,6 +137,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
         Timber.i("GoogleApiClient Connection failed: ConnectionResult.getErrorCode() = " + errorCode);
 
+        // TODO This class should not directly reference MainActivity
         switch (errorCode) {
             case 1:
                 mMainActivity.showSnackBarIndefinite("ERROR: Google Play services is missing on this device");
@@ -374,7 +376,7 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
         mLocationUpdateTimestamp = timestamp;
     }
 
-    public void setActivity(RestaurantListActivity mainActivity) {
+    public void setActivity(BusinessListActivity mainActivity) {
         this.mMainActivity = mainActivity;
     }
 }

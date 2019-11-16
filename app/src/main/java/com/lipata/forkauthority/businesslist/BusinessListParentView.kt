@@ -1,4 +1,4 @@
-package com.lipata.forkauthority.ui
+package com.lipata.forkauthority.businesslist
 
 import android.content.Context
 import android.graphics.drawable.Drawable

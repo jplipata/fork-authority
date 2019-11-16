@@ -1,4 +1,4 @@
-package com.lipata.forkauthority.ui;
+package com.lipata.forkauthority.businesslist;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;

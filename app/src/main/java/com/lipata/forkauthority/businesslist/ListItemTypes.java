@@ -1,4 +1,4 @@
-package com.lipata.forkauthority.ui;
+package com.lipata.forkauthority.businesslist;
 
 /**
  * Unique IDs for recyclerview list item types

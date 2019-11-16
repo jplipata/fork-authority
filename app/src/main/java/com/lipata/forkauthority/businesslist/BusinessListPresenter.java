@@ -1,4 +1,4 @@
-package com.lipata.forkauthority.ui;
+package com.lipata.forkauthority.businesslist;
 
 import android.location.Address;
 import android.location.Location;
@@ -17,10 +17,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 import timber.log.Timber;
 
 // TODO Dispose subscriptions!!
-public class MainPresenter implements Presenter {
+public class BusinessListPresenter extends ViewModel implements Presenter {
 
     private MainView view;
     private long callYelpApiStartTime;
@@ -31,8 +33,9 @@ public class MainPresenter implements Presenter {
     private final ListComposer listComposer;
     private final AddressParser addressParser;
 
-    @Inject
-    MainPresenter(
+    private MutableLiveData<CombinedList> combinedListLiveData;
+
+    @Inject public BusinessListPresenter(
             final ListFetcher fetcher,
             final GooglePlayApi googlePlayApi,
             final GeocoderApi geocoderApi,
@@ -43,6 +46,7 @@ public class MainPresenter implements Presenter {
         this.geocoderApi = geocoderApi;
         this.listComposer = listComposer;
         this.addressParser = addressParser;
+        this.combinedListLiveData = new MutableLiveData<>();
     }
 
     @Override
@@ -124,6 +128,8 @@ public class MainPresenter implements Presenter {
             BusinessListAdapter businessListAdapter = view.getSuggestionListAdapter();
             businessListAdapter.setBusinessList(filteredBusinesses);
             businessListAdapter.notifyDataSetChanged();
+
+            combinedListLiveData.setValue(filteredBusinesses);
         } else {
             view.onNoResults();
         }

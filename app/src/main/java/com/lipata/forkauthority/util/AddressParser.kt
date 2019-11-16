@@ -1,8 +1,9 @@
 package com.lipata.forkauthority.util
 
 import android.location.Address
+import javax.inject.Inject
 
-class AddressParser {
+class AddressParser @Inject constructor() {
 
     /**
      * @param address Takes {@link android.location.Address}

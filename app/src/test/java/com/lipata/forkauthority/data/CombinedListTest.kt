@@ -1,8 +1,8 @@
 package com.lipata.forkauthority.data
 
 import com.lipata.forkauthority.api.yelp3.entities.Business
-import com.lipata.forkauthority.ui.BusinessListBaseItem
-import com.lipata.forkauthority.ui.BusinessListHeader
+import com.lipata.forkauthority.businesslist.BusinessListBaseItem
+import com.lipata.forkauthority.businesslist.BusinessListHeader
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat

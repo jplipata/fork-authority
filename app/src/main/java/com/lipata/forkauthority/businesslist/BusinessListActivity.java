@@ -1,4 +1,4 @@
-package com.lipata.forkauthority.ui;
+package com.lipata.forkauthority.businesslist;
 
 import android.animation.ObjectAnimator;
 import android.app.Activity;
@@ -24,7 +24,6 @@ import com.crashlytics.android.answers.CustomEvent;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
-import com.lipata.forkauthority.di.AppComponent;
 import com.lipata.forkauthority.ForkAuthorityApp;
 import com.lipata.forkauthority.R;
 import com.lipata.forkauthority.api.GeocoderApi;
@@ -44,13 +43,14 @@ import javax.inject.Inject;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 import timber.log.Timber;
 
-public class RestaurantListActivity extends AppCompatActivity implements MainView, BusinessListParentView {
+public class BusinessListActivity extends AppCompatActivity implements MainView, BusinessListParentView {
 
     // Constants
     static final String LOCATION_UPDATE_TIMESTAMP_KEY = "mLocationUpdateTimestamp";
@@ -60,10 +60,9 @@ public class RestaurantListActivity extends AppCompatActivity implements MainVie
     static final String PROGRESS_BAR_BUSINESSES_KEY = "progressBarBusinesses";
     final static int MY_PERMISSIONS_ACCESS_FINE_LOCATION_ID = 0;
 
-    // App modules
-    AppComponent component;
+    BusinessListPresenter presenter;
+    @Inject BusinessListViewModelFactory viewModelFactory;
     @Inject GeocoderApi mGeocoder;
-    @Inject MainPresenter presenter;
     @Inject GooglePlayApi mGooglePlayApi;
     @Inject UserRecords mUserRecords;
     @Inject ListComposer listComposer;
@@ -94,6 +93,7 @@ public class RestaurantListActivity extends AppCompatActivity implements MainVie
         super.onCreate(savedInstanceState);
 
         ((ForkAuthorityApp) getApplication()).appComponent.inject(this);
+        presenter = ViewModelProviders.of(this, viewModelFactory).get(BusinessListPresenter.class);
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -134,7 +134,7 @@ public class RestaurantListActivity extends AppCompatActivity implements MainVie
             if (mGooglePlayApi.isLocationStale()) {
                 fetchBusinessList();
             } else {
-                Toast.makeText(RestaurantListActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(BusinessListActivity.this, "Too soon. Please try again in a few seconds...", Toast.LENGTH_SHORT).show();
             }
         });
         mFAB_refreshAnimation = ObjectAnimator.ofFloat(mFAB_refresh, View.ROTATION, 360);
@@ -227,7 +227,7 @@ public class RestaurantListActivity extends AppCompatActivity implements MainVie
 
     @Override
     public void showToast(String text) {
-        Toast.makeText(RestaurantListActivity.this, text, Toast.LENGTH_SHORT).show();
+        Toast.makeText(BusinessListActivity.this, text, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -455,7 +455,7 @@ public class RestaurantListActivity extends AppCompatActivity implements MainVie
         return mSuggestionListAdapter;
     }
 
-    public MainPresenter getPresenter() {
+    public BusinessListPresenter getPresenter() {
         return presenter;
     }
 

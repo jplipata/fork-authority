@@ -9,7 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import com.lipata.forkauthority.R;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.di.ApplicationScope;
-import com.lipata.forkauthority.ui.BusinessListAdapter;
+import com.lipata.forkauthority.businesslist.BusinessListAdapter;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;

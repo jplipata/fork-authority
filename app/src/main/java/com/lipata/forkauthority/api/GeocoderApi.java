@@ -20,7 +20,7 @@ public class GeocoderApi {
     private final Geocoder geocoder;
 
     @Inject
-    GeocoderApi(final Context context) {
+    public GeocoderApi(final Context context) {
         geocoder = new Geocoder(context);
     }
 
