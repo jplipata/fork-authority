@@ -7,9 +7,9 @@ import com.lipata.forkauthority.api.GeocoderApi;
 import com.lipata.forkauthority.api.GooglePlayApi;
 import com.lipata.forkauthority.api.yelp3.entities.Business;
 import com.lipata.forkauthority.data.AppSettings;
-import com.lipata.forkauthority.data.ListFetcher;
-import com.lipata.forkauthority.data.ListComposer;
 import com.lipata.forkauthority.data.CombinedList;
+import com.lipata.forkauthority.data.ListComposer;
+import com.lipata.forkauthority.data.ListFetcher;
 import com.lipata.forkauthority.util.AddressParser;
 import com.lipata.forkauthority.util.Utility;
 
@@ -19,12 +19,11 @@ import javax.inject.Inject;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
 
-// TODO Dispose subscriptions!!
-public class BusinessListPresenter extends ViewModel implements Presenter {
+public class BusinessListViewModel extends ViewModel {
 
-    private MainView view;
     private long callYelpApiStartTime;
 
     private final ListFetcher fetcher;
@@ -33,9 +32,12 @@ public class BusinessListPresenter extends ViewModel implements Presenter {
     private final ListComposer listComposer;
     private final AddressParser addressParser;
 
-    private MutableLiveData<CombinedList> combinedListLiveData;
+    private MutableLiveData<FetchListState> listLiveData;
+    private MutableLiveData<LocationState> locationLiveData;
 
-    @Inject public BusinessListPresenter(
+    private CompositeDisposable compositeDisposable;
+
+    @Inject public BusinessListViewModel(
             final ListFetcher fetcher,
             final GooglePlayApi googlePlayApi,
             final GeocoderApi geocoderApi,
@@ -46,37 +48,31 @@ public class BusinessListPresenter extends ViewModel implements Presenter {
         this.geocoderApi = geocoderApi;
         this.listComposer = listComposer;
         this.addressParser = addressParser;
-        this.combinedListLiveData = new MutableLiveData<>();
+        this.listLiveData = new MutableLiveData<>();
+        this.locationLiveData = new MutableLiveData<>();
+        this.compositeDisposable = new CompositeDisposable();
     }
 
-    @Override
     public void onBestLocation(Location location) {
-        geocoderApi
-                .getAddressObservable(location)
-                .compose(Utility::applySchedulers)
-                .subscribe(this::onAddressReceived, throwable -> {
-                    Timber.e(throwable.getMessage(), throwable);
-                });
+        compositeDisposable.add(
+                geocoderApi
+                        .getAddressObservable(location)
+                        .compose(Utility::applySchedulers)
+                        .subscribe(this::onAddressReceived,
+                                throwable -> Timber.e(throwable.getMessage(), throwable))
+        );
     }
 
     public void checkNetworkPermissionAndCallYelpApi(Location location) {
-        // If connected to network make Yelp API call, if no network, notify user
-        if (view.isNetworkConnected()) {
-            Timber.d("Querying YelpV3api... Search term: " + AppSettings.SEARCH_TERM + " | Location: " + location.toString());
-            callYelpApiStartTime = System.nanoTime();
-            //get list
-            fetcher
-                    .getList(Double.toString(location.getLatitude()), Double.toString(location.getLongitude()))
-                    .subscribe(this::onListReceived, this::onError);
+        Timber.d("Querying YelpV3api... Search term: " + AppSettings.SEARCH_TERM + " | Location: " + location.toString());
+        callYelpApiStartTime = System.nanoTime();
 
-        } else {
-            view.showSnackBarIndefinite("No network. Try again when you are connected to the internet.");
-            view.stopRefreshAnimation();
-        }
-    }
-
-    public void setView(MainView view) {
-        this.view = view;
+        //get list
+        compositeDisposable.add(
+                fetcher
+                        .getList(Double.toString(location.getLatitude()), Double.toString(location.getLongitude()))
+                        .subscribe(this::onListReceived, this::onError)
+        );
     }
 
     void onFetchBusinessList() {
@@ -92,7 +88,7 @@ public class BusinessListPresenter extends ViewModel implements Presenter {
 
     void executeGooglePlayApiLocation() {
         // Trigger UI progress bar, analytic
-        view.onDeviceLocationRequested();
+        locationLiveData.setValue(new LocationState.Loading());
 
         // Request location from Google Play API
         if (!googlePlayApi.getClient().isConnected()) {
@@ -103,8 +99,7 @@ public class BusinessListPresenter extends ViewModel implements Presenter {
     }
 
     void onError(Throwable e) {
-        view.stopRefreshAnimation();
-        view.showSnackBarIndefinite(e.getMessage());
+        listLiveData.setValue(new FetchListState.Error(e));
         Timber.e(e.getMessage(), e);
     }
 
@@ -113,7 +108,7 @@ public class BusinessListPresenter extends ViewModel implements Presenter {
 
         String text = addressParser.getFormattedAddress(address);
         if (!text.isEmpty()) {
-            view.setLocationText(text);
+            locationLiveData.setValue(new LocationState.Success(text));
         }
     }
 
@@ -125,22 +120,32 @@ public class BusinessListPresenter extends ViewModel implements Presenter {
             CombinedList filteredBusinesses = listComposer.filter(businesses);
 
             // Update UI
-            BusinessListAdapter businessListAdapter = view.getSuggestionListAdapter();
-            businessListAdapter.setBusinessList(filteredBusinesses);
-            businessListAdapter.notifyDataSetChanged();
-
-            combinedListLiveData.setValue(filteredBusinesses);
+            listLiveData.setValue(new FetchListState.Success(filteredBusinesses));
         } else {
-            view.onNoResults();
+            listLiveData.setValue(new FetchListState.NoResults());
         }
 
         // Analytics
         Utility.reportExecutionTime(this, "callYelpApi sequence, time to get "
                 + businesses.size() + " businesses", callYelpApiStartTime);
-        view.logFabricAnswersMetric(AppSettings.FABRIC_METRIC_YELPAPI, callYelpApiStartTime);
 
-        // UI
-        view.onNewBusinessListReceived();
-        view.stopRefreshAnimation();
+        // TODO Fabric has been deprecated
+        //view.logFabricAnswersMetric(AppSettings.FABRIC_METRIC_YELPAPI, callYelpApiStartTime);
     }
+
+    @Override protected void onCleared() {
+        compositeDisposable.dispose();
+        super.onCleared();
+    }
+
+    //region Getters/Setters
+    MutableLiveData<FetchListState> getListLiveData() {
+        return listLiveData;
+    }
+
+    MutableLiveData<LocationState> getLocationLiveData() {
+        return locationLiveData;
+    }
+    //endregion
+
 }

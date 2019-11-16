@@ -298,8 +298,10 @@ public class GooglePlayApi implements GoogleApiClient.ConnectionCallbacks,
 
     private void onBestLocationDetermined(Location location) {
         updateLastLocationAndUpdateUI(location);
-        mMainActivity.getPresenter().onBestLocation(location);
-        mMainActivity.getPresenter().checkNetworkPermissionAndCallYelpApi(location);
+
+        // TODO this is bad
+        mMainActivity.getViewModel().onBestLocation(location);
+        mMainActivity.getViewModel().checkNetworkPermissionAndCallYelpApi(location);
     }
 
     private void checkLocationPermissionAndRequestLocation() {
