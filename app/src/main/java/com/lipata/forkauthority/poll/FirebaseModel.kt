@@ -13,13 +13,14 @@ import com.google.firebase.firestore.ServerTimestamp
 data class Poll(
     @ServerTimestamp
     val created: Timestamp? = null,
-    var restaurants: MutableList<VotableRestaurant> = mutableListOf()
+    val participants: MutableList<String> = mutableListOf(),
+    val restaurants: MutableList<VotableRestaurant> = mutableListOf()
 )
 
 data class VotableRestaurant(
     var name: String = "",
-    var votesFor: MutableList<String> = mutableListOf(),
-    var votesAgainst: MutableList<String> = mutableListOf()
+    val votesFor: MutableList<String> = mutableListOf(),
+    val votesAgainst: MutableList<String> = mutableListOf()
 ) {
     fun totalVotes() = votesFor.size - votesAgainst.size
 }

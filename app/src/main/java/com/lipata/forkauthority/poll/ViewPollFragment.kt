@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.fragment_view_poll.view.*
 import javax.inject.Inject
 
 class ViewPollFragment : Fragment() {
+
     lateinit var adapter: PollAdapter
 
     @Inject
@@ -35,6 +36,9 @@ class ViewPollFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_view_poll, container, false)
 
         viewModel.run {
+            arguments?.let {
+                documentId = ViewPollFragmentArgs.fromBundle(it).documentId
+            }
             lifecycle.addObserver(this)
             observeLiveData(this@ViewPollFragment, Observer { onLce(it) })
             adapter = PollAdapter(this)
@@ -47,16 +51,6 @@ class ViewPollFragment : Fragment() {
         }
 
         return view
-    }
-
-    override fun onStart() {
-        super.onStart()
-        userIdentityManager.checkUserIdentity(requireContext()) { refreshEmail() }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        refreshEmail()
     }
 
     private fun onLce(lce: Lce?) {
@@ -78,9 +72,5 @@ class ViewPollFragment : Fragment() {
             } // do nothing
         }
 
-    }
-
-    private fun refreshEmail() {
-        tvEmail.text = userIdentityManager.email.orEmpty()
     }
 }

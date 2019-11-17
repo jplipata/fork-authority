@@ -12,6 +12,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: "androidx.navigation.safeargs"
+
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -77,12 +79,19 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
+
+    def lifecycle_version = "2.2.0-rc02"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+
+    def lifecycle_ext_version = "2.1.0"
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_ext_version"
+
     def nav_version = "2.1.0"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-
-    def lifecycle_version = "2.1.0"
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
 
     implementation 'com.google.android.gms:play-services-location:17.0.0'
 
@@ -137,6 +146,8 @@ dependencies {
     testImplementation "androidx.test.ext:truth:1.2.0"
     testImplementation "org.robolectric:robolectric:4.0"
 
+    // https://developer.android.com/training/basics/fragments/testing
+    debugImplementation 'androidx.fragment:fragment-testing:1.1.0'
 
     androidTestImplementation 'androidx.annotation:annotation:1.1.0'
     androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'

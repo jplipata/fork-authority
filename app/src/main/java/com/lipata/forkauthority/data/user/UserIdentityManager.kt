@@ -30,7 +30,7 @@ class UserIdentityManager @Inject constructor(val sharedPreferences: SharedPrefe
         emailDialog.showEmailPrompt(context,
             object : EmailDialog.Listener {
                 override fun onSubmit(text: String) {
-                    sharedPreferences.edit().putString(USER_EMAIL_KEY, text).commit()
+                    sharedPreferences.edit().putString(USER_EMAIL_KEY, text).apply()
                     emailUpdatedListener()
                 }
             }
