@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 class ViewPollFragment : Fragment() {
 
-    lateinit var adapter: PollAdapter
+    lateinit var adapter: VotableRestaurantsAdapter
 
     @Inject
     lateinit var userIdentityManager: UserIdentityManager
@@ -41,7 +41,7 @@ class ViewPollFragment : Fragment() {
             }
             lifecycle.addObserver(this)
             observeLiveData(this@ViewPollFragment, Observer { onLce(it) })
-            adapter = PollAdapter(this)
+            adapter = VotableRestaurantsAdapter(this)
         }
 
         view.pollRecycler.run {

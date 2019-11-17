@@ -1,48 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/poll_item_layout_margin_topbottom"
-    android:layout_marginBottom="@dimen/poll_item_layout_margin_topbottom">
+    android:background="?attr/selectableItemBackground">
 
     <TextView
-        android:id="@+id/tvVoteCount"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvPollName"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="10" />
-
-    <TextView
-        android:id="@+id/tvRestaurantName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/tvVoteCount"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Shake Shack" />
-
-
-    <TextView
-        android:id="@+id/tvVoteFor"
-        style="@style/PollRoundButton"
-        android:layout_marginRight="8dp"
-        android:text="Yes!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/tvVoteAgainst"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tvVoteAgainst"
-        style="@style/PollRoundButton"
-        android:layout_marginLeft="24dp"
-        android:text="No!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:gravity="center"
+        android:minHeight="48dp"
+        tools:text="Poll1" />
+</FrameLayout>
