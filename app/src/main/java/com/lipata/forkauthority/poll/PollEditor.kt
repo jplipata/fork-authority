@@ -16,15 +16,22 @@ class PollEditor @Inject constructor(
     // TODO Are we using this?
     val createPollLiveData = MutableLiveData<Lce>()
 
-    fun voteFor(votableRestaurant: VotableRestaurant) {
+    suspend fun voteFor(documentId: String, votableRestaurant: VotableRestaurant,
+                position: Int) {
         // update poll
         val email = userIdentityManager.email
-        email?.let { votableRestaurant.votesFor.add(it) }
+
+        val docSnapshot = getDocument(documentId)
+        val poll = docSnapshot.toObject(Poll::class.java)
+        poll!!.restaurants[position].votesFor.add(email!!)
 
         // save to db
+        db.collection("polls").document(documentId).set(poll)
 
-        //WRONG db.collection("polls").document("4z4zop9XAhkJ0dSeuVXm").set(votableRestaurant) // TODO temp poll
     }
+
+    private suspend fun getDocument(
+        documentId: String) = db.collection("polls").document(documentId).get().await()
 
     suspend fun createPoll(): String? {
         createPollLiveData.value = Lce.Loading
@@ -43,6 +50,19 @@ class PollEditor @Inject constructor(
             createPollLiveData.value = Lce.Error(error)
             null
         }
+    }
+
+    suspend fun addRestaurant(documentId: String?, restaurantName: String) {
+        val doc = getDocument(documentId!!)
+        val poll = doc.toObject(Poll::class.java)
+        poll?.restaurants?.add(
+            VotableRestaurant(
+                name = restaurantName,
+                votesFor = mutableListOf(userIdentityManager.email!!)
+            )
+        )
+
+        db.collection("polls").document(documentId).set(poll!!)
     }
 
 }

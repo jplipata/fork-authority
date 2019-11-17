@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.lipata.forkauthority.ForkAuthorityApp
@@ -14,17 +15,18 @@ import com.lipata.forkauthority.data.Lce
 import com.lipata.forkauthority.data.user.UserIdentityManager
 import kotlinx.android.synthetic.main.fragment_view_poll.*
 import kotlinx.android.synthetic.main.fragment_view_poll.view.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ViewPollFragment : Fragment() {
-
-    lateinit var adapter: VotableRestaurantsAdapter
+class ViewPollFragment : Fragment(), VotableRestaurantListener {
 
     @Inject
     lateinit var userIdentityManager: UserIdentityManager
 
     @Inject
     lateinit var viewModel: PollViewModel
+
+    lateinit var adapter: VotableRestaurantsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +43,7 @@ class ViewPollFragment : Fragment() {
             }
             lifecycle.addObserver(this)
             observeLiveData(this@ViewPollFragment, Observer { onLce(it) })
-            adapter = VotableRestaurantsAdapter(this)
+            adapter = VotableRestaurantsAdapter(this@ViewPollFragment)
         }
 
         view.pollRecycler.run {
@@ -50,7 +52,20 @@ class ViewPollFragment : Fragment() {
             adapter = this@ViewPollFragment.adapter
         }
 
+        view.tvAddRestaurant.setOnClickListener { onAddRestaurant() }
+
         return view
+    }
+
+    private fun onAddRestaurant() {
+        RestaurantDialog().showRestaurantPrompt(requireContext(),
+            object : RestaurantDialog.Listener {
+                override fun onSubmit(text: String) {
+                    lifecycleScope.launch {
+                        viewModel.addVotableRestaurant(text)
+                    }
+                }
+            })
     }
 
     private fun onLce(lce: Lce?) {
@@ -72,5 +87,14 @@ class ViewPollFragment : Fragment() {
             } // do nothing
         }
 
+    }
+
+    override fun voteFor(data: VotableRestaurant, position: Int) {
+        lifecycleScope.launch {
+            viewModel.voteFor(data, position)
+        }
+    }
+
+    override fun voteAgainst() {
     }
 }

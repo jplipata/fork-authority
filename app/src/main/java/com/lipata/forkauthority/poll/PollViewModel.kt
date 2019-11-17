@@ -7,7 +7,13 @@ import com.lipata.forkauthority.data.Lce
 import timber.log.Timber
 import javax.inject.Inject
 
-class PollViewModel @Inject constructor(private val db: FirebaseFirestore, private val pollEditor: PollEditor) : LifecycleObserver {
+/**
+ * This is not an Android ViewModel
+ */
+class PollViewModel @Inject constructor(
+    private val db: FirebaseFirestore,
+    private val pollEditor: PollEditor
+) : LifecycleObserver {
 
     private val livedata = MutableLiveData<Lce>()
 
@@ -52,8 +58,13 @@ class PollViewModel @Inject constructor(private val db: FirebaseFirestore, priva
         livedata.observe(lifecycleOwner, observer)
     }
 
-    fun voteFor(votableRestaurant: VotableRestaurant) {
-        pollEditor.voteFor(votableRestaurant)
+    suspend fun voteFor(votableRestaurant: VotableRestaurant,
+                position: Int) {
+        pollEditor.voteFor(documentId!!, votableRestaurant, position)
+    }
+
+    suspend fun addVotableRestaurant(restaurantName: String) {
+        pollEditor.addRestaurant(documentId, restaurantName)
     }
 }
 
