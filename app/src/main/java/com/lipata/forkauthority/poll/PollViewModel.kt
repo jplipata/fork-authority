@@ -6,7 +6,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.lipata.forkauthority.data.Lce
 import javax.inject.Inject
 
-class PollViewModel @Inject constructor(private val db: FirebaseFirestore) : LifecycleObserver {
+class PollViewModel @Inject constructor(private val db: FirebaseFirestore, private val pollEditor: PollEditor) : LifecycleObserver {
 
     private val livedata = MutableLiveData<Lce>()
 
@@ -44,6 +44,10 @@ class PollViewModel @Inject constructor(private val db: FirebaseFirestore) : Lif
 
     fun observeLiveData(lifecycleOwner: LifecycleOwner, observer: Observer<Lce>) {
         livedata.observe(lifecycleOwner, observer)
+    }
+
+    fun voteFor(votableRestaurant: VotableRestaurant) {
+        pollEditor.voteFor(votableRestaurant)
     }
 }
 

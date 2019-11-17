@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/poll_nav_graph"
+    app:startDestination="@id/homePollFragment">
+
+    <fragment
+        android:id="@+id/homePollFragment"
+        android:name="com.lipata.forkauthority.poll.HomePollFragment"
+        android:label="fragment_home_polls"
+        tools:layout="@layout/fragment_home_poll" >
+        <action
+            android:id="@+id/action_homePollFragment_to_viewPollFragment"
+            app:destination="@id/viewPollFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/viewPollFragment"
+        android:name="com.lipata.forkauthority.poll.ViewPollFragment"
+        android:label="ViewPollFragment" />
+</navigation>

@@ -3,18 +3,17 @@ package com.lipata.forkauthority.poll
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.lipata.forkauthority.R
 import kotlinx.android.synthetic.main.poll_item.view.*
 
-class PollAdapter : RecyclerView.Adapter<PollViewHolder>() {
+class PollAdapter(private val viewModel: PollViewModel) : RecyclerView.Adapter<PollViewHolder>() {
     var items: List<VotableRestaurant> = emptyList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PollViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.poll_item, parent, false)
-        return PollViewHolder(view)
+        return PollViewHolder(view, viewModel)
     }
 
     override fun getItemCount(): Int {
@@ -26,12 +25,21 @@ class PollAdapter : RecyclerView.Adapter<PollViewHolder>() {
     }
 }
 
-class PollViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    private val restaurantName: TextView = view.tvRestaurantName
-    private val votes: TextView = view.tvVoteCount
-
+class PollViewHolder(
+    private val view: View,
+    private val viewModel: PollViewModel
+) : RecyclerView.ViewHolder(view) {
     fun bind(data: VotableRestaurant) {
-        restaurantName.text = data.name
-        votes.text = (data.votesFor.size - data.votesAgainst.size).toString()
+        view.tvRestaurantName.text = data.name
+        view.tvVoteCount.text = (data.votesFor.size - data.votesAgainst.size).toString()
+
+        view.tvVoteFor.setOnClickListener {
+            viewModel.voteFor(data)
+        }
+
+//        view.tvVoteAgainst.setOnClickListener {
+//            viewModel.voteAgainst(data)
+//        }
+
     }
 }
