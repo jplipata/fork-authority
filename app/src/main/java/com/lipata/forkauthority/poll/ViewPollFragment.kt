@@ -20,11 +20,9 @@ import javax.inject.Inject
 
 class ViewPollFragment : Fragment(), VotableRestaurantListener {
 
-    @Inject
-    lateinit var userIdentityManager: UserIdentityManager
-
-    @Inject
-    lateinit var viewModel: PollViewModel
+    @Inject lateinit var userIdentityManager: UserIdentityManager
+    @Inject lateinit var viewModel: PollViewModel
+    @Inject lateinit var restaurantDialog: RestaurantDialog
 
     lateinit var adapter: VotableRestaurantsAdapter
 
@@ -58,7 +56,7 @@ class ViewPollFragment : Fragment(), VotableRestaurantListener {
     }
 
     private fun onAddRestaurant() {
-        RestaurantDialog().showRestaurantPrompt(requireContext(),
+        restaurantDialog.showRestaurantPrompt(requireContext(),
             object : RestaurantDialog.Listener {
                 override fun onSubmit(text: String) {
                     lifecycleScope.launch {
