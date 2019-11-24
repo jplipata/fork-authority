@@ -14,6 +14,7 @@ class LaunchActivity : AppCompatActivity() {
 
         if (!BuildConfig.DEBUG) {
             launchRestaurantListFeature()
+            finishAffinity()
         } else {
             showDebugActivity()
         }
