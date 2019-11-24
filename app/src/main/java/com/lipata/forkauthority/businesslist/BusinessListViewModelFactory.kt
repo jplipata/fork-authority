@@ -17,12 +17,6 @@ class BusinessListViewModelFactory @Inject constructor(
     private val addressParser: AddressParser
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return modelClass.getConstructor(
-            ListFetcher::class.java,
-            GooglePlayApi::class.java,
-            GeocoderApi::class.java,
-            ListComposer::class.java,
-            AddressParser::class.java
-        ).newInstance(listFetcher, googlePlayApi, geocoderApi, listComposer, addressParser)
+        return BusinessListViewModel(listFetcher, googlePlayApi, geocoderApi, listComposer, addressParser) as T
     }
 }

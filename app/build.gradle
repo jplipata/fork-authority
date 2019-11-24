@@ -147,7 +147,7 @@ dependencies {
     testImplementation "org.robolectric:robolectric:4.0"
 
     // https://developer.android.com/training/basics/fragments/testing
-    debugImplementation 'androidx.fragment:fragment-testing:1.1.0'
+    // debugImplementation 'androidx.fragment:fragment-testing:1.1.0' // TODO Versioning issues in release build
 
     androidTestImplementation 'androidx.annotation:annotation:1.1.0'
     androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'
