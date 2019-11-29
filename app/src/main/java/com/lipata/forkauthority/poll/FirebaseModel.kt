@@ -24,3 +24,5 @@ data class VotableRestaurant(
 ) {
     fun totalVotes() = votesFor.size - votesAgainst.size
 }
+
+class ToObjectError : Exception()

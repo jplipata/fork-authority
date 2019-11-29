@@ -16,22 +16,40 @@ class PollEditor @Inject constructor(
     // TODO Are we using this?
     val createPollLiveData = MutableLiveData<Lce>()
 
-    // TODO Block illegal votes -- here or in DB rules? Both?
     suspend fun vote(voteType: VoteType, documentId: String, position: Int) {
         // update poll
         val email = userIdentityManager.email
-
-        val docSnapshot = getDocument(documentId)
-        val poll = docSnapshot.toObject(Poll::class.java)
-
-        when (voteType) {
-            VoteType.FOR -> poll!!.restaurants[position].votesFor.add(email!!)
-            VoteType.AGAINST -> poll!!.restaurants[position].votesAgainst.add(email!!)
+        if (email.isNullOrBlank()) {
+            throw NoEmailException()
         }
 
-        // save to db
-        db.collection("polls").document(documentId).set(poll)
+        val docSnapshot = getDocument(documentId)
+        docSnapshot.toObject(Poll::class.java)?.let { poll ->
+            when (voteType) {
+                VoteType.FOR -> tryVoteFor(poll, position, email)
+                VoteType.AGAINST -> tryVoteAgainst(poll, position, email)
+            }
 
+            // save to db
+            db.collection("polls").document(documentId).set(poll)
+        } ?: throw ToObjectError()
+    }
+
+    private fun tryVoteFor(poll: Poll, position: Int,
+                           email: String) {
+        if (!poll.restaurants[position].votesFor.contains(email)) {
+            poll.restaurants[position].votesFor.add(email)
+        } else {
+            throw AlreadyVotedForException()
+        }
+    }
+
+    private fun tryVoteAgainst(poll: Poll, position: Int, email: String) {
+        if (!poll.restaurants[position].votesAgainst.contains(email)) {
+            poll.restaurants[position].votesAgainst.add(email)
+        } else {
+            throw AlreadyVotedAgainstException()
+        }
     }
 
     private suspend fun getDocument(
@@ -68,5 +86,9 @@ class PollEditor @Inject constructor(
 
         db.collection("polls").document(documentId).set(poll!!)
     }
+
+    class NoEmailException : Exception()
+    class AlreadyVotedForException : Exception()
+    class AlreadyVotedAgainstException : Exception()
 
 }

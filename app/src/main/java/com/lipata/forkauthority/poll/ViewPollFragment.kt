@@ -86,7 +86,18 @@ class ViewPollFragment : Fragment(), VotableRestaurantListener {
 
     override fun vote(voteType: VoteType, position: Int) {
         lifecycleScope.launch {
-            viewModel.vote(voteType, position)
+            try {
+                viewModel.vote(voteType, position)
+            }
+
+            // Maybe we can combine these
+            catch (e: PollEditor.AlreadyVotedForException) {
+                Snackbar.make(requireView(), "You cannot vote for the same place twice",
+                    Snackbar.LENGTH_LONG).show()
+            } catch (e: PollEditor.AlreadyVotedAgainstException) {
+                Snackbar.make(requireView(), "You cannot vote for the same place twice",
+                    Snackbar.LENGTH_LONG).show()
+            }
         }
     }
 }
