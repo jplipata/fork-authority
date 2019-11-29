@@ -1,16 +1,19 @@
-package com.lipata.forkauthority.poll
+package com.lipata.forkauthority.poll.viewpoll
 
 import androidx.lifecycle.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.lipata.forkauthority.data.Lce
+import com.lipata.forkauthority.poll.Poll
+import com.lipata.forkauthority.poll.PollEditor
+import com.lipata.forkauthority.poll.VoteType
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * This is not an Android ViewModel
  */
-class PollViewModel @Inject constructor(
+class ViewPollViewModel @Inject constructor(
     private val db: FirebaseFirestore,
     private val pollEditor: PollEditor
 ) : LifecycleObserver {

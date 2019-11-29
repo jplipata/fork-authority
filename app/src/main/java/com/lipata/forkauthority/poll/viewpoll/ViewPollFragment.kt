@@ -1,4 +1,4 @@
-package com.lipata.forkauthority.poll
+package com.lipata.forkauthority.poll.viewpoll
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,15 +13,17 @@ import com.lipata.forkauthority.ForkAuthorityApp
 import com.lipata.forkauthority.R
 import com.lipata.forkauthority.data.Lce
 import com.lipata.forkauthority.data.user.UserIdentityManager
+import com.lipata.forkauthority.poll.*
 import kotlinx.android.synthetic.main.fragment_view_poll.*
 import kotlinx.android.synthetic.main.fragment_view_poll.view.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ViewPollFragment : Fragment(), VotableRestaurantListener {
+class ViewPollFragment : Fragment(),
+    VotableRestaurantListener {
 
     @Inject lateinit var userIdentityManager: UserIdentityManager
-    @Inject lateinit var viewModel: PollViewModel
+    @Inject lateinit var viewModel: ViewPollViewModel
     @Inject lateinit var restaurantDialog: AddRestaurantDialog
 
     lateinit var adapter: VotableRestaurantsAdapter
@@ -41,7 +43,8 @@ class ViewPollFragment : Fragment(), VotableRestaurantListener {
             }
             lifecycle.addObserver(this)
             observeLiveData(this@ViewPollFragment, Observer { onLce(it) })
-            adapter = VotableRestaurantsAdapter(this@ViewPollFragment)
+            adapter = VotableRestaurantsAdapter(
+                this@ViewPollFragment)
         }
 
         view.pollRecycler.run {
@@ -95,7 +98,7 @@ class ViewPollFragment : Fragment(), VotableRestaurantListener {
                 Snackbar.make(requireView(), "You cannot vote for the same place twice",
                     Snackbar.LENGTH_LONG).show()
             } catch (e: PollEditor.AlreadyVotedAgainstException) {
-                Snackbar.make(requireView(), "You cannot vote for the same place twice",
+                Snackbar.make(requireView(), "You cannot vote against the same place twice",
                     Snackbar.LENGTH_LONG).show()
             }
         }

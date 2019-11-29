@@ -2,8 +2,8 @@ package com.lipata.forkauthority.di
 
 import com.lipata.forkauthority.businesslist.BusinessListActivity
 import com.lipata.forkauthority.poll.PollActivity
-import com.lipata.forkauthority.poll.PollHomeFragment
-import com.lipata.forkauthority.poll.ViewPollFragment
+import com.lipata.forkauthority.poll.home.PollHomeFragment
+import com.lipata.forkauthority.poll.viewpoll.ViewPollFragment
 import dagger.Component
 
 @ApplicationScope

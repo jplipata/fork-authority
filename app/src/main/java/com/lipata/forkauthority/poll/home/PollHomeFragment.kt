@@ -1,4 +1,4 @@
-package com.lipata.forkauthority.poll
+package com.lipata.forkauthority.poll.home
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,6 +13,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.lipata.forkauthority.ForkAuthorityApp
 import com.lipata.forkauthority.R
 import com.lipata.forkauthority.data.user.UserIdentityManager
+import com.lipata.forkauthority.poll.PollEditor
 import kotlinx.android.synthetic.main.fragment_poll_home.*
 import kotlinx.android.synthetic.main.fragment_poll_home.view.*
 import kotlinx.coroutines.launch

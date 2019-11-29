@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import com.lipata.forkauthority.data.user.UserIdentityManager
-import com.lipata.forkauthority.poll.PollViewModel
+import com.lipata.forkauthority.poll.viewpoll.ViewPollViewModel
 import com.lipata.forkauthority.util.AddressParser
 import com.nhaarman.mockitokotlin2.mock
 import dagger.Module
@@ -44,7 +44,7 @@ class TestAppModule {
 
     @Provides
     @ApplicationScope
-    fun providePollViewModel(): PollViewModel {
+    fun providePollViewModel(): ViewPollViewModel {
         return mock()
     }
 }

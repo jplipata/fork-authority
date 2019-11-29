@@ -1,4 +1,4 @@
-package com.lipata.forkauthority.poll
+package com.lipata.forkauthority.poll.home
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.DocumentSnapshot
 import com.lipata.forkauthority.R
+import com.lipata.forkauthority.poll.Poll
 import kotlinx.android.synthetic.main.poll_item.view.*
 
 class PollListAdapter(private val listener: Listener) : RecyclerView.Adapter<PollViewHolder>() {

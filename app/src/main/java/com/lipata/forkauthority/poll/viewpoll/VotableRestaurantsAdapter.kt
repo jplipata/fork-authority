@@ -1,10 +1,12 @@
-package com.lipata.forkauthority.poll
+package com.lipata.forkauthority.poll.viewpoll
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.lipata.forkauthority.R
+import com.lipata.forkauthority.poll.VotableRestaurant
+import com.lipata.forkauthority.poll.VoteType
 import kotlinx.android.synthetic.main.votable_restaurant_item.view.*
 
 class VotableRestaurantsAdapter(private val listener: VotableRestaurantListener) :
@@ -33,8 +35,14 @@ class VotableRestaurantViewHolder(
     fun bind(data: VotableRestaurant, position: Int) {
         view.tvRestaurantName.text = data.name
         view.tvVoteCount.text = (data.votesFor.size - data.votesAgainst.size).toString()
-        view.tvVoteFor.setOnClickListener { listener.vote(VoteType.FOR, position) }
-        view.tvVoteAgainst.setOnClickListener { listener.vote(VoteType.AGAINST, position) }
+        view.tvVoteFor.setOnClickListener {
+            listener.vote(
+                VoteType.FOR, position)
+        }
+        view.tvVoteAgainst.setOnClickListener {
+            listener.vote(
+                VoteType.AGAINST, position)
+        }
     }
 }
 

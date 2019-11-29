@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homePollFragment"
-        android:name="com.lipata.forkauthority.poll.PollHomeFragment"
+        android:name="com.lipata.forkauthority.poll.home.PollHomeFragment"
         android:label="fragment_home_polls"
         tools:layout="@layout/fragment_poll_home" >
         <action
@@ -20,7 +20,7 @@
     </fragment>
     <fragment
         android:id="@+id/viewPollFragment"
-        android:name="com.lipata.forkauthority.poll.ViewPollFragment"
+        android:name="com.lipata.forkauthority.poll.viewpoll.ViewPollFragment"
         android:label="ViewPollFragment" >
         <argument
             android:name="documentId"
