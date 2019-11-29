@@ -56,14 +56,11 @@ class ViewPollFragment : Fragment(), VotableRestaurantListener {
     }
 
     private fun onAddRestaurant() {
-        restaurantDialog.showRestaurantPrompt(requireContext(),
-            object : AddRestaurantDialog.Listener {
-                override fun onSubmit(text: String) {
-                    lifecycleScope.launch {
-                        viewModel.addVotableRestaurant(text)
-                    }
-                }
-            })
+        restaurantDialog.show(requireContext()) {
+            lifecycleScope.launch {
+                viewModel.addVotableRestaurant(it)
+            }
+        }
     }
 
     private fun onLce(lce: Lce?) {

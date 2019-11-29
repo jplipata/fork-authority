@@ -6,20 +6,16 @@ import androidx.appcompat.app.AlertDialog
 import javax.inject.Inject
 
 class AddRestaurantDialog @Inject constructor() {
-    fun showRestaurantPrompt(context: Context, listener: Listener) {
+    fun show(context: Context, action: (String) -> Unit) {
         val taskEditText = EditText(context)
         val dialog = AlertDialog.Builder(context)
             .setTitle("Add restaurant")
             .setView(taskEditText)
             .setPositiveButton("OK") { dialog, which ->
-                listener.onSubmit(taskEditText.text.toString())
+                action.invoke(taskEditText.text.toString())
             }
             .setNegativeButton("Cancel", null)
             .create()
         dialog.show()
-    }
-
-    interface Listener {
-        fun onSubmit(text: String)
     }
 }

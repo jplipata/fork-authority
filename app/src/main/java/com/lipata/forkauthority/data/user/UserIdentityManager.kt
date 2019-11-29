@@ -26,18 +26,11 @@ class UserIdentityManager @Inject constructor(val sharedPreferences: SharedPrefe
     }
 
     fun promptUserForEmail(context: Context, emailUpdatedListener: () -> Unit) {
-        // show UI
-        emailDialog.showEmailPrompt(context,
-            object : EmailDialog.Listener {
-                override fun onSubmit(text: String) {
-                    sharedPreferences.edit().putString(USER_EMAIL_KEY, text).apply()
-                    emailUpdatedListener()
-                }
-            }
-        )
+        emailDialog.show(context) {
+            sharedPreferences.edit().putString(USER_EMAIL_KEY, it).apply()
+            emailUpdatedListener()
+        }
     }
-
-
 }
 
 
