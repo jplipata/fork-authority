@@ -237,8 +237,6 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
     }
 
     public void startRefreshAnimation() {
-        Timber.d("Starting animation");
-
         mProgressBar_Businesses.setVisibility(View.VISIBLE);
 
         if (!mFAB_refreshAnimation.isRunning()) {
@@ -247,8 +245,6 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
     }
 
     public void stopRefreshAnimation() {
-        Timber.d("Stop animation");
-
         mProgressBar_Businesses.setVisibility(View.GONE);
         mProgressBar_Location.setVisibility(View.GONE);
         mFAB_refreshAnimation.cancel();
@@ -428,8 +424,8 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
     }
 
     public void onNoResults() {
+        stopRefreshAnimation();
         mRecyclerView_suggestionList.setVisibility(View.GONE);
-        mProgressBar_Businesses.setVisibility(View.GONE);
         mNoResultsTextView.setVisibility(View.VISIBLE);
     }
 
@@ -457,17 +453,6 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
         }
-    }
-
-    // Getters
-
-    @Override
-    public LinearLayoutManager getRecyclerViewLayoutManager() {
-        return mSuggestionListLayoutManager;
-    }
-
-    public BusinessListViewModel getViewModel() {
-        return viewModel;
     }
 
     @Override
@@ -509,11 +494,6 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
         startActivity(browserIntent);
     }
 
-    @Override
-    public Context getContext() {
-        return this;
-    }
-
     @NotNull
     @Override
     public Drawable getRatingDrawable(@NotNull String rating) {
@@ -540,4 +520,22 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
                 return getResources().getDrawable(R.drawable.stars_small_0);
         }
     }
+
+    // region Getters
+
+    @Override
+    public LinearLayoutManager getRecyclerViewLayoutManager() {
+        return mSuggestionListLayoutManager;
+    }
+
+    public BusinessListViewModel getViewModel() {
+        return viewModel;
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
+    }
+
+    // endregion
 }
