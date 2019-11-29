@@ -1,8 +1,6 @@
 package com.lipata.forkauthority.poll
 
 import android.widget.TextView
-import androidx.fragment.app.testing.launchFragment
-import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.Navigation
 import androidx.test.core.app.ActivityScenario

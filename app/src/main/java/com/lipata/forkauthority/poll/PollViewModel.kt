@@ -58,9 +58,8 @@ class PollViewModel @Inject constructor(
         livedata.observe(lifecycleOwner, observer)
     }
 
-    suspend fun voteFor(votableRestaurant: VotableRestaurant,
-                position: Int) {
-        pollEditor.voteFor(documentId!!, votableRestaurant, position)
+    suspend fun vote(voteType: VoteType, position: Int) {
+        pollEditor.vote(voteType, documentId!!, position)
     }
 
     suspend fun addVotableRestaurant(restaurantName: String) {

@@ -22,7 +22,7 @@ class ViewPollFragment : Fragment(), VotableRestaurantListener {
 
     @Inject lateinit var userIdentityManager: UserIdentityManager
     @Inject lateinit var viewModel: PollViewModel
-    @Inject lateinit var restaurantDialog: RestaurantDialog
+    @Inject lateinit var restaurantDialog: AddRestaurantDialog
 
     lateinit var adapter: VotableRestaurantsAdapter
 
@@ -57,7 +57,7 @@ class ViewPollFragment : Fragment(), VotableRestaurantListener {
 
     private fun onAddRestaurant() {
         restaurantDialog.showRestaurantPrompt(requireContext(),
-            object : RestaurantDialog.Listener {
+            object : AddRestaurantDialog.Listener {
                 override fun onSubmit(text: String) {
                     lifecycleScope.launch {
                         viewModel.addVotableRestaurant(text)
@@ -87,12 +87,9 @@ class ViewPollFragment : Fragment(), VotableRestaurantListener {
 
     }
 
-    override fun voteFor(data: VotableRestaurant, position: Int) {
+    override fun vote(voteType: VoteType, position: Int) {
         lifecycleScope.launch {
-            viewModel.voteFor(data, position)
+            viewModel.vote(voteType, position)
         }
-    }
-
-    override fun voteAgainst() {
     }
 }

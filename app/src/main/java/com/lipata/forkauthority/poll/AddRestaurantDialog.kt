@@ -5,7 +5,7 @@ import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import javax.inject.Inject
 
-class RestaurantDialog @Inject constructor() {
+class AddRestaurantDialog @Inject constructor() {
     fun showRestaurantPrompt(context: Context, listener: Listener) {
         val taskEditText = EditText(context)
         val dialog = AlertDialog.Builder(context)

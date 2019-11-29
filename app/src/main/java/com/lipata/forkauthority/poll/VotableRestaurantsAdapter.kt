@@ -33,18 +33,14 @@ class VotableRestaurantViewHolder(
     fun bind(data: VotableRestaurant, position: Int) {
         view.tvRestaurantName.text = data.name
         view.tvVoteCount.text = (data.votesFor.size - data.votesAgainst.size).toString()
-        view.tvVoteFor.setOnClickListener { listener.voteFor(data, position) }
+        view.tvVoteFor.setOnClickListener { listener.vote(VoteType.FOR, position) }
+        view.tvVoteAgainst.setOnClickListener { listener.vote(VoteType.AGAINST, position) }
     }
 }
 
 interface VotableRestaurantListener {
-    fun voteFor(data: VotableRestaurant, position: Int)
-    fun voteAgainst()
+    fun vote(voteType: VoteType, position: Int)
 }
 
-// TODO
-//        view.tvVoteAgainst.setOnClickListener {
-//            viewModel.voteAgainst(data)
-//        }
 
 

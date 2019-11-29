@@ -16,14 +16,18 @@ class PollEditor @Inject constructor(
     // TODO Are we using this?
     val createPollLiveData = MutableLiveData<Lce>()
 
-    suspend fun voteFor(documentId: String, votableRestaurant: VotableRestaurant,
-                position: Int) {
+    // TODO Block illegal votes -- here or in DB rules? Both?
+    suspend fun vote(voteType: VoteType, documentId: String, position: Int) {
         // update poll
         val email = userIdentityManager.email
 
         val docSnapshot = getDocument(documentId)
         val poll = docSnapshot.toObject(Poll::class.java)
-        poll!!.restaurants[position].votesFor.add(email!!)
+
+        when (voteType) {
+            VoteType.FOR -> poll!!.restaurants[position].votesFor.add(email!!)
+            VoteType.AGAINST -> poll!!.restaurants[position].votesAgainst.add(email!!)
+        }
 
         // save to db
         db.collection("polls").document(documentId).set(poll)
