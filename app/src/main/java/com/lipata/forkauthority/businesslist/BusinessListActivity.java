@@ -203,17 +203,19 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
         } else if (locationState instanceof LocationState.Success) {
             setLocationText(((LocationState.Success) locationState).getLocation());
         }
-
     }
 
     private void onFetchListState(final FetchListState fetchListState) {
         if (fetchListState instanceof FetchListState.Success) {
+            stopRefreshAnimation();
             mSuggestionListAdapter.setBusinessList(((FetchListState.Success) fetchListState).getList());
             mSuggestionListAdapter.notifyDataSetChanged();
-            onNewBusinessListReceived();
-            stopRefreshAnimation();
+            mRecyclerView_suggestionList.setVisibility(View.VISIBLE);
+            trackSuccessAnalytics();
         } else if (fetchListState instanceof FetchListState.NoResults) {
-            onNoResults();
+            stopRefreshAnimation();
+            mRecyclerView_suggestionList.setVisibility(View.GONE);
+            mNoResultsTextView.setVisibility(View.VISIBLE);
         } else if (fetchListState instanceof FetchListState.Error) {
             stopRefreshAnimation();
             showSnackBarIndefinite(((FetchListState.Error) fetchListState).getThrowable().getMessage());
@@ -287,7 +289,7 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
         logFabricAnswersMetric(AppSettings.FABRIC_METRIC_GOOGLEPLAYAPI, mStartTime_Location);
     }
 
-    public void onNewBusinessListReceived() {
+    public void trackSuccessAnalytics() {
         // Analytics
         Utility.reportExecutionTime(this, "Fetch businesses until displayed", mStartTime_Fetch);
         logFabricAnswersMetric(AppSettings.FABRIC_METRIC_FETCH_BIZ_SEQUENCE, mStartTime_Fetch);
