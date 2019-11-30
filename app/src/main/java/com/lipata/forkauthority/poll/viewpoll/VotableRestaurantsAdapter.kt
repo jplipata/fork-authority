@@ -32,6 +32,7 @@ class VotableRestaurantViewHolder(
     private val view: View,
     private val listener: VotableRestaurantListener
 ) : RecyclerView.ViewHolder(view) {
+
     fun bind(data: VotableRestaurant, position: Int) {
         view.tvRestaurantName.text = data.name
         view.tvVoteCount.text = (data.votesFor.size - data.votesAgainst.size).toString()
