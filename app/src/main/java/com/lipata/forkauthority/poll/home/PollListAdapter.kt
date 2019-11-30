@@ -33,6 +33,7 @@ class PollListAdapter(private val listener: Listener) : RecyclerView.Adapter<Pol
 
 class PollViewHolder(private val view: View,
                      private val listener: PollListAdapter.Listener) : RecyclerView.ViewHolder(view) {
+
     fun bind(documentSnapshot: DocumentSnapshot) {
         val poll = documentSnapshot.toObject(Poll::class.java)
         view.tvPollName.text = poll!!.created!!.toDate().toString()

@@ -45,6 +45,10 @@ class PollHomeFragment : Fragment(), PollListAdapter.Listener {
 
         view.tvCreatePoll.setOnClickListener { createPoll(view) }
 
+        view.tvEmail.setOnClickListener {
+            userIdentityManager.promptUserForEmail(requireContext()) { refreshEmail() }
+        }
+
         return view
     }
 
