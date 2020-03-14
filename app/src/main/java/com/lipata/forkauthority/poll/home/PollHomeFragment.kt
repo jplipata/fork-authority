@@ -17,6 +17,7 @@ import com.lipata.forkauthority.poll.PollEditor
 import kotlinx.android.synthetic.main.fragment_poll_home.*
 import kotlinx.android.synthetic.main.fragment_poll_home.view.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -26,7 +27,7 @@ class PollHomeFragment : Fragment(), PollListAdapter.Listener {
     @Inject lateinit var userIdentityManager: UserIdentityManager
     @Inject lateinit var db: FirebaseFirestore
 
-    val pollListAdapter = PollListAdapter(this)
+    private val pollListAdapter = PollListAdapter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,10 +60,14 @@ class PollHomeFragment : Fragment(), PollListAdapter.Listener {
     }
 
     private fun fetchPolls() {
-        db.collection("polls").get().addOnSuccessListener { querySnapshot ->
-            pollListAdapter.items = querySnapshot.documents
-            pollListAdapter.notifyDataSetChanged()
-        }
+        db.collection("polls").get()
+            .addOnSuccessListener { querySnapshot ->
+                pollListAdapter.items = querySnapshot.documents
+                pollListAdapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener {
+                Timber.e(it)
+            }
     }
 
     override fun onResume() {
@@ -102,5 +107,4 @@ class PollHomeFragment : Fragment(), PollListAdapter.Listener {
             documentId)
         view.findNavController().navigate(navigationAction)
     }
-
 }
