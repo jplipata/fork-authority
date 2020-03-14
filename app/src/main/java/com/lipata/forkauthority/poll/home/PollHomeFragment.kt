@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.findNavController
@@ -66,7 +67,9 @@ class PollHomeFragment : Fragment(), PollListAdapter.Listener {
                 pollListAdapter.notifyDataSetChanged()
             }
             .addOnFailureListener {
+                // TODO Standardize error handling
                 Timber.e(it)
+                showErrorDialog(it.localizedMessage)
             }
     }
 
@@ -77,6 +80,14 @@ class PollHomeFragment : Fragment(), PollListAdapter.Listener {
 
     override fun onClick(documentId: String) {
         navToViewPollFragment(documentId, requireView())
+    }
+
+    private fun showErrorDialog(message: String) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Something went wrong!")
+            .setMessage(message)
+            .setPositiveButton(R.string.ok) { dialog, which -> dialog.dismiss() }
+            .show()
     }
 
     private fun refreshEmail() {

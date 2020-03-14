@@ -9,8 +9,8 @@
     <!-- UI - Suggestion List Strings -->
     <string name="moved_to_bottom">. I have moved this to the bottom of the list.</string>
     <string name="moved_to_toosoon">. I have moved this to the Too Soon list below.</string>
-    <string name="getting_your_location">Getting your location...</string>
-    <string name="loading_businesses">Loading stuff to eat...</string>
+    <string name="getting_your_location">Getting your location…</string>
+    <string name="loading_businesses">Loading stuff to eat…</string>
 
     <!-- Shared Preferences Strings -->
     <string name="shared_prefs_file">userData</string>
@@ -19,4 +19,6 @@
     <string name="key_user_records_v2">UserRecordMap</string>
     <string name="key_yelp3_token">YelpV3token</string>
     <string name="sorry_no_results_found">Sorry! No results found.</string>
+
+    <string name="ok">OK</string>
 </resources>
