@@ -57,10 +57,9 @@ class PollHomeFragment : Fragment(), PollListAdapter.Listener {
     override fun onStart() {
         super.onStart()
         userIdentityManager.checkUserIdentity(requireContext()) { refreshEmail() }
-        fetchPolls()
     }
 
-    private fun fetchPolls() {
+    private fun refreshPolls() {
         db.collection("polls").get()
             .addOnSuccessListener { querySnapshot ->
                 pollListAdapter.items = querySnapshot.documents
@@ -76,6 +75,7 @@ class PollHomeFragment : Fragment(), PollListAdapter.Listener {
     override fun onResume() {
         super.onResume()
         refreshEmail()
+        refreshPolls()
     }
 
     override fun onClick(documentId: String) {
