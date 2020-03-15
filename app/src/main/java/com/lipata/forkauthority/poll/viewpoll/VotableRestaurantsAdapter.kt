@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.votable_restaurant_item.view.*
 
 class VotableRestaurantsAdapter(private val listener: VotableRestaurantListener) :
     RecyclerView.Adapter<VotableRestaurantViewHolder>() {
-    var items: List<VotableRestaurant> = emptyList()
+    var items: List<UserVotableRestaurant> = emptyList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VotableRestaurantViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -33,16 +33,27 @@ class VotableRestaurantViewHolder(
     private val listener: VotableRestaurantListener
 ) : RecyclerView.ViewHolder(view) {
 
-    fun bind(data: VotableRestaurant, position: Int) {
-        view.tvRestaurantName.text = data.name
-        view.tvVoteCount.text = (data.votesFor.size - data.votesAgainst.size).toString()
+    fun bind(data: UserVotableRestaurant, position: Int) {
+        view.tvRestaurantName.text = data.votableRestaurant.name
+        view.tvVoteCount.text = (data.votableRestaurant.totalVotes()).toString()
+
+        if (data.userHasVotedFor) {
+            // TODO Clicked state
+        } else {
+            // TODO Default state
+        }
+
+        if (data.userHasVotedAgainst) {
+            // TODO Clicked state
+        } else {
+            // TODO Default state
+        }
+
         view.tvVoteFor.setOnClickListener {
-            listener.vote(
-                VoteType.FOR, position)
+            listener.vote(VoteType.FOR, position)
         }
         view.tvVoteAgainst.setOnClickListener {
-            listener.vote(
-                VoteType.AGAINST, position)
+            listener.vote(VoteType.AGAINST, position)
         }
     }
 }

@@ -76,7 +76,7 @@ class ViewPollFragment : Fragment(),
             }
 
             is Lce.Content<*> -> {
-                adapter.items = lce.content as? List<VotableRestaurant>
+                adapter.items = lce.content as? List<UserVotableRestaurant>
                     ?: emptyList() // TODO these generics are not great
                 adapter.notifyDataSetChanged()
             }
@@ -93,7 +93,7 @@ class ViewPollFragment : Fragment(),
                 viewModel.vote(voteType, position)
             }
 
-            // Maybe we can combine these
+            // TODO Maybe we can combine these
             catch (e: PollEditor.AlreadyVotedForException) {
                 Snackbar.make(requireView(), "You cannot vote for the same place twice",
                     Snackbar.LENGTH_LONG).show()

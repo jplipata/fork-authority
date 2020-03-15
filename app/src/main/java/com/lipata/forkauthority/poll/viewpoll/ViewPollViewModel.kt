@@ -4,8 +4,10 @@ import androidx.lifecycle.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.lipata.forkauthority.data.Lce
+import com.lipata.forkauthority.data.user.UserIdentityManager
 import com.lipata.forkauthority.poll.Poll
 import com.lipata.forkauthority.poll.PollEditor
+import com.lipata.forkauthority.poll.VotableRestaurant
 import com.lipata.forkauthority.poll.VoteType
 import timber.log.Timber
 import javax.inject.Inject
@@ -15,7 +17,8 @@ import javax.inject.Inject
  */
 class ViewPollViewModel @Inject constructor(
     private val db: FirebaseFirestore,
-    private val pollEditor: PollEditor
+    private val pollEditor: PollEditor,
+    private val userIdentityManager: UserIdentityManager
 ) : LifecycleObserver {
 
     private val livedata = MutableLiveData<Lce>()
@@ -44,7 +47,13 @@ class ViewPollViewModel @Inject constructor(
                     val poll = snapshot.toObject(Poll::class.java)
                     livedata.value = Lce.Content(
                         poll?.restaurants.orEmpty()
-                            .sortedByDescending { it.totalVotes() }
+                            .map { votableRestaurant ->
+                                UserVotableRestaurant(
+                                    votableRestaurant,
+                                    userIdentityManager.email.orEmpty()
+                                )
+                            }
+                            .sortedByDescending { it.votableRestaurant.totalVotes() }
                     )
                 }
             }
@@ -69,4 +78,13 @@ class ViewPollViewModel @Inject constructor(
         pollEditor.addRestaurant(documentId, restaurantName)
     }
 }
+
+class UserVotableRestaurant(
+    val votableRestaurant: VotableRestaurant, // TODO Exposing this might be bad
+    user: String
+) {
+    val userHasVotedFor = votableRestaurant.votesFor.contains(user)
+    val userHasVotedAgainst = votableRestaurant.votesFor.contains(user)
+}
+
 
