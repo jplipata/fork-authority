@@ -36,11 +36,11 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
     public static final int DISMISS = 3;
 
     // For brevity, due to ugliness of Kotlin interop
-    private static final String LIKES_KEY = Categories.Companion.getLIKES();
-    private static final String LIKED_TOO_SOON_KEY = Categories.Companion.getLIKES_TOO_SOON();
-    private static final String UNSORTED_KEY = Categories.Companion.getUNSORTED();
-    private static final String UNSORTED_TOO_SOON_KEY = Categories.Companion.getUNSORTED_TOO_SOON();
-    private static final String DONT_LIKE_KEY = Categories.Companion.getDONT_LIKE();
+    private static final String LIKES_KEY = Categories.LIKES;
+    private static final String LIKED_TOO_SOON_KEY = Categories.LIKES_TOO_SOON;
+    private static final String UNSORTED_KEY = Categories.UNSORTED;
+    private static final String UNSORTED_TOO_SOON_KEY = Categories.UNSORTED_TOO_SOON;
+    private static final String DONT_LIKE_KEY = Categories.DONT_LIKE;
 
     private CombinedList mBusinessList;
     private BusinessListParentView parentView;

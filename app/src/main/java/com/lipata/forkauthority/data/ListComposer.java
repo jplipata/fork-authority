@@ -149,19 +149,19 @@ public class ListComposer {
         // Add headers
 
         if (likesList.size() > 0) {
-            likesList.add(0, new BusinessListHeader(Categories.Companion.getLIKES()));
+            likesList.add(0, new BusinessListHeader(Categories.LIKES));
         }
         if (likedButTooSoonList.size() > 0) {
-            likedButTooSoonList.add(0, new BusinessListHeader(Categories.Companion.getLIKES_TOO_SOON()));
+            likedButTooSoonList.add(0, new BusinessListHeader(Categories.LIKES_TOO_SOON));
         }
         if (businessList_temp.size() > 0) {
-            businessList_temp.add(0, new BusinessListHeader(Categories.Companion.getUNSORTED()));
+            businessList_temp.add(0, new BusinessListHeader(Categories.UNSORTED));
         }
         if (unsortedTooSoonList.size() > 0) {
-            unsortedTooSoonList.add(0, new BusinessListHeader(Categories.Companion.getUNSORTED_TOO_SOON()));
+            unsortedTooSoonList.add(0, new BusinessListHeader(Categories.UNSORTED_TOO_SOON));
         }
         if (dontLikeList.size() > 0) {
-            dontLikeList.add(0, new BusinessListHeader(Categories.Companion.getDONT_LIKE()));
+            dontLikeList.add(0, new BusinessListHeader(Categories.DONT_LIKE));
         }
 
         List<List<BusinessListBaseItem>> lists = new ArrayList<>();
