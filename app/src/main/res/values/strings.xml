@@ -18,7 +18,9 @@
     <string name="key_user_records">UserRecordList</string> <!-- Deprecated -->
     <string name="key_user_records_v2">UserRecordMap</string>
     <string name="key_yelp3_token">YelpV3token</string>
-    <string name="sorry_no_results_found">Sorry! No results found.</string>
+    <string name="preference_key_just_ate_here_expiration">just_ate_here_expiration</string>
+    <string name="preference_default_value_just_ate_here_expiration">3</string> <!-- Days. It's a string instead of an Int because that's what EditTextPreference uses -->
 
+    <string name="sorry_no_results_found">Sorry! No results found.</string>
     <string name="ok">OK</string>
 </resources>

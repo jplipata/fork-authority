@@ -35,6 +35,7 @@
         </activity>
 
         <activity android:name=".poll.PollActivity" />
+        <activity android:name=".businesslist.SettingsActivity" />
 
         <meta-data
             android:name="io.fabric.ApiKey"

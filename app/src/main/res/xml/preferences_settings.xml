@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditTextPreference
+        android:defaultValue="@string/preference_default_value_just_ate_here_expiration"
+        app:iconSpaceReserved="false"
+        app:key="@string/preference_key_just_ate_here_expiration"
+        app:summary="How long to keep restaurants in the Just Ate Here list"
+        app:title="Just Ate Here Expiration" />
+
+</PreferenceScreen>

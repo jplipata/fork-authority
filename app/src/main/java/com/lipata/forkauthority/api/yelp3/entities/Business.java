@@ -101,12 +101,6 @@ public class Business extends BusinessListBaseItem {
 
     private int dismissedCount;
 
-    public boolean isTooSoonClickDateExpired() {
-        long now = System.currentTimeMillis();
-        if (now - AppSettings.TOOSOON_THRESHOLD > tooSoonClickDate) return true;
-        else return false;
-    }
-
     public boolean isDontLike() {
         return getDontLikeClickDate() > 0;
     }
