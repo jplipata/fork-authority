@@ -64,6 +64,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
         LinearLayout mLayout_BusinessHeader;
         CardView mCardView_CardView;
         ImageView mImageView_BusinessImage;
+        TextView mTextView_Closed;
         TextView mTextView_BusinessName;
         TextView mTextView_BusinessCategories;
         TextView mTextView_BusinessAddress;
@@ -82,6 +83,7 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
             mCardView_CardView = v.findViewById(R.id.card_view);
             mImageView_BusinessImage = v.findViewById(R.id.business_image);
             mImageView_BusinessImage.setClipToOutline(true); // for rounded corners.  See https://stackoverflow.com/questions/31675420/set-round-corner-image-in-imageview
+            mTextView_Closed = v.findViewById(R.id.closed);
             mTextView_BusinessName = v.findViewById(R.id.business_name);
             mTextView_BusinessCategories = v.findViewById(R.id.business_categories);
             mTextView_BusinessAddress = v.findViewById(R.id.business_address);
@@ -162,6 +164,9 @@ public class BusinessListAdapter extends RecyclerView.Adapter<BusinessListAdapte
                             .fit()
                             .into(holder.mImageView_BusinessImage);
                 }
+
+                // Closed
+                holder.mTextView_Closed.setVisibility(business.isClosed ? View.VISIBLE : View.GONE);
 
                 // Business name
                 holder.mTextView_BusinessName.setText(calculateCardPosition(position) + ". " + business.getName());
