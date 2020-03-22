@@ -51,4 +51,11 @@
         <item name="android:focusable">true</item>
     </style>
 
+    <!-- See Caption in https://material.io/design/typography/the-type-system.html#type-scale
+         letter spacing is ignored to match original font  -->
+    <style name="TextCaption">
+        <item name="android:textColor">@color/material_text_gray</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
 </resources>
