@@ -3,7 +3,9 @@ package com.lipata.forkauthority.di
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
 import com.lipata.forkauthority.R
+import com.lipata.forkauthority.businesslist.ExpirationProvider
 import com.lipata.forkauthority.util.AddressParser
 import dagger.Module
 import dagger.Provides
@@ -40,19 +42,22 @@ class AppModule(private val application: Application) {
 
     @Provides
     @ApplicationScope
-    @JustAteHerePref
-    fun provideJustAteHerePref(context: Context, sharedPreferences: SharedPreferences): Int {
-        val default = context.getString(R.string.preference_default_value_just_ate_here_expiration)
+    fun provideJustAteHerePref(context: Context): ExpirationProvider {
+        return object : ExpirationProvider {
+            override fun get(): Int {
+                val default = context.getString(R.string.preference_default_value_just_ate_here_expiration)
 
-        val expirationPrefString = sharedPreferences.getString(
-            context.getString(R.string.preference_key_just_ate_here_expiration),
-            default) ?: default
+                val expirationPrefString = PreferenceManager.getDefaultSharedPreferences(context).getString(
+                    context.getString(R.string.preference_key_just_ate_here_expiration),
+                    default) ?: default
 
-        return try {
-            expirationPrefString.toInt()
-        } catch (e: Exception) {
-            Timber.e(e)
-            default.toInt()
+                return try {
+                    expirationPrefString.toInt()
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    default.toInt()
+                }
+            }
         }
     }
 }
