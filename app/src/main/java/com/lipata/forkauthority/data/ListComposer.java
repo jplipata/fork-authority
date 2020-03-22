@@ -1,10 +1,11 @@
 package com.lipata.forkauthority.data;
 
 import com.lipata.forkauthority.api.yelp3.entities.Business;
+import com.lipata.forkauthority.businesslist.BusinessListBaseItem;
+import com.lipata.forkauthority.businesslist.BusinessListHeader;
+import com.lipata.forkauthority.businesslist.JustAteHereExpiryCalculator;
 import com.lipata.forkauthority.data.user.BusinessItemRecord;
 import com.lipata.forkauthority.data.user.UserRecords;
-import com.lipata.forkauthority.ui.BusinessListBaseItem;
-import com.lipata.forkauthority.ui.BusinessListHeader;
 import com.lipata.forkauthority.util.Utility;
 
 import java.util.ArrayList;
@@ -16,15 +17,20 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-import static com.lipata.forkauthority.ui.BusinessListAdapter.DONTLIKE;
+import static com.lipata.forkauthority.businesslist.BusinessListAdapter.DONTLIKE;
 
 public class ListComposer {
 
     private UserRecords mUserRecords;
+    private JustAteHereExpiryCalculator justAteHereExpiryCalculator;
 
     @Inject
-    public ListComposer(final UserRecords userRecords) {
+    public ListComposer(
+            final UserRecords userRecords,
+            final JustAteHereExpiryCalculator justAteHereExpiryCalculator
+    ) {
         this.mUserRecords = userRecords;
+        this.justAteHereExpiryCalculator = justAteHereExpiryCalculator;
     }
 
     /**
@@ -43,8 +49,7 @@ public class ListComposer {
         List<BusinessListBaseItem> dontLikeList = new ArrayList<>();
 
         // Make a copy of the source list
-        List<BusinessListBaseItem> businessList_temp = new ArrayList<>();
-        businessList_temp.addAll(businessList_Source);
+        List<BusinessListBaseItem> businessList_temp = new ArrayList<>(businessList_Source);
 
         // Get user data
         HashMap<String, BusinessItemRecord> userRecordMap = mUserRecords.getUserRecords();
@@ -85,7 +90,8 @@ public class ListComposer {
 
                     // Assign it to the "Liked" list, or the "Liked, but too soon" list
 
-                    if (business.getTooSoonClickDate() == 0 || business.isTooSoonClickDateExpired()) {
+                    if (business.getTooSoonClickDate() == 0 ||
+                            justAteHereExpiryCalculator.isExpired(business.getTooSoonClickDate())) {
 
                         likesList.add(business);
                         businessList_temp.set(i, null); // Remove business from original list
@@ -123,7 +129,7 @@ public class ListComposer {
                 // Handle the "Too Soon" case:
 
                 if (tooSoonClickDate != 0 && dontLikeClickDate != -1) {
-                    if (!business.isTooSoonClickDateExpired()) {
+                    if (!justAteHereExpiryCalculator.isExpired(business.getTooSoonClickDate())) {
                         Timber.v("filter() Deemed too soon, unsorted!");
                         unsortedTooSoonList.add(business);
                         businessList_temp.set(i, null); // Remove business from original list
@@ -149,19 +155,19 @@ public class ListComposer {
         // Add headers
 
         if (likesList.size() > 0) {
-            likesList.add(0, new BusinessListHeader(Categories.Companion.getLIKES()));
+            likesList.add(0, new BusinessListHeader(Categories.LIKES));
         }
         if (likedButTooSoonList.size() > 0) {
-            likedButTooSoonList.add(0, new BusinessListHeader(Categories.Companion.getLIKES_TOO_SOON()));
+            likedButTooSoonList.add(0, new BusinessListHeader(Categories.LIKES_TOO_SOON));
         }
         if (businessList_temp.size() > 0) {
-            businessList_temp.add(0, new BusinessListHeader(Categories.Companion.getUNSORTED()));
+            businessList_temp.add(0, new BusinessListHeader(Categories.UNSORTED));
         }
         if (unsortedTooSoonList.size() > 0) {
-            unsortedTooSoonList.add(0, new BusinessListHeader(Categories.Companion.getUNSORTED_TOO_SOON()));
+            unsortedTooSoonList.add(0, new BusinessListHeader(Categories.UNSORTED_TOO_SOON));
         }
         if (dontLikeList.size() > 0) {
-            dontLikeList.add(0, new BusinessListHeader(Categories.Companion.getDONT_LIKE()));
+            dontLikeList.add(0, new BusinessListHeader(Categories.DONT_LIKE));
         }
 
         List<List<BusinessListBaseItem>> lists = new ArrayList<>();

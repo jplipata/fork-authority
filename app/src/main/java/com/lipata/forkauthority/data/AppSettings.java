@@ -34,7 +34,6 @@ public class AppSettings {
 
     // Timings
 
-    public static long TOOSOON_THRESHOLD = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
     public static int DONTLIKE_THRESHOLD_INDAYS = 90;
 
     /* "Age" of location data in milliseconds before it becomes "stale"

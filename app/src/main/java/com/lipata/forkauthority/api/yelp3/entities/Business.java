@@ -3,8 +3,8 @@ package com.lipata.forkauthority.api.yelp3.entities;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.lipata.forkauthority.data.AppSettings;
-import com.lipata.forkauthority.ui.BusinessListBaseItem;
-import com.lipata.forkauthority.ui.ListItemTypes;
+import com.lipata.forkauthority.businesslist.BusinessListBaseItem;
+import com.lipata.forkauthority.businesslist.ListItemTypes;
 import com.lipata.forkauthority.util.Utility;
 
 import java.util.List;
@@ -100,12 +100,6 @@ public class Business extends BusinessListBaseItem {
     private long dismissedDate;
 
     private int dismissedCount;
-
-    public boolean isTooSoonClickDateExpired() {
-        long now = System.currentTimeMillis();
-        if (now - AppSettings.TOOSOON_THRESHOLD > tooSoonClickDate) return true;
-        else return false;
-    }
 
     public boolean isDontLike() {
         return getDontLikeClickDate() > 0;

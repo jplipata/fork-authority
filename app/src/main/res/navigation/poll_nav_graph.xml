@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/poll_nav_graph"
+    app:startDestination="@id/homePollFragment">
+
+    <fragment
+        android:id="@+id/homePollFragment"
+        android:name="com.lipata.forkauthority.poll.home.PollHomeFragment"
+        android:label="fragment_home_polls"
+        tools:layout="@layout/fragment_poll_home" >
+        <action
+            android:id="@+id/action_homePollFragment_to_viewPollFragment"
+            app:destination="@id/viewPollFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/viewPollFragment"
+        android:name="com.lipata.forkauthority.poll.viewpoll.ViewPollFragment"
+        android:label="ViewPollFragment" >
+        <argument
+            android:name="documentId"
+            app:argType="string" />
+    </fragment>
+</navigation>

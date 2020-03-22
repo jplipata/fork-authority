@@ -21,4 +21,7 @@
     <dimen name="header_line_width">32dp</dimen>
     <dimen name="cardview_corner_radius">8dp</dimen>
 
+
+    <dimen name="poll_item_layout_margin_topbottom">8dp</dimen>
+
 </resources>
