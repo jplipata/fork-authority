@@ -19,8 +19,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -382,8 +380,10 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
     public void logFabricAnswersMetric(String metricName, long startTime) {
         long executionTime = System.nanoTime() - startTime;
         long executionTime_ms = executionTime / 1000000;
-        Answers.getInstance().logCustom(new CustomEvent(metricName)
-                .putCustomAttribute("Execution time (ms)", executionTime_ms));
+
+        // TODO Fabric deprecated. Replace this
+        // Answers.getInstance().logCustom(new CustomEvent(metricName)
+        //         .putCustomAttribute("Execution time (ms)", executionTime_ms));
     }
 
 

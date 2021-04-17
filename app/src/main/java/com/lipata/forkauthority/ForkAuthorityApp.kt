@@ -1,13 +1,10 @@
 package com.lipata.forkauthority
 
 import android.app.Application
-import com.crashlytics.android.Crashlytics
-import com.crashlytics.android.answers.Answers
-import com.lipata.forkauthority.di.YelpModule
 import com.lipata.forkauthority.di.AppComponent
 import com.lipata.forkauthority.di.AppModule
 import com.lipata.forkauthority.di.DaggerAppComponent
-import io.fabric.sdk.android.Fabric
+import com.lipata.forkauthority.di.YelpModule
 import timber.log.Timber
 
 class ForkAuthorityApp : Application() {
@@ -21,17 +18,17 @@ class ForkAuthorityApp : Application() {
             Timber.plant(Timber.DebugTree())
         }
 
-        initFabric()
+        //initFabric()
     }
 
-    private fun initFabric() {
-        Fabric.with(this, Crashlytics())
-        val fabric = Fabric.Builder(this)
-            .kits(Answers())
-            .debuggable(true)
-            .build()
-        Fabric.with(fabric)
-    }
+//    private fun initFabric() {
+//        Fabric.with(this, Crashlytics())
+//        val fabric = Fabric.Builder(this)
+//            .kits(Answers())
+//            .debuggable(true)
+//            .build()
+//        Fabric.with(fabric)
+//    }
 
     fun initDagger(application: ForkAuthorityApp): AppComponent {
         return DaggerAppComponent.builder()

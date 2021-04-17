@@ -3,6 +3,7 @@ package com.lipata.forkauthority.di
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import com.lipata.forkauthority.businesslist.ExpirationProvider
 import com.lipata.forkauthority.data.user.UserIdentityManager
 import com.lipata.forkauthority.poll.viewpoll.ViewPollViewModel
 import com.lipata.forkauthority.util.AddressParser
@@ -45,6 +46,12 @@ class TestAppModule {
     @Provides
     @ApplicationScope
     fun providePollViewModel(): ViewPollViewModel {
+        return mock()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideJustAteHerePref(context: Context): ExpirationProvider {
         return mock()
     }
 }
