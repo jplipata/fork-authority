@@ -1,7 +1,7 @@
 package com.lipata.forkauthority.di
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.lipata.forkauthority.data.user.UserIdentityManager
+import com.lipata.forkauthority.poll.UserIdentityManager
 import dagger.Component
 
 @ApplicationScope

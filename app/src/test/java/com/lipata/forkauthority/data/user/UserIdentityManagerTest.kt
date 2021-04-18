@@ -2,6 +2,7 @@ package com.lipata.forkauthority.data.user
 
 import android.content.SharedPreferences
 import com.lipata.forkauthority.data.SharedPreferencesKeys.USER_EMAIL_KEY
+import com.lipata.forkauthority.poll.UserIdentityManager
 import com.nhaarman.mockitokotlin2.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual.equalTo
