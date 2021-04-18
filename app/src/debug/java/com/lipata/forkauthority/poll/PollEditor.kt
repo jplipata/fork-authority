@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.lipata.forkauthority.data.Lce
-import com.lipata.forkauthority.data.user.UserIdentityManager
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import javax.inject.Inject

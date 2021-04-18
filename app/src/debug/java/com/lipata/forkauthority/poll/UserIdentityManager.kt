@@ -1,9 +1,8 @@
-package com.lipata.forkauthority.data.user
+package com.lipata.forkauthority.poll
 
 import android.content.Context
 import android.content.SharedPreferences
 import com.lipata.forkauthority.data.SharedPreferencesKeys.USER_EMAIL_KEY
-import com.lipata.forkauthority.poll.EmailDialog
 import javax.inject.Inject
 
 

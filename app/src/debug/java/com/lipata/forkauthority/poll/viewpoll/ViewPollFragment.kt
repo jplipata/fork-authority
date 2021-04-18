@@ -12,7 +12,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.lipata.forkauthority.ForkAuthorityApp
 import com.lipata.forkauthority.R
 import com.lipata.forkauthority.data.Lce
-import com.lipata.forkauthority.data.user.UserIdentityManager
+import com.lipata.forkauthority.poll.UserIdentityManager
 import com.lipata.forkauthority.poll.*
 import kotlinx.android.synthetic.main.fragment_view_poll.*
 import kotlinx.android.synthetic.main.fragment_view_poll.view.*

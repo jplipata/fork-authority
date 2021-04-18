@@ -112,7 +112,7 @@ public class BusinessListActivity extends AppCompatActivity implements BusinessL
 
         // RecyclerView
         mRecyclerView_suggestionList = findViewById(R.id.suggestion_list);
-        mRecyclerView_suggestionList.setHasFixedSize(true);
+        mRecyclerView_suggestionList.setHasFixedSize(false);
         mSuggestionListLayoutManager = new LinearLayoutManager(this);
         mRecyclerView_suggestionList.setLayoutManager(mSuggestionListLayoutManager);
         RecyclerView.ItemAnimator animator = mRecyclerView_suggestionList.getItemAnimator();

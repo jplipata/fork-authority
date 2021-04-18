@@ -4,7 +4,7 @@ import androidx.lifecycle.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.lipata.forkauthority.data.Lce
-import com.lipata.forkauthority.data.user.UserIdentityManager
+import com.lipata.forkauthority.poll.UserIdentityManager
 import com.lipata.forkauthority.poll.Poll
 import com.lipata.forkauthority.poll.PollEditor
 import com.lipata.forkauthority.poll.VotableRestaurant
